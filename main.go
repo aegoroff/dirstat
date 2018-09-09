@@ -6,6 +6,7 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/golang-collections/collections/stack"
 	"github.com/voxelbrain/goptions"
+	"gonum.org/v1/gonum/graph"
 	"gonum.org/v1/gonum/graph/path"
 	"gonum.org/v1/gonum/graph/simple"
 	"gonum.org/v1/gonum/graph/topo"
@@ -106,12 +107,18 @@ func main() {
 
 	//allp := path.DijkstraAllPaths(fileSystemGraph)
 
+	outputBigFilesInfo(sorted, fileSystemGraph)
+
+	fmt.Printf("Read taken %v\n", readingTime)
+	fmt.Printf("Sort taken %v\n\n", sortingTime)
+	fmt.Printf("Total files %d Total size: %s\n", countFiles, humanize.Bytes(totalSize))
+	fmt.Printf("Total folders %d\n", countDirs)
+}
+
+func outputBigFilesInfo(sorted []graph.Node, fileSystemGraph *simple.WeightedDirectedGraph) {
 	root := sorted[0]
-
 	allPaths := path.DijkstraFrom(root, fileSystemGraph)
-
 	const MinFileSize = 8388608
-
 	// Output all files bigger then value specified
 	for _, node := range sorted {
 		n := node.(Node)
@@ -137,9 +144,4 @@ func main() {
 
 		fmt.Printf("%s %s\n", fullPath, humanize.Bytes(uint64(w)))
 	}
-
-	fmt.Printf("Read taken %v\n", readingTime)
-	fmt.Printf("Sort taken %v\n\n", sortingTime)
-	fmt.Printf("Total files %d Total size: %s\n", countFiles, humanize.Bytes(totalSize))
-	fmt.Printf("Total folders %d\n", countDirs)
 }
