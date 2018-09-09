@@ -51,7 +51,7 @@ func main() {
 
 	fileSystemGraph := simple.NewWeightedDirectedGraph(0, 0)
 
-	s := stack.New()
+	walkingStack := stack.New()
 
 	var nodeid int64 = 0
 
@@ -66,12 +66,12 @@ func main() {
 
 		var parent FileItem
 
-		if s.Len() > 0 {
-			parent = s.Peek().(FileItem)
-			for !strings.HasPrefix(path, parent.Path) && s.Len() > 0 {
-				parent = s.Pop().(FileItem)
+		if walkingStack.Len() > 0 {
+			parent = walkingStack.Peek().(FileItem)
+			for !strings.HasPrefix(path, parent.Path) && walkingStack.Len() > 0 {
+				parent = walkingStack.Pop().(FileItem)
 				if strings.HasPrefix(path, parent.Path) {
-					s.Push(parent)
+					walkingStack.Push(parent)
 				}
 			}
 		}
@@ -83,7 +83,7 @@ func main() {
 				fileSystemGraph.SetWeightedEdge(edge)
 			}
 
-			s.Push(FileItem{Path: path, Node: node})
+			walkingStack.Push(FileItem{Path: path, Node: node})
 			countDirs++
 		} else {
 
