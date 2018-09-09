@@ -78,7 +78,6 @@ func main() {
 
 		if info.IsDir() {
 			if len(parent.Path) > 0 {
-				//g.AddEdge(parent, node, 0)
 				edge := fileSystemGraph.NewWeightedEdge(parent.Node, node, 0)
 				fileSystemGraph.SetWeightedEdge(edge)
 			}
@@ -110,7 +109,7 @@ func main() {
 	root := sorted[0]
 
 	allPaths := path.DijkstraFrom(root, fileSystemGraph)
-	pathTo200, w200 := allPaths.To(3300)
+	pathTo200, w200 := allPaths.To(433)
 
 	var parts []string
 	for _, p := range pathTo200 {
