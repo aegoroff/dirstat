@@ -73,6 +73,7 @@ func main() {
 				parent = walkingStack.Pop().(FileItem)
 				if strings.HasPrefix(path, parent.Path) {
 					walkingStack.Push(parent)
+					break
 				}
 			}
 		}
