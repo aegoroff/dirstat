@@ -112,7 +112,7 @@ func main() {
 
 	fmt.Printf("Read taken %v\n", readingTime)
 	fmt.Printf("Sort taken %v\n\n", sortingTime)
-	fmt.Printf("Total files %d Total size: %s\n", countFiles, humanize.Bytes(totalSize))
+	fmt.Printf("Total files %d Total size: %s\n", countFiles, humanize.IBytes(totalSize))
 	fmt.Printf("Total folders %d\n", countDirs)
 }
 
@@ -146,8 +146,8 @@ func outputBigFilesInfo(sorted []graph.Node, fileSystemGraph *simple.WeightedDir
 		}
 		fullPath := strings.Join(parts, "/")
 
-		fmt.Printf("%s %s\n", fullPath, humanize.Bytes(uint64(w)))
+		fmt.Printf("%s %s\n", fullPath, humanize.IBytes(uint64(w)))
 	}
 
-	fmt.Printf("\nTotal files above %s: %d\n\n", humanize.Bytes(uint64(MinFileSize)), bigFilesCount)
+	fmt.Printf("\nTotal files above %s: %d\n\n", humanize.IBytes(uint64(MinFileSize)), bigFilesCount)
 }
