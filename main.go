@@ -106,6 +106,19 @@ func main() {
 	sorted, _ := topo.Sort(fileSystemGraph)
 	sortingTime := time.Since(start)
 
+	//bfs := traverse.BreadthFirst{}
+	//
+	//bfs.Walk(fileSystemGraph, sorted[0], func(n graph.Node, d int) bool {
+	//	nn := n.(Node)
+	//	aboveFirstLevel := d > 1
+	//
+	//	if !aboveFirstLevel {
+	//		fmt.Printf("%s\n", nn.Name)
+	//	}
+	//
+	//	return aboveFirstLevel
+	//})
+
 	//allp := path.DijkstraAllPaths(fileSystemGraph)
 
 	outputBigFilesInfo(sorted, fileSystemGraph)
@@ -119,7 +132,8 @@ func main() {
 func outputBigFilesInfo(sorted []graph.Node, fileSystemGraph *simple.WeightedDirectedGraph) {
 	root := sorted[0]
 	allPaths := path.DijkstraFrom(root, fileSystemGraph)
-	const MinFileSize = 8388608
+	//const MinFileSize = 8388608
+	const MinFileSize = 1
 	// Output all files bigger then value specified
 	var bigFilesCount uint64
 	for _, node := range sorted {
