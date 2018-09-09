@@ -121,6 +121,7 @@ func outputBigFilesInfo(sorted []graph.Node, fileSystemGraph *simple.WeightedDir
 	allPaths := path.DijkstraFrom(root, fileSystemGraph)
 	const MinFileSize = 8388608
 	// Output all files bigger then value specified
+	var bigFilesCount uint64
 	for _, node := range sorted {
 		n := node.(Node)
 		if n.IsDir {
@@ -131,6 +132,8 @@ func outputBigFilesInfo(sorted []graph.Node, fileSystemGraph *simple.WeightedDir
 		if w < MinFileSize {
 			continue
 		}
+
+		bigFilesCount++
 
 		var parts []string
 		for _, p := range paths {
@@ -145,4 +148,6 @@ func outputBigFilesInfo(sorted []graph.Node, fileSystemGraph *simple.WeightedDir
 
 		fmt.Printf("%s %s\n", fullPath, humanize.Bytes(uint64(w)))
 	}
+
+	fmt.Printf("\nTotal files above %s: %d\n\n", humanize.Bytes(uint64(MinFileSize)), bigFilesCount)
 }
