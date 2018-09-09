@@ -109,23 +109,37 @@ func main() {
 	root := sorted[0]
 
 	allPaths := path.DijkstraFrom(root, fileSystemGraph)
-	pathTo200, w200 := allPaths.To(433)
 
-	var parts []string
-	for _, p := range pathTo200 {
-		n := p.(Node).Name
-		if n == "\\" {
-			n = ""
+	const MinFileSize = 8388608
+
+	// Output all files bigger then value specified
+	for _, node := range sorted {
+		n := node.(Node)
+		if n.IsDir {
+			continue
+		}
+		paths, w := allPaths.To(n.Id)
+
+		if w < MinFileSize {
+			continue
 		}
 
-		parts = append(parts, n)
-	}
+		var parts []string
+		for _, p := range paths {
+			n := p.(Node).Name
+			if n == "\\" {
+				n = ""
+			}
 
-	p200s := strings.Join(parts, "/")
+			parts = append(parts, n)
+		}
+		fullPath := strings.Join(parts, "/")
+
+		fmt.Printf("%s %s\n", fullPath, humanize.Bytes(uint64(w)))
+	}
 
 	fmt.Printf("Read taken %v\n", readingTime)
 	fmt.Printf("Sort taken %v\n\n", sortingTime)
 	fmt.Printf("Total files %d Total size: %s\n", countFiles, humanize.Bytes(totalSize))
 	fmt.Printf("Total folders %d\n", countDirs)
-	fmt.Printf("W200 (%s) %s\n", p200s, humanize.Bytes(uint64(w200)))
 }
