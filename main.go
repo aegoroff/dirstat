@@ -10,6 +10,7 @@ import (
 	"gonum.org/v1/gonum/graph/path"
 	"gonum.org/v1/gonum/graph/simple"
 	"gonum.org/v1/gonum/graph/topo"
+	"gonum.org/v1/gonum/graph/traverse"
 	"log"
 	"os"
 	"path/filepath"
@@ -18,8 +19,9 @@ import (
 )
 
 type Options struct {
-	Help goptions.Help `goptions:"-h, --help, description='Show this help'"`
-	Path string        `goptions:"-p, --path, obligatory, description='Name to the directory'"`
+	Help      goptions.Help `goptions:"-h, --help, description='Show this help'"`
+	Verbosity bool          `goptions:"-v, --verbose, description='Be verbose'"`
+	Path      string        `goptions:"-p, --path, obligatory, description='Name to the directory'"`
 }
 
 type Node struct {
@@ -36,6 +38,19 @@ type FileItem struct {
 func (n Node) ID() int64 {
 	return n.Id
 }
+
+type Range struct {
+	Min int64
+	Max int64
+}
+
+const (
+	_ int64 = 1 << (10 * iota)
+	Kbyte
+	Mbyte
+	Gbyte
+	Tbyte
+)
 
 func main() {
 	options := Options{}
@@ -59,7 +74,6 @@ func main() {
 	start := time.Now()
 
 	filepath.Walk(options.Path, func(path string, info os.FileInfo, err error) error {
-		//fmt.Printf("%s", path)
 
 		node := Node{Id: nodeid, Name: info.Name(), IsDir: info.IsDir()}
 		fileSystemGraph.AddNode(node)
@@ -90,13 +104,11 @@ func main() {
 
 			countFiles++
 			sz := uint64(info.Size())
-			//fmt.Printf(" (%s)", humanize.Bytes(sz))
 			totalSize += sz
 
 			edge := fileSystemGraph.NewWeightedEdge(parent.Node, node, float64(sz))
 			fileSystemGraph.SetWeightedEdge(edge)
 		}
-		//fmt.Print("\n")
 		return nil
 	})
 
@@ -106,36 +118,55 @@ func main() {
 	sorted, _ := topo.Sort(fileSystemGraph)
 	sortingTime := time.Since(start)
 
-	//bfs := traverse.BreadthFirst{}
-	//
-	//bfs.Walk(fileSystemGraph, sorted[0], func(n graph.Node, d int) bool {
-	//	nn := n.(Node)
-	//	aboveFirstLevel := d > 1
-	//
-	//	if !aboveFirstLevel {
-	//		fmt.Printf("%s\n", nn.Name)
-	//	}
-	//
-	//	return aboveFirstLevel
-	//})
+	allPaths := path.DijkstraFrom(sorted[0], fileSystemGraph)
 
-	//allp := path.DijkstraAllPaths(fileSystemGraph)
+	ranges := [...]Range{
+		{Min: 0, Max: 100 * Kbyte},
+		{Min: 100 * Kbyte, Max: Mbyte},
+		{Min: Mbyte, Max: 10 * Mbyte},
+		{Min: 10 * Mbyte, Max: 100 * Mbyte},
+		{Min: 100 * Mbyte, Max: Gbyte},
+		{Min: Gbyte, Max: 10 * Gbyte},
+		{Min: 10 * Gbyte, Max: 100 * Gbyte},
+		{Min: 100 * Gbyte, Max: Tbyte},
+	}
 
-	outputBigFilesInfo(sorted, fileSystemGraph)
+	stat := [len(ranges)]int64{}
 
-	fmt.Printf("Read taken %v\n", readingTime)
+	bfs := traverse.BreadthFirst{}
+	bfs.Walk(fileSystemGraph, sorted[0], func(n graph.Node, d int) bool {
+		nn := n.(Node)
+		if !nn.IsDir {
+			_, w := allPaths.To(nn.Id)
+
+			sz := int64(w)
+			for i, r := range ranges {
+				if sz < r.Min || sz > r.Max {
+					continue
+				}
+				stat[i]++
+			}
+
+		}
+
+		return false
+	})
+
+	for i, r := range ranges {
+		fmt.Printf("Total files between %s and %s: %d\n", humanize.IBytes(uint64(r.Min)), humanize.IBytes(uint64(r.Max)), stat[i])
+		if options.Verbosity {
+			outputFilesInfoWithinRange(sorted, &allPaths, r.Min, r.Max)
+		}
+	}
+
+	fmt.Printf("\nRead taken %v\n", readingTime)
 	fmt.Printf("Sort taken %v\n\n", sortingTime)
 	fmt.Printf("Total files %d Total size: %s\n", countFiles, humanize.IBytes(totalSize))
 	fmt.Printf("Total folders %d\n", countDirs)
 }
 
-func outputBigFilesInfo(sorted []graph.Node, fileSystemGraph *simple.WeightedDirectedGraph) {
-	root := sorted[0]
-	allPaths := path.DijkstraFrom(root, fileSystemGraph)
-	//const MinFileSize = 8388608
-	const MinFileSize = 1
-	// Output all files bigger then value specified
-	var bigFilesCount uint64
+func outputFilesInfoWithinRange(sorted []graph.Node, allPaths *path.Shortest, min int64, max int64) {
+	var filesCount uint64
 	for _, node := range sorted {
 		n := node.(Node)
 		if n.IsDir {
@@ -143,11 +174,11 @@ func outputBigFilesInfo(sorted []graph.Node, fileSystemGraph *simple.WeightedDir
 		}
 		paths, w := allPaths.To(n.Id)
 
-		if w < MinFileSize {
+		if w < float64(min) || w > float64(max) {
 			continue
 		}
 
-		bigFilesCount++
+		filesCount++
 
 		var parts []string
 		for _, p := range paths {
@@ -160,8 +191,6 @@ func outputBigFilesInfo(sorted []graph.Node, fileSystemGraph *simple.WeightedDir
 		}
 		fullPath := strings.Join(parts, "/")
 
-		fmt.Printf("%s %s\n", fullPath, humanize.IBytes(uint64(w)))
+		fmt.Printf("   %s %s\n", fullPath, humanize.IBytes(uint64(w)))
 	}
-
-	fmt.Printf("\nTotal files above %s: %d\n\n", humanize.IBytes(uint64(MinFileSize)), bigFilesCount)
 }
