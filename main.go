@@ -39,6 +39,10 @@ func (n Node) ID() int64 {
 	return n.Id
 }
 
+func (n Node) DOTID() string {
+	return fmt.Sprintf("\"%s\"", n.Name)
+}
+
 type Range struct {
 	Min int64
 	Max int64
