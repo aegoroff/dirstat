@@ -11,10 +11,10 @@ import (
 	"gonum.org/v1/gonum/graph/simple"
 	"gonum.org/v1/gonum/graph/topo"
 	"gonum.org/v1/gonum/graph/traverse"
+	"html/template"
 	"log"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"time"
 )
@@ -22,27 +22,8 @@ import (
 type Options struct {
 	Help      goptions.Help `goptions:"-h, --help, description='Show this help'"`
 	Verbosity bool          `goptions:"-v, --verbose, description='Be verbose'"`
-	Range     int           `goptions:"-r, --range, description='Output verbose files info for range specified and above'"`
+	Range     []int         `goptions:"-r, --range, description='Output verbose files info for ranges specified'"`
 	Path      string        `goptions:"-p, --path, obligatory, description='Name to the directory'"`
-}
-
-type Node struct {
-	Id    int64
-	Name  string
-	IsDir bool
-}
-
-type FileItem struct {
-	Node *Node
-	Path string
-}
-
-func (n Node) ID() int64 {
-	return n.Id
-}
-
-func (n Node) DOTID() string {
-	return fmt.Sprintf("\"%s\"", n.Name)
 }
 
 type Range struct {
@@ -58,6 +39,22 @@ const (
 	Tbyte
 )
 
+type TotalStat struct {
+	ReadingTime    time.Duration
+	SortingTime    time.Duration
+	CountFiles     int64
+	CountFolders   int64
+	TotalFilesSize uint64
+}
+
+const totalTemplate = `
+Read taken:    {{.ReadingTime}}
+Sort taken:    {{.SortingTime}}
+
+Total files:   {{.CountFiles}} ({{.TotalFilesSize | toBytesString }})
+Total folders: {{.CountFolders}}
+`
+
 func main() {
 	options := Options{}
 
@@ -69,9 +66,7 @@ func main() {
 
 	fmt.Printf("Root: %s\n\n", options.Path)
 
-	countFiles := 0
-	countDirs := 0
-	var totalSize uint64
+	totalStat := TotalStat{}
 
 	fileSystemGraph := simple.NewWeightedDirectedGraph(0, 0)
 
@@ -107,12 +102,12 @@ func main() {
 			}
 
 			walkingStack.Push(&FileItem{Path: path, Node: node})
-			countDirs++
+			totalStat.CountFolders++
 		} else {
 
-			countFiles++
+			totalStat.CountFiles++
 			sz := uint64(info.Size())
-			totalSize += sz
+			totalStat.TotalFilesSize += sz
 
 			edge := fileSystemGraph.NewWeightedEdge(parent.Node, node, float64(sz))
 			fileSystemGraph.SetWeightedEdge(edge)
@@ -120,11 +115,11 @@ func main() {
 		return nil
 	})
 
-	readingTime := time.Since(start)
+	totalStat.ReadingTime = time.Since(start)
 
 	start = time.Now()
 	sorted, _ := topo.Sort(fileSystemGraph)
-	sortingTime := time.Since(start)
+	totalStat.SortingTime = time.Since(start)
 
 	allPaths := path.DijkstraFrom(sorted[0], fileSystemGraph)
 
@@ -160,17 +155,21 @@ func main() {
 		return false
 	})
 
+	verboseRanges := make(map[int]bool)
+
+	for _, x := range options.Range {
+		verboseRanges[x] = true
+	}
+
 	for i, r := range ranges {
 		fmt.Printf("Total files between %s and %s: %d\n", humanize.IBytes(uint64(r.Min)), humanize.IBytes(uint64(r.Max)), stat[r])
-		if options.Verbosity && i+1 >= options.Range {
+		if options.Verbosity && verboseRanges[i+1] {
 			outputFilesInfoWithinRange(sorted, &allPaths, r.Min, r.Max)
 		}
 	}
 
-	fmt.Printf("\nRead taken %v\n", readingTime)
-	fmt.Printf("Sort taken %v\n\n", sortingTime)
-	fmt.Printf("Total files %d Total size: %s\n", countFiles, humanize.IBytes(totalSize))
-	fmt.Printf("Total folders %d\n", countDirs)
+	var report = template.Must(template.New("totalstat").Funcs(template.FuncMap{"toBytesString": humanize.IBytes}).Parse(totalTemplate))
+	report.Execute(os.Stdout, totalStat)
 
 	PrintMemUsage()
 }
@@ -203,16 +202,4 @@ func outputFilesInfoWithinRange(sorted []graph.Node, allPaths *path.Shortest, mi
 
 		fmt.Printf("   %s %s\n", fullPath, humanize.IBytes(uint64(w)))
 	}
-}
-
-// PrintMemUsage outputs the current, total and OS memory being used. As well as the number
-// of garage collection cycles completed.
-func PrintMemUsage() {
-	var m runtime.MemStats
-	runtime.ReadMemStats(&m)
-	// For info on each, see: https://golang.org/pkg/runtime/#MemStats
-	fmt.Printf("\nAlloc = %s", humanize.IBytes(m.Alloc))
-	fmt.Printf("\tTotalAlloc = %s", humanize.IBytes(m.TotalAlloc))
-	fmt.Printf("\tSys = %s", humanize.IBytes(m.Sys))
-	fmt.Printf("\tNumGC = %v\n", m.NumGC)
 }
