@@ -65,6 +65,8 @@ func main() {
 		log.Fatalf("Directory '%s' does not exist. Details:\n  %v", options.Path, err)
 	}
 
+	fmt.Printf("Root: %s\n\n", options.Path)
+
 	countFiles := 0
 	countDirs := 0
 	var totalSize uint64
