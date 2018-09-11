@@ -14,6 +14,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 )
@@ -31,7 +32,7 @@ type Node struct {
 }
 
 type FileItem struct {
-	Node Node
+	Node *Node
 	Path string
 }
 
@@ -81,16 +82,16 @@ func main() {
 
 	filepath.Walk(options.Path, func(path string, info os.FileInfo, err error) error {
 
-		node := Node{Id: nodeid, Name: info.Name(), IsDir: info.IsDir()}
+		node := &Node{Id: nodeid, Name: info.Name(), IsDir: info.IsDir()}
 		fileSystemGraph.AddNode(node)
 		nodeid++
 
-		var parent FileItem
+		var parent *FileItem
 
 		if walkingStack.Len() > 0 {
-			parent = walkingStack.Peek().(FileItem)
+			parent = walkingStack.Peek().(*FileItem)
 			for !strings.HasPrefix(path, parent.Path) && walkingStack.Len() > 0 {
-				parent = walkingStack.Pop().(FileItem)
+				parent = walkingStack.Pop().(*FileItem)
 				if strings.HasPrefix(path, parent.Path) {
 					walkingStack.Push(parent)
 					break
@@ -99,12 +100,12 @@ func main() {
 		}
 
 		if info.IsDir() {
-			if len(parent.Path) > 0 {
+			if parent != nil {
 				edge := fileSystemGraph.NewWeightedEdge(parent.Node, node, 0)
 				fileSystemGraph.SetWeightedEdge(edge)
 			}
 
-			walkingStack.Push(FileItem{Path: path, Node: node})
+			walkingStack.Push(&FileItem{Path: path, Node: node})
 			countDirs++
 		} else {
 
@@ -137,20 +138,20 @@ func main() {
 		{Min: 100 * Gbyte, Max: Tbyte},
 	}
 
-	stat := [len(ranges)]int64{}
+	stat := make(map[Range]int64)
 
 	bfs := traverse.BreadthFirst{}
 	bfs.Walk(fileSystemGraph, sorted[0], func(n graph.Node, d int) bool {
-		nn := n.(Node)
+		nn := n.(*Node)
 		if !nn.IsDir {
 			_, w := allPaths.To(nn.Id)
 
 			sz := int64(w)
-			for i, r := range ranges {
+			for _, r := range ranges {
 				if sz < r.Min || sz > r.Max {
 					continue
 				}
-				stat[i]++
+				stat[r]++
 			}
 
 		}
@@ -158,8 +159,8 @@ func main() {
 		return false
 	})
 
-	for i, r := range ranges {
-		fmt.Printf("Total files between %s and %s: %d\n", humanize.IBytes(uint64(r.Min)), humanize.IBytes(uint64(r.Max)), stat[i])
+	for _, r := range ranges {
+		fmt.Printf("Total files between %s and %s: %d\n", humanize.IBytes(uint64(r.Min)), humanize.IBytes(uint64(r.Max)), stat[r])
 		if options.Verbosity {
 			outputFilesInfoWithinRange(sorted, &allPaths, r.Min, r.Max)
 		}
@@ -169,6 +170,8 @@ func main() {
 	fmt.Printf("Sort taken %v\n\n", sortingTime)
 	fmt.Printf("Total files %d Total size: %s\n", countFiles, humanize.IBytes(totalSize))
 	fmt.Printf("Total folders %d\n", countDirs)
+
+	PrintMemUsage()
 }
 
 func outputFilesInfoWithinRange(sorted []graph.Node, allPaths *path.Shortest, min int64, max int64) {
@@ -199,4 +202,16 @@ func outputFilesInfoWithinRange(sorted []graph.Node, allPaths *path.Shortest, mi
 
 		fmt.Printf("   %s %s\n", fullPath, humanize.IBytes(uint64(w)))
 	}
+}
+
+// PrintMemUsage outputs the current, total and OS memory being used. As well as the number
+// of garage collection cycles completed.
+func PrintMemUsage() {
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
+	// For info on each, see: https://golang.org/pkg/runtime/#MemStats
+	fmt.Printf("\nAlloc = %s", humanize.IBytes(m.Alloc))
+	fmt.Printf("\tTotalAlloc = %s", humanize.IBytes(m.TotalAlloc))
+	fmt.Printf("\tSys = %s", humanize.IBytes(m.Sys))
+	fmt.Printf("\tNumGC = %v\n", m.NumGC)
 }
