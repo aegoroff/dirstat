@@ -22,6 +22,7 @@ import (
 type Options struct {
 	Help      goptions.Help `goptions:"-h, --help, description='Show this help'"`
 	Verbosity bool          `goptions:"-v, --verbose, description='Be verbose'"`
+	Range     int           `goptions:"-r, --range, description='Output verbose files info for range specified and above'"`
 	Path      string        `goptions:"-p, --path, obligatory, description='Name to the directory'"`
 }
 
@@ -159,9 +160,9 @@ func main() {
 		return false
 	})
 
-	for _, r := range ranges {
+	for i, r := range ranges {
 		fmt.Printf("Total files between %s and %s: %d\n", humanize.IBytes(uint64(r.Min)), humanize.IBytes(uint64(r.Max)), stat[r])
-		if options.Verbosity {
+		if options.Verbosity && i+1 >= options.Range {
 			outputFilesInfoWithinRange(sorted, &allPaths, r.Min, r.Max)
 		}
 	}
@@ -177,7 +178,7 @@ func main() {
 func outputFilesInfoWithinRange(sorted []graph.Node, allPaths *path.Shortest, min int64, max int64) {
 	var filesCount uint64
 	for _, node := range sorted {
-		n := node.(Node)
+		n := node.(*Node)
 		if n.IsDir {
 			continue
 		}
@@ -191,7 +192,7 @@ func outputFilesInfoWithinRange(sorted []graph.Node, allPaths *path.Shortest, mi
 
 		var parts []string
 		for _, p := range paths {
-			n := p.(Node).Name
+			n := p.(*Node).Name
 			if n == "\\" {
 				n = ""
 			}
