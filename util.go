@@ -3,6 +3,9 @@ package main
 import (
 	"fmt"
 	"github.com/dustin/go-humanize"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"runtime"
 )
 
@@ -16,4 +19,23 @@ func printMemUsage() {
 	fmt.Printf("\tTotalAlloc = %s", humanize.IBytes(m.TotalAlloc))
 	fmt.Printf("\tSys = %s", humanize.IBytes(m.Sys))
 	fmt.Printf("\tNumGC = %v\n", m.NumGC)
+}
+
+func walkDir(path string, action func(path string, info os.FileInfo)) {
+	for _, entry := range dirents(path) {
+		fullPath := filepath.Join(path, entry.Name())
+		action(fullPath, entry)
+		if entry.IsDir() {
+			walkDir(fullPath, action)
+		}
+	}
+}
+
+func dirents(path string) []os.FileInfo {
+	entries, err := ioutil.ReadDir(path)
+	if err != nil {
+		return nil
+	}
+
+	return entries
 }

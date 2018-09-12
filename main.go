@@ -9,7 +9,6 @@ import (
 	"gonum.org/v1/gonum/graph"
 	"gonum.org/v1/gonum/graph/path"
 	"gonum.org/v1/gonum/graph/simple"
-	"gonum.org/v1/gonum/graph/topo"
 	"gonum.org/v1/gonum/graph/traverse"
 	"log"
 	"os"
@@ -36,7 +35,6 @@ const (
 
 type TotalStat struct {
 	ReadingTime    time.Duration
-	SortingTime    time.Duration
 	CountFiles     int64
 	CountFolders   int64
 	TotalFilesSize uint64
@@ -74,30 +72,29 @@ func main() {
 
 	start := time.Now()
 
-	filepath.Walk(options.Path, func(path string, info os.FileInfo, err error) error {
+	root := &Node{Id: nodeid, Name: filepath.Base(options.Path), IsDir: true}
+	fileSystemGraph.AddNode(root)
+	walkingStack.Push(&FileItem{Path: options.Path, Node: root})
+	nodeid++
+
+	walkDir(options.Path, func(path string, info os.FileInfo) {
 
 		node := &Node{Id: nodeid, Name: info.Name(), IsDir: info.IsDir()}
 		fileSystemGraph.AddNode(node)
 		nodeid++
 
-		var parent *FileItem
-
-		if walkingStack.Len() > 0 {
-			parent = walkingStack.Peek().(*FileItem)
-			for !strings.HasPrefix(path, parent.Path) && walkingStack.Len() > 0 {
-				parent = walkingStack.Pop().(*FileItem)
-				if strings.HasPrefix(path, parent.Path) {
-					walkingStack.Push(parent)
-					break
-				}
+		parent := walkingStack.Peek().(*FileItem)
+		for !strings.HasPrefix(path, parent.Path) && walkingStack.Len() > 0 {
+			parent = walkingStack.Pop().(*FileItem)
+			if strings.HasPrefix(path, parent.Path) {
+				walkingStack.Push(parent)
+				break
 			}
 		}
 
 		if info.IsDir() {
-			if parent != nil {
-				edge := fileSystemGraph.NewWeightedEdge(parent.Node, node, 0)
-				fileSystemGraph.SetWeightedEdge(edge)
-			}
+			edge := fileSystemGraph.NewWeightedEdge(parent.Node, node, 0)
+			fileSystemGraph.SetWeightedEdge(edge)
 
 			walkingStack.Push(&FileItem{Path: path, Node: node})
 			totalStat.CountFolders++
@@ -110,27 +107,23 @@ func main() {
 			edge := fileSystemGraph.NewWeightedEdge(parent.Node, node, float64(sz))
 			fileSystemGraph.SetWeightedEdge(edge)
 		}
-		return nil
 	})
 
 	totalStat.ReadingTime = time.Since(start)
 
-	printStatistic(fileSystemGraph, options, totalStat)
+	printStatistic(fileSystemGraph, root, options, totalStat)
 
 	printTotals(totalStat)
 
 	printMemUsage()
 }
 
-func printStatistic(fileSystemGraph *simple.WeightedDirectedGraph, options Options, totalStat TotalStat) {
-	start := time.Now()
-	sorted, _ := topo.Sort(fileSystemGraph)
-	totalStat.SortingTime = time.Since(start)
+func printStatistic(fileSystemGraph *simple.WeightedDirectedGraph, root *Node, options Options, totalStat TotalStat) {
 
-	allPaths := path.DijkstraFrom(sorted[0], fileSystemGraph)
+	allPaths := path.DijkstraFrom(root, fileSystemGraph)
 	stat := make(map[Range]int64)
 	bfs := traverse.BreadthFirst{}
-	bfs.Walk(fileSystemGraph, sorted[0], func(n graph.Node, d int) bool {
+	bfs.Walk(fileSystemGraph, root, func(n graph.Node, d int) bool {
 		nn := n.(*Node)
 		if !nn.IsDir {
 			_, w := allPaths.To(nn.Id)
@@ -166,7 +159,7 @@ func printStatistic(fileSystemGraph *simple.WeightedDirectedGraph, options Optio
 		for i, r := range fileSizeRanges {
 			if options.Verbosity && verboseRanges[i+1] && stat[r] > 0 {
 				fmt.Printf("%s\n", heads[i])
-				outputFilesInfoWithinRange(sorted, &allPaths, r)
+				outputFilesInfoWithinRange(fileSystemGraph.Nodes(), &allPaths, r)
 			}
 		}
 	}
@@ -176,7 +169,6 @@ func printTotals(t TotalStat) {
 
 	const totalTemplate = `
 Read taken:    {{.ReadingTime}}
-Sort taken:    {{.SortingTime}}
 
 Total files:   {{.CountFiles}} ({{.TotalFilesSize | toBytesString }})
 Total folders: {{.CountFolders}}
@@ -186,9 +178,9 @@ Total folders: {{.CountFolders}}
 	report.Execute(os.Stdout, t)
 }
 
-func outputFilesInfoWithinRange(sorted []graph.Node, allPaths *path.Shortest, r Range) {
+func outputFilesInfoWithinRange(nodes []graph.Node, allPaths *path.Shortest, r Range) {
 	var filesCount uint64
-	for _, node := range sorted {
+	for _, node := range nodes {
 		n := node.(*Node)
 		if n.IsDir {
 			continue
