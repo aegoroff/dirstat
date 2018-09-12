@@ -26,11 +26,6 @@ type Options struct {
 	Path      string        `goptions:"-p, --path, obligatory, description='Name to the directory'"`
 }
 
-type Range struct {
-	Min int64
-	Max int64
-}
-
 const (
 	_ int64 = 1 << (10 * iota)
 	Kbyte
@@ -56,10 +51,6 @@ var fileSizeRanges = [...]Range{
 	{Min: Gbyte, Max: 10 * Gbyte},
 	{Min: 10 * Gbyte, Max: 100 * Gbyte},
 	{Min: 100 * Gbyte, Max: Tbyte},
-}
-
-func (r Range) contains(f float64) bool {
-	return f >= float64(r.Min) && f <= float64(r.Max)
 }
 
 func main() {
