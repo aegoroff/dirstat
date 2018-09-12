@@ -58,6 +58,10 @@ var fileSizeRanges = [...]Range{
 	{Min: 100 * Gbyte, Max: Tbyte},
 }
 
+func (r Range) contains(f float64) bool {
+	return f >= float64(r.Min) && f <= float64(r.Max)
+}
+
 func main() {
 	options := Options{}
 
@@ -140,9 +144,8 @@ func printStatistic(fileSystemGraph *simple.WeightedDirectedGraph, options Optio
 		if !nn.IsDir {
 			_, w := allPaths.To(nn.Id)
 
-			sz := int64(w)
 			for _, r := range fileSizeRanges {
-				if sz < r.Min || sz > r.Max {
+				if !r.contains(w) {
 					continue
 				}
 				stat[r]++
@@ -170,7 +173,7 @@ func printStatistic(fileSystemGraph *simple.WeightedDirectedGraph, options Optio
 	if options.Verbosity && len(options.Range) > 0 {
 		fmt.Printf("\nDetailed files stat:\n")
 		for i, r := range fileSizeRanges {
-			if options.Verbosity && verboseRanges[i+1] {
+			if options.Verbosity && verboseRanges[i+1] && stat[r] > 0 {
 				fmt.Printf("%s\n", heads[i])
 				outputFilesInfoWithinRange(sorted, &allPaths, r)
 			}
@@ -201,7 +204,7 @@ func outputFilesInfoWithinRange(sorted []graph.Node, allPaths *path.Shortest, r 
 		}
 		paths, w := allPaths.To(n.Id)
 
-		if w < float64(r.Min) || w > float64(r.Max) {
+		if !r.contains(w) {
 			continue
 		}
 
