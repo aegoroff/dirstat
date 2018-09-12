@@ -22,12 +22,22 @@ func printMemUsage() {
 }
 
 func walkDir(path string, action func(path string, info os.FileInfo)) {
-	for _, entry := range dirents(path) {
-		fullPath := filepath.Join(path, entry.Name())
-		action(fullPath, entry)
-		if entry.IsDir() {
-			walkDir(fullPath, action)
+	queue := make([]string, 0)
+
+	queue = append(queue, path)
+
+	for len(queue) > 0 {
+		curr := queue[0]
+
+		for _, entry := range dirents(curr) {
+			fullPath := filepath.Join(curr, entry.Name())
+			action(fullPath, entry)
+			if entry.IsDir() {
+				queue = append(queue, fullPath)
+			}
 		}
+
+		queue = queue[1:]
 	}
 }
 

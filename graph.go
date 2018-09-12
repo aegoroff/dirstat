@@ -8,11 +8,6 @@ type Node struct {
 	IsDir bool
 }
 
-type FileItem struct {
-	Node *Node
-	Path string
-}
-
 func (n Node) ID() int64 {
 	return n.Id
 }

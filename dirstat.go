@@ -4,7 +4,6 @@ package main
 import (
 	"fmt"
 	"github.com/dustin/go-humanize"
-	"github.com/golang-collections/collections/stack"
 	"github.com/voxelbrain/goptions"
 	"gonum.org/v1/gonum/graph"
 	"gonum.org/v1/gonum/graph/path"
@@ -40,6 +39,11 @@ type TotalStat struct {
 	TotalFilesSize uint64
 }
 
+type DirNode struct {
+	Node *Node
+	Path string
+}
+
 var fileSizeRanges = [...]Range{
 	{Min: 0, Max: 100 * Kbyte},
 	{Min: 100 * Kbyte, Max: Mbyte},
@@ -66,48 +70,46 @@ func main() {
 
 	fileSystemGraph := simple.NewWeightedDirectedGraph(0, 0)
 
-	walkingStack := stack.New()
-
 	var nodeid int64 = 0
 
 	start := time.Now()
 
 	root := &Node{Id: nodeid, Name: filepath.Base(options.Path), IsDir: true}
 	fileSystemGraph.AddNode(root)
-	walkingStack.Push(&FileItem{Path: options.Path, Node: root})
 	nodeid++
 
-	walkDir(options.Path, func(path string, info os.FileInfo) {
+	queue := make([]*DirNode, 0)
 
-		node := &Node{Id: nodeid, Name: info.Name(), IsDir: info.IsDir()}
-		fileSystemGraph.AddNode(node)
-		nodeid++
+	queue = append(queue, &DirNode{Node: root, Path: options.Path})
 
-		parent := walkingStack.Peek().(*FileItem)
-		for !strings.HasPrefix(path, parent.Path) && walkingStack.Len() > 0 {
-			parent = walkingStack.Pop().(*FileItem)
-			if strings.HasPrefix(path, parent.Path) {
-				walkingStack.Push(parent)
-				break
+	for len(queue) > 0 {
+		curr := queue[0]
+		parent := curr.Node
+
+		for _, entry := range dirents(curr.Path) {
+			fullPath := filepath.Join(curr.Path, entry.Name())
+
+			node := &Node{Id: nodeid, Name: entry.Name(), IsDir: entry.IsDir()}
+			fileSystemGraph.AddNode(node)
+			nodeid++
+
+			if entry.IsDir() {
+				queue = append(queue, &DirNode{Node: node, Path: fullPath})
+				edge := fileSystemGraph.NewWeightedEdge(parent, node, 0)
+				fileSystemGraph.SetWeightedEdge(edge)
+				totalStat.CountFolders++
+			} else {
+				totalStat.CountFiles++
+				sz := uint64(entry.Size())
+				totalStat.TotalFilesSize += sz
+
+				edge := fileSystemGraph.NewWeightedEdge(parent, node, float64(sz))
+				fileSystemGraph.SetWeightedEdge(edge)
 			}
 		}
 
-		if info.IsDir() {
-			edge := fileSystemGraph.NewWeightedEdge(parent.Node, node, 0)
-			fileSystemGraph.SetWeightedEdge(edge)
-
-			walkingStack.Push(&FileItem{Path: path, Node: node})
-			totalStat.CountFolders++
-		} else {
-
-			totalStat.CountFiles++
-			sz := uint64(info.Size())
-			totalStat.TotalFilesSize += sz
-
-			edge := fileSystemGraph.NewWeightedEdge(parent.Node, node, float64(sz))
-			fileSystemGraph.SetWeightedEdge(edge)
-		}
-	})
+		queue = queue[1:]
+	}
 
 	totalStat.ReadingTime = time.Since(start)
 
