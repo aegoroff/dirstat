@@ -172,10 +172,10 @@ func printStatistic(fileSystemGraph *simple.WeightedDirectedGraph, root *Node, o
 func printTotals(t TotalStat) {
 
 	const totalTemplate = `
-Read taken:    {{.ReadingTime}}
-
 Total files:   {{.CountFiles}} ({{.TotalFilesSize | toBytesString }})
 Total folders: {{.CountFolders}}
+
+Read taken:    {{.ReadingTime}}
 `
 
 	var report = template.Must(template.New("totalstat").Funcs(template.FuncMap{"toBytesString": humanize.IBytes}).Parse(totalTemplate))
