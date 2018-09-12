@@ -11,10 +11,8 @@ import (
 	"gonum.org/v1/gonum/graph/traverse"
 	"log"
 	"os"
-	"path/filepath"
 	"strings"
 	"text/template"
-	"time"
 )
 
 type Options struct {
@@ -31,18 +29,6 @@ const (
 	Gbyte
 	Tbyte
 )
-
-type TotalStat struct {
-	ReadingTime    time.Duration
-	CountFiles     int64
-	CountFolders   int64
-	TotalFilesSize uint64
-}
-
-type DirNode struct {
-	Node *Node
-	Path string
-}
 
 var fileSizeRanges = [...]Range{
 	{Min: 0, Max: 100 * Kbyte},
@@ -68,66 +54,21 @@ func main() {
 
 	fmt.Printf("Root: %s\n\n", options.Path)
 
-	totalStat := TotalStat{}
+	gr, root, total := createFileSystemGraph(options.Path)
 
-	fileSystemGraph := simple.NewWeightedDirectedGraph(0, 0)
+	printStatistic(gr, root, total, options)
 
-	var nodeid int64 = 0
-
-	start := time.Now()
-
-	root := &Node{Id: nodeid, Name: options.Path, IsDir: true}
-	fileSystemGraph.AddNode(root)
-	nodeid++
-
-	queue := make([]*DirNode, 0)
-
-	queue = append(queue, &DirNode{Node: root, Path: options.Path})
-
-	for len(queue) > 0 {
-		curr := queue[0]
-		parent := curr.Node
-
-		for _, entry := range dirents(curr.Path) {
-			fullPath := filepath.Join(curr.Path, entry.Name())
-
-			node := &Node{Id: nodeid, Name: entry.Name(), IsDir: entry.IsDir()}
-			fileSystemGraph.AddNode(node)
-			nodeid++
-
-			if entry.IsDir() {
-				queue = append(queue, &DirNode{Node: node, Path: fullPath})
-				edge := fileSystemGraph.NewWeightedEdge(parent, node, 0)
-				fileSystemGraph.SetWeightedEdge(edge)
-				totalStat.CountFolders++
-			} else {
-				totalStat.CountFiles++
-				sz := uint64(entry.Size())
-				totalStat.TotalFilesSize += sz
-
-				edge := fileSystemGraph.NewWeightedEdge(parent, node, float64(sz))
-				fileSystemGraph.SetWeightedEdge(edge)
-			}
-		}
-
-		queue = queue[1:]
-	}
-
-	totalStat.ReadingTime = time.Since(start)
-
-	printStatistic(fileSystemGraph, root, options, totalStat)
-
-	printTotals(totalStat)
+	printTotals(total)
 
 	printMemUsage()
 }
 
-func printStatistic(fileSystemGraph *simple.WeightedDirectedGraph, root *Node, options Options, totalStat TotalStat) {
+func printStatistic(gr *simple.WeightedDirectedGraph, root *Node, total TotalInfo, options Options) {
 
-	allPaths := path.DijkstraFrom(root, fileSystemGraph)
+	allPaths := path.DijkstraFrom(root, gr)
 	stat := make(map[Range]int64)
 	bfs := traverse.BreadthFirst{}
-	bfs.Walk(fileSystemGraph, root, func(n graph.Node, d int) bool {
+	bfs.Walk(gr, root, func(n graph.Node, d int) bool {
 		nn := n.(*Node)
 		if !nn.IsDir {
 			_, w := allPaths.To(nn.Id)
@@ -143,6 +84,7 @@ func printStatistic(fileSystemGraph *simple.WeightedDirectedGraph, root *Node, o
 
 		return false
 	})
+
 	verboseRanges := make(map[int]bool)
 	for _, x := range options.Range {
 		verboseRanges[x] = true
@@ -152,7 +94,7 @@ func printStatistic(fileSystemGraph *simple.WeightedDirectedGraph, root *Node, o
 	fmt.Printf("%-35s%-12s %s\n", "", "Amount", "Percent")
 	var heads []string
 	for _, r := range fileSizeRanges {
-		percent := (float64(stat[r]) / float64(totalStat.CountFiles)) * 100
+		percent := (float64(stat[r]) / float64(total.CountFiles)) * 100
 		head := fmt.Sprintf("Between %s and %s", humanize.IBytes(uint64(r.Min)), humanize.IBytes(uint64(r.Max)))
 		heads = append(heads, head)
 		fmt.Printf("%-35s%-12d %.2f%%\n", head, stat[r], percent)
@@ -163,23 +105,10 @@ func printStatistic(fileSystemGraph *simple.WeightedDirectedGraph, root *Node, o
 		for i, r := range fileSizeRanges {
 			if options.Verbosity && verboseRanges[i+1] && stat[r] > 0 {
 				fmt.Printf("%s\n", heads[i])
-				outputFilesInfoWithinRange(fileSystemGraph.Nodes(), &allPaths, r)
+				outputFilesInfoWithinRange(gr.Nodes(), &allPaths, r)
 			}
 		}
 	}
-}
-
-func printTotals(t TotalStat) {
-
-	const totalTemplate = `
-Total files:   {{.CountFiles}} ({{.TotalFilesSize | toBytesString }})
-Total folders: {{.CountFolders}}
-
-Read taken:    {{.ReadingTime}}
-`
-
-	var report = template.Must(template.New("totalstat").Funcs(template.FuncMap{"toBytesString": humanize.IBytes}).Parse(totalTemplate))
-	report.Execute(os.Stdout, t)
 }
 
 func outputFilesInfoWithinRange(nodes []graph.Node, allPaths *path.Shortest, r Range) {
@@ -208,4 +137,17 @@ func outputFilesInfoWithinRange(nodes []graph.Node, allPaths *path.Shortest, r R
 
 		fmt.Printf("   %s - %s\n", fullPath, humanize.IBytes(uint64(w)))
 	}
+}
+
+func printTotals(t TotalInfo) {
+
+	const totalTemplate = `
+Total files:   {{.CountFiles}} ({{.TotalFilesSize | toBytesString }})
+Total folders: {{.CountFolders}}
+
+Read taken:    {{.ReadingTime}}
+`
+
+	var report = template.Must(template.New("totalstat").Funcs(template.FuncMap{"toBytesString": humanize.IBytes}).Parse(totalTemplate))
+	report.Execute(os.Stdout, t)
 }
