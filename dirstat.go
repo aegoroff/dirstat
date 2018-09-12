@@ -13,6 +13,7 @@ import (
 	"os"
 	"strings"
 	"text/template"
+	"time"
 )
 
 type Options struct {
@@ -41,6 +42,13 @@ var fileSizeRanges = [...]Range{
 	{Min: 100 * Gbyte, Max: Tbyte},
 }
 
+type TotalInfo struct {
+	ReadingTime    time.Duration
+	CountFiles     int64
+	CountFolders   int64
+	TotalFilesSize uint64
+}
+
 var pathSeparator = fmt.Sprintf("%c", os.PathSeparator)
 
 func main() {
@@ -54,32 +62,32 @@ func main() {
 
 	fmt.Printf("Root: %s\n\n", options.Path)
 
-	gr, root, total := createFileSystemGraph(options.Path)
+	gr, root, elapsed := createFileSystemGraph(options.Path)
 
-	printStatistic(gr, root, total, options)
-
-	printTotals(total)
+	printStatistic(gr, root, elapsed, options)
 
 	printMemUsage()
 }
 
-func printStatistic(gr *simple.WeightedDirectedGraph, root *Node, total TotalInfo, options Options) {
-
+func printStatistic(gr *simple.WeightedDirectedGraph, root *Node, elapsed time.Duration, options Options) {
+	total := TotalInfo{ReadingTime: elapsed}
 	allPaths := path.DijkstraFrom(root, gr)
 	stat := make(map[Range]int64)
 	bfs := traverse.BreadthFirst{}
 	bfs.Walk(gr, root, func(n graph.Node, d int) bool {
 		nn := n.(*Node)
-		if !nn.IsDir {
+		if nn.IsDir {
+			total.CountFolders++
+		} else {
 			_, w := allPaths.To(nn.Id)
-
+			total.CountFiles++
+			total.TotalFilesSize += uint64(w)
 			for _, r := range fileSizeRanges {
 				if !r.contains(w) {
 					continue
 				}
 				stat[r]++
 			}
-
 		}
 
 		return false
@@ -109,6 +117,8 @@ func printStatistic(gr *simple.WeightedDirectedGraph, root *Node, total TotalInf
 			}
 		}
 	}
+
+	printTotals(total)
 }
 
 func outputFilesInfoWithinRange(nodes []graph.Node, allPaths *path.Shortest, r Range) {

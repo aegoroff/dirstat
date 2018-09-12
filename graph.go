@@ -13,13 +13,6 @@ type Node struct {
 	IsDir bool
 }
 
-type TotalInfo struct {
-	ReadingTime    time.Duration
-	CountFiles     int64
-	CountFolders   int64
-	TotalFilesSize uint64
-}
-
 type DirNode struct {
 	Node *Node
 	Path string
@@ -33,8 +26,7 @@ func (n Node) DOTID() string {
 	return fmt.Sprintf("\"%s\"", n.Name)
 }
 
-func createFileSystemGraph(path string) (graph *simple.WeightedDirectedGraph, root *Node, total TotalInfo) {
-	total = TotalInfo{}
+func createFileSystemGraph(path string) (graph *simple.WeightedDirectedGraph, root *Node, elapsed time.Duration) {
 	graph = simple.NewWeightedDirectedGraph(0, 0)
 
 	start := time.Now()
@@ -58,23 +50,19 @@ func createFileSystemGraph(path string) (graph *simple.WeightedDirectedGraph, ro
 			graph.AddNode(node)
 			nodeid++
 
+			var weight float64
 			if entry.IsDir() {
 				queue = append(queue, &DirNode{Node: node, Path: fullPath})
-				edge := graph.NewWeightedEdge(parent, node, 0)
-				graph.SetWeightedEdge(edge)
-				total.CountFolders++
+				weight = 0
 			} else {
-				total.CountFiles++
-				sz := uint64(entry.Size())
-				total.TotalFilesSize += sz
-
-				edge := graph.NewWeightedEdge(parent, node, float64(sz))
-				graph.SetWeightedEdge(edge)
+				weight = float64(entry.Size())
 			}
+			edge := graph.NewWeightedEdge(parent, node, weight)
+			graph.SetWeightedEdge(edge)
 		}
 
 		queue = queue[1:]
 	}
-	total.ReadingTime = time.Since(start)
-	return graph, root, total
+	elapsed = time.Since(start)
+	return graph, root, elapsed
 }
