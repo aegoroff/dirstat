@@ -156,11 +156,24 @@ func printStatistic(fileSystemGraph *simple.WeightedDirectedGraph, options Optio
 	for _, x := range options.Range {
 		verboseRanges[x] = true
 	}
-	for i, r := range fileSizeRanges {
+
+	fmt.Printf("Total files stat:\n")
+	fmt.Printf("%-35s%-12s %s\n", "", "Amount", "Percent")
+	var heads []string
+	for _, r := range fileSizeRanges {
 		percent := (float64(stat[r]) / float64(totalStat.CountFiles)) * 100
-		fmt.Printf("Total files between %s and %s: %d (%.2f%%)\n", humanize.IBytes(uint64(r.Min)), humanize.IBytes(uint64(r.Max)), stat[r], percent)
-		if options.Verbosity && verboseRanges[i+1] {
-			outputFilesInfoWithinRange(sorted, &allPaths, r)
+		head := fmt.Sprintf("Between %s and %s", humanize.IBytes(uint64(r.Min)), humanize.IBytes(uint64(r.Max)))
+		heads = append(heads, head)
+		fmt.Printf("%-35s%-12d %.2f%%\n", head, stat[r], percent)
+	}
+
+	if options.Verbosity && len(options.Range) > 0 {
+		fmt.Printf("\nDetailed files stat:\n")
+		for i, r := range fileSizeRanges {
+			if options.Verbosity && verboseRanges[i+1] {
+				fmt.Printf("%s\n", heads[i])
+				outputFilesInfoWithinRange(sorted, &allPaths, r)
+			}
 		}
 	}
 }
