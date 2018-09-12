@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"gonum.org/v1/gonum/graph/simple"
+	"math"
 	"path/filepath"
 	"time"
 )
@@ -27,7 +28,7 @@ func (n Node) DOTID() string {
 }
 
 func createFileSystemGraph(path string) (graph *simple.WeightedDirectedGraph, root *Node, elapsed time.Duration) {
-	graph = simple.NewWeightedDirectedGraph(0, 0)
+	graph = simple.NewWeightedDirectedGraph(0, math.Inf(1))
 
 	start := time.Now()
 
