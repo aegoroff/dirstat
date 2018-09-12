@@ -55,6 +55,8 @@ var fileSizeRanges = [...]Range{
 	{Min: 100 * Gbyte, Max: Tbyte},
 }
 
+var pathSeparator = fmt.Sprintf("%c", os.PathSeparator)
+
 func main() {
 	options := Options{}
 
@@ -74,7 +76,7 @@ func main() {
 
 	start := time.Now()
 
-	root := &Node{Id: nodeid, Name: filepath.Base(options.Path), IsDir: true}
+	root := &Node{Id: nodeid, Name: options.Path, IsDir: true}
 	fileSystemGraph.AddNode(root)
 	nodeid++
 
@@ -181,7 +183,6 @@ Total folders: {{.CountFolders}}
 }
 
 func outputFilesInfoWithinRange(nodes []graph.Node, allPaths *path.Shortest, r Range) {
-	var filesCount uint64
 	for _, node := range nodes {
 		n := node.(*Node)
 		if n.IsDir {
@@ -193,19 +194,18 @@ func outputFilesInfoWithinRange(nodes []graph.Node, allPaths *path.Shortest, r R
 			continue
 		}
 
-		filesCount++
-
 		var parts []string
 		for _, p := range paths {
 			n := p.(*Node).Name
-			if n == "\\" {
-				n = ""
+
+			if strings.LastIndex(n, pathSeparator) == len(n)-1 {
+				n = strings.TrimRight(n, pathSeparator)
 			}
 
 			parts = append(parts, n)
 		}
-		fullPath := strings.Join(parts, "/")
+		fullPath := strings.Join(parts, pathSeparator)
 
-		fmt.Printf("   %s %s\n", fullPath, humanize.IBytes(uint64(w)))
+		fmt.Printf("   %s - %s\n", fullPath, humanize.IBytes(uint64(w)))
 	}
 }
