@@ -22,7 +22,7 @@ import (
 type Options struct {
 	Help      goptions.Help `goptions:"-h, --help, description='Show this help'"`
 	Verbosity bool          `goptions:"-v, --verbose, description='Be verbose'"`
-	Range     []int         `goptions:"-r, --range, description='Output verbose files info for ranges specified'"`
+	Range     []int         `goptions:"-r, --range, description='Output verbose files info for fileSizeRanges specified'"`
 	Path      string        `goptions:"-p, --path, obligatory, description='Name to the directory'"`
 }
 
@@ -47,13 +47,16 @@ type TotalStat struct {
 	TotalFilesSize uint64
 }
 
-const totalTemplate = `
-Read taken:    {{.ReadingTime}}
-Sort taken:    {{.SortingTime}}
-
-Total files:   {{.CountFiles}} ({{.TotalFilesSize | toBytesString }})
-Total folders: {{.CountFolders}}
-`
+var fileSizeRanges = [...]Range{
+	{Min: 0, Max: 100 * Kbyte},
+	{Min: 100 * Kbyte, Max: Mbyte},
+	{Min: Mbyte, Max: 10 * Mbyte},
+	{Min: 10 * Mbyte, Max: 100 * Mbyte},
+	{Min: 100 * Mbyte, Max: Gbyte},
+	{Min: Gbyte, Max: 10 * Gbyte},
+	{Min: 10 * Gbyte, Max: 100 * Gbyte},
+	{Min: 100 * Gbyte, Max: Tbyte},
+}
 
 func main() {
 	options := Options{}
@@ -117,25 +120,20 @@ func main() {
 
 	totalStat.ReadingTime = time.Since(start)
 
-	start = time.Now()
+	printStatistic(fileSystemGraph, options, totalStat)
+
+	printTotals(totalStat)
+
+	printMemUsage()
+}
+
+func printStatistic(fileSystemGraph *simple.WeightedDirectedGraph, options Options, totalStat TotalStat) {
+	start := time.Now()
 	sorted, _ := topo.Sort(fileSystemGraph)
 	totalStat.SortingTime = time.Since(start)
 
 	allPaths := path.DijkstraFrom(sorted[0], fileSystemGraph)
-
-	ranges := [...]Range{
-		{Min: 0, Max: 100 * Kbyte},
-		{Min: 100 * Kbyte, Max: Mbyte},
-		{Min: Mbyte, Max: 10 * Mbyte},
-		{Min: 10 * Mbyte, Max: 100 * Mbyte},
-		{Min: 100 * Mbyte, Max: Gbyte},
-		{Min: Gbyte, Max: 10 * Gbyte},
-		{Min: 10 * Gbyte, Max: 100 * Gbyte},
-		{Min: 100 * Gbyte, Max: Tbyte},
-	}
-
 	stat := make(map[Range]int64)
-
 	bfs := traverse.BreadthFirst{}
 	bfs.Walk(fileSystemGraph, sorted[0], func(n graph.Node, d int) bool {
 		nn := n.(*Node)
@@ -143,7 +141,7 @@ func main() {
 			_, w := allPaths.To(nn.Id)
 
 			sz := int64(w)
-			for _, r := range ranges {
+			for _, r := range fileSizeRanges {
 				if sz < r.Min || sz > r.Max {
 					continue
 				}
@@ -154,27 +152,34 @@ func main() {
 
 		return false
 	})
-
 	verboseRanges := make(map[int]bool)
-
 	for _, x := range options.Range {
 		verboseRanges[x] = true
 	}
-
-	for i, r := range ranges {
-		fmt.Printf("Total files between %s and %s: %d\n", humanize.IBytes(uint64(r.Min)), humanize.IBytes(uint64(r.Max)), stat[r])
+	for i, r := range fileSizeRanges {
+		percent := (float64(stat[r]) / float64(totalStat.CountFiles)) * 100
+		fmt.Printf("Total files between %s and %s: %d (%.2f%%)\n", humanize.IBytes(uint64(r.Min)), humanize.IBytes(uint64(r.Max)), stat[r], percent)
 		if options.Verbosity && verboseRanges[i+1] {
-			outputFilesInfoWithinRange(sorted, &allPaths, r.Min, r.Max)
+			outputFilesInfoWithinRange(sorted, &allPaths, r)
 		}
 	}
-
-	var report = template.Must(template.New("totalstat").Funcs(template.FuncMap{"toBytesString": humanize.IBytes}).Parse(totalTemplate))
-	report.Execute(os.Stdout, totalStat)
-
-	PrintMemUsage()
 }
 
-func outputFilesInfoWithinRange(sorted []graph.Node, allPaths *path.Shortest, min int64, max int64) {
+func printTotals(t TotalStat) {
+
+	const totalTemplate = `
+Read taken:    {{.ReadingTime}}
+Sort taken:    {{.SortingTime}}
+
+Total files:   {{.CountFiles}} ({{.TotalFilesSize | toBytesString }})
+Total folders: {{.CountFolders}}
+`
+
+	var report = template.Must(template.New("totalstat").Funcs(template.FuncMap{"toBytesString": humanize.IBytes}).Parse(totalTemplate))
+	report.Execute(os.Stdout, t)
+}
+
+func outputFilesInfoWithinRange(sorted []graph.Node, allPaths *path.Shortest, r Range) {
 	var filesCount uint64
 	for _, node := range sorted {
 		n := node.(*Node)
@@ -183,7 +188,7 @@ func outputFilesInfoWithinRange(sorted []graph.Node, allPaths *path.Shortest, mi
 		}
 		paths, w := allPaths.To(n.Id)
 
-		if w < float64(min) || w > float64(max) {
+		if w < float64(r.Min) || w > float64(r.Max) {
 			continue
 		}
 
