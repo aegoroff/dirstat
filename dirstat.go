@@ -12,6 +12,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"text/tabwriter"
 	"text/template"
 	"time"
 )
@@ -64,12 +65,12 @@ func main() {
 
 	gr, root, elapsed := createFileSystemGraph(options.Path)
 
-	printStatistic(gr, root, elapsed, options)
+	analyzeGraphAndOutputResults(gr, root, elapsed, options)
 
 	printMemUsage()
 }
 
-func printStatistic(gr *simple.WeightedDirectedGraph, root *Node, elapsed time.Duration, options Options) {
+func analyzeGraphAndOutputResults(gr *simple.WeightedDirectedGraph, root *Node, elapsed time.Duration, options Options) {
 	total := TotalInfo{ReadingTime: elapsed}
 	allPaths := path.DijkstraFrom(root, gr)
 	stat := make(map[Range]int64)
@@ -99,14 +100,22 @@ func printStatistic(gr *simple.WeightedDirectedGraph, root *Node, elapsed time.D
 	}
 
 	fmt.Printf("Total files stat:\n")
-	fmt.Printf("%-35s%-12s %s\n", "", "Amount", "Percent")
+
+	const format = "%v\t%v\t%v\n"
+	tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 4, ' ', 0)
+
+	fmt.Fprintf(tw, format, "File size", "Amount", "Percent")
+	fmt.Fprintf(tw, format, "---------", "------", "-------")
+
 	var heads []string
 	for _, r := range fileSizeRanges {
 		percent := (float64(stat[r]) / float64(total.CountFiles)) * 100
 		head := fmt.Sprintf("Between %s and %s", humanize.IBytes(uint64(r.Min)), humanize.IBytes(uint64(r.Max)))
 		heads = append(heads, head)
-		fmt.Printf("%-35s%-12d %.2f%%\n", head, stat[r], percent)
+
+		fmt.Fprintf(tw, "%v\t%v\t%.2f%%\n", head, stat[r], percent)
 	}
+	tw.Flush()
 
 	if options.Verbosity && len(options.Range) > 0 {
 		fmt.Printf("\nDetailed files stat:\n")
