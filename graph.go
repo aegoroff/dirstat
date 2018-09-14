@@ -20,6 +20,12 @@ type DirNode struct {
 	Path string
 }
 
+type WalkNode struct {
+	Node   *Node
+	Parent string
+	Size   int64
+}
+
 func (n Node) ID() int64 {
 	return n.Id
 }
@@ -33,34 +39,49 @@ func createFileSystemGraph(path string) (graph *simple.WeightedDirectedGraph, ro
 
 	start := time.Now()
 
-	var nodeid int64 = 0
-	root = &Node{Id: nodeid, Name: path, IsDir: true}
+	root = &Node{Id: 0, Name: path, IsDir: true}
 	graph.AddNode(root)
-	nodeid++
+
+	ch := make(chan *WalkNode, 1024)
+
+	go runWalkingDir(path, 1, ch)
 
 	queue := []*DirNode{{Node: root, Path: path}}
 
-	walkDirBreadthFirst(path, func(parent string, entry os.FileInfo) {
-		node := &Node{Id: nodeid, Name: entry.Name(), IsDir: entry.IsDir()}
-		graph.AddNode(node)
-		nodeid++
+	for {
+		walkNode, ok := <-ch
+		if !ok {
+			break
+		}
+		node := walkNode.Node
 
-		for queue[0].Path != parent {
+		graph.AddNode(node)
+
+		for queue[0].Path != walkNode.Parent {
 			queue = queue[1:]
 		}
 
 		parentNode := queue[0]
 
-		if entry.IsDir() {
-			fullPath := filepath.Join(parent, node.Name)
+		if node.IsDir {
+			fullPath := filepath.Join(walkNode.Parent, node.Name)
 			queue = append(queue, &DirNode{Node: node, Path: fullPath})
 		}
 
-		weight := float64(entry.Size())
+		weight := float64(walkNode.Size)
 		edge := graph.NewWeightedEdge(parentNode.Node, node, weight)
 		graph.SetWeightedEdge(edge)
-	})
+	}
 
 	elapsed = time.Since(start)
 	return graph, root, elapsed
+}
+
+func runWalkingDir(path string, nextId int64, ch chan<- *WalkNode) {
+	walkDirBreadthFirst(path, func(parent string, entry os.FileInfo) {
+		node := &Node{Id: nextId, Name: entry.Name(), IsDir: entry.IsDir()}
+		ch <- &WalkNode{Node: node, Parent: parent, Size: entry.Size()}
+		nextId++
+	})
+	close(ch)
 }
