@@ -124,9 +124,9 @@ func analyzeGraphAndOutputResults(gr *simple.WeightedDirectedGraph, root *Node, 
 	fmt.Fprintf(tw, format, "---------", "------", "-------")
 
 	var heads []string
-	for _, r := range fileSizeRanges {
+	for i, r := range fileSizeRanges {
 		percent := (float64(stat[r]) / float64(total.CountFiles)) * 100
-		head := fmt.Sprintf("Between %s and %s", humanize.IBytes(uint64(r.Min)), humanize.IBytes(uint64(r.Max)))
+		head := fmt.Sprintf("%d. Between %s and %s", i+1, humanize.IBytes(uint64(r.Min)), humanize.IBytes(uint64(r.Max)))
 		heads = append(heads, head)
 
 		fmt.Fprintf(tw, "%v\t%v\t%.2f%%\n", head, stat[r], percent)
