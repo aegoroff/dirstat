@@ -43,6 +43,11 @@ var fileSizeRanges = [...]Range{
 	{Min: 100 * Gbyte, Max: Tbyte},
 }
 
+type FileStat struct {
+	TotalFilesSize  uint64
+	TotalFilesCount int64
+}
+
 type TotalInfo struct {
 	ReadingTime    time.Duration
 	CountFiles     int64
@@ -78,7 +83,7 @@ func analyzeGraphAndOutputResults(gr *simple.WeightedDirectedGraph, root *Node, 
 
 	total := TotalInfo{ReadingTime: elapsed}
 	allPaths := path.DijkstraFrom(root, gr)
-	stat := make(map[Range]int64)
+	stat := make(map[Range]FileStat)
 	bfs := traverse.BreadthFirst{}
 
 	fileNodesByRange := map[Range][]*Node{}
@@ -93,13 +98,18 @@ func analyzeGraphAndOutputResults(gr *simple.WeightedDirectedGraph, root *Node, 
 			total.CountFolders++
 		} else {
 			_, w := allPaths.To(nn.Id)
+			sz := uint64(w)
 			total.CountFiles++
-			total.TotalFilesSize += uint64(w)
+			total.TotalFilesSize += sz
 			for i, r := range fileSizeRanges {
 				if !r.contains(w) {
 					continue
 				}
-				stat[r]++
+
+				s := stat[r]
+				s.TotalFilesCount++
+				s.TotalFilesSize += sz
+				stat[r] = s
 
 				if includeIntoRange(i) {
 					nodes, ok := fileNodesByRange[r]
@@ -117,26 +127,27 @@ func analyzeGraphAndOutputResults(gr *simple.WeightedDirectedGraph, root *Node, 
 
 	fmt.Printf("Total files stat:\n")
 
-	const format = "%v\t%v\t%v\n"
+	const format = "%v\t%v\t%v\t%v\t%v\n"
 	tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 4, ' ', 0)
 
-	fmt.Fprintf(tw, format, "File size", "Amount", "Percent")
-	fmt.Fprintf(tw, format, "---------", "------", "-------")
+	fmt.Fprintf(tw, format, "File size", "Amount", "%", "Size", "%")
+	fmt.Fprintf(tw, format, "---------", "------", "------", "----", "------")
 
 	var heads []string
 	for i, r := range fileSizeRanges {
-		percent := (float64(stat[r]) / float64(total.CountFiles)) * 100
+		percentOfCount := (float64(stat[r].TotalFilesCount) / float64(total.CountFiles)) * 100
+		percentOfSize := (float64(stat[r].TotalFilesSize) / float64(total.TotalFilesSize)) * 100
 		head := fmt.Sprintf("%d. Between %s and %s", i+1, humanize.IBytes(uint64(r.Min)), humanize.IBytes(uint64(r.Max)))
 		heads = append(heads, head)
 
-		fmt.Fprintf(tw, "%v\t%v\t%.2f%%\n", head, stat[r], percent)
+		fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", head, stat[r].TotalFilesCount, percentOfCount, humanize.IBytes(stat[r].TotalFilesSize), percentOfSize)
 	}
 	tw.Flush()
 
 	if options.Verbosity && len(options.Range) > 0 {
 		fmt.Printf("\nDetailed files stat:\n")
 		for i, r := range fileSizeRanges {
-			if includeIntoRange(i) && stat[r] > 0 {
+			if includeIntoRange(i) && stat[r].TotalFilesCount > 0 {
 				fmt.Printf("%s\n", heads[i])
 				outputFilesInfoWithinRange(fileNodesByRange[r], &allPaths, r)
 			}
