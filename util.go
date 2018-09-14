@@ -21,7 +21,7 @@ func printMemUsage() {
 	fmt.Printf("\tNumGC = %v\n", m.NumGC)
 }
 
-func walkDir(path string, action func(path string, info os.FileInfo)) {
+func walkDirBreadthFirst(path string, action func(parent string, entry os.FileInfo)) {
 	queue := make([]string, 0)
 
 	queue = append(queue, path)
@@ -30,10 +30,9 @@ func walkDir(path string, action func(path string, info os.FileInfo)) {
 		curr := queue[0]
 
 		for _, entry := range dirents(curr) {
-			fullPath := filepath.Join(curr, entry.Name())
-			action(fullPath, entry)
+			action(curr, entry)
 			if entry.IsDir() {
-				queue = append(queue, fullPath)
+				queue = append(queue, filepath.Join(curr, entry.Name()))
 			}
 		}
 

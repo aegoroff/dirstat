@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gonum.org/v1/gonum/graph/simple"
 	"math"
+	"os"
 	"path/filepath"
 	"time"
 )
@@ -37,33 +38,29 @@ func createFileSystemGraph(path string) (graph *simple.WeightedDirectedGraph, ro
 	graph.AddNode(root)
 	nodeid++
 
-	queue := make([]*DirNode, 0)
-	queue = append(queue, &DirNode{Node: root, Path: path})
+	queue := []*DirNode{{Node: root, Path: path}}
 
-	for len(queue) > 0 {
-		curr := queue[0]
-		parent := curr.Node
+	walkDirBreadthFirst(path, func(parent string, entry os.FileInfo) {
+		node := &Node{Id: nodeid, Name: entry.Name(), IsDir: entry.IsDir()}
+		graph.AddNode(node)
+		nodeid++
 
-		for _, entry := range dirents(curr.Path) {
-			fullPath := filepath.Join(curr.Path, entry.Name())
-
-			node := &Node{Id: nodeid, Name: entry.Name(), IsDir: entry.IsDir()}
-			graph.AddNode(node)
-			nodeid++
-
-			var weight float64
-			if entry.IsDir() {
-				queue = append(queue, &DirNode{Node: node, Path: fullPath})
-				weight = 0
-			} else {
-				weight = float64(entry.Size())
-			}
-			edge := graph.NewWeightedEdge(parent, node, weight)
-			graph.SetWeightedEdge(edge)
+		for queue[0].Path != parent {
+			queue = queue[1:]
 		}
 
-		queue = queue[1:]
-	}
+		parentNode := queue[0]
+
+		if entry.IsDir() {
+			fullPath := filepath.Join(parent, node.Name)
+			queue = append(queue, &DirNode{Node: node, Path: fullPath})
+		}
+
+		weight := float64(entry.Size())
+		edge := graph.NewWeightedEdge(parentNode.Node, node, weight)
+		graph.SetWeightedEdge(edge)
+	})
+
 	elapsed = time.Since(start)
 	return graph, root, elapsed
 }
