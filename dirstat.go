@@ -71,10 +71,22 @@ func main() {
 }
 
 func analyzeGraphAndOutputResults(gr *simple.WeightedDirectedGraph, root *Node, elapsed time.Duration, options Options) {
+	verboseRanges := make(map[int]bool)
+	for _, x := range options.Range {
+		verboseRanges[x] = true
+	}
+
 	total := TotalInfo{ReadingTime: elapsed}
 	allPaths := path.DijkstraFrom(root, gr)
 	stat := make(map[Range]int64)
 	bfs := traverse.BreadthFirst{}
+
+	fileNodesByRange := map[Range][]*Node{}
+
+	includeIntoRange := func(i int) bool {
+		return options.Verbosity && verboseRanges[i+1]
+	}
+
 	bfs.Walk(gr, root, func(n graph.Node, d int) bool {
 		nn := n.(*Node)
 		if nn.IsDir {
@@ -83,21 +95,25 @@ func analyzeGraphAndOutputResults(gr *simple.WeightedDirectedGraph, root *Node, 
 			_, w := allPaths.To(nn.Id)
 			total.CountFiles++
 			total.TotalFilesSize += uint64(w)
-			for _, r := range fileSizeRanges {
+			for i, r := range fileSizeRanges {
 				if !r.contains(w) {
 					continue
 				}
 				stat[r]++
+
+				if includeIntoRange(i) {
+					nodes, ok := fileNodesByRange[r]
+					if !ok {
+						fileNodesByRange[r] = []*Node{nn}
+					} else {
+						fileNodesByRange[r] = append(nodes, nn)
+					}
+				}
 			}
 		}
 
 		return false
 	})
-
-	verboseRanges := make(map[int]bool)
-	for _, x := range options.Range {
-		verboseRanges[x] = true
-	}
 
 	fmt.Printf("Total files stat:\n")
 
@@ -120,9 +136,9 @@ func analyzeGraphAndOutputResults(gr *simple.WeightedDirectedGraph, root *Node, 
 	if options.Verbosity && len(options.Range) > 0 {
 		fmt.Printf("\nDetailed files stat:\n")
 		for i, r := range fileSizeRanges {
-			if options.Verbosity && verboseRanges[i+1] && stat[r] > 0 {
+			if includeIntoRange(i) && stat[r] > 0 {
 				fmt.Printf("%s\n", heads[i])
-				outputFilesInfoWithinRange(gr.Nodes(), &allPaths, r)
+				outputFilesInfoWithinRange(fileNodesByRange[r], &allPaths, r)
 			}
 		}
 	}
@@ -130,14 +146,13 @@ func analyzeGraphAndOutputResults(gr *simple.WeightedDirectedGraph, root *Node, 
 	printTotals(total)
 }
 
-func outputFilesInfoWithinRange(nodes []graph.Node, allPaths *path.Shortest, r Range) {
+func outputFilesInfoWithinRange(nodes []*Node, allPaths *path.Shortest, r Range) {
 	for _, node := range nodes {
-		n := node.(*Node)
-		if n.IsDir {
+		if node.IsDir {
 			continue
 		}
 
-		nodes, w := allPaths.To(n.Id)
+		nodes, w := allPaths.To(node.Id)
 
 		if !r.contains(w) {
 			continue
