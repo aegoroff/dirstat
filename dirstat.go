@@ -136,26 +136,32 @@ func outputFilesInfoWithinRange(nodes []graph.Node, allPaths *path.Shortest, r R
 		if n.IsDir {
 			continue
 		}
-		paths, w := allPaths.To(n.Id)
+
+		nodes, w := allPaths.To(n.Id)
 
 		if !r.contains(w) {
 			continue
 		}
 
-		var parts []string
-		for _, p := range paths {
-			n := p.(*Node).Name
-
-			if strings.LastIndex(n, pathSeparator) == len(n)-1 {
-				n = strings.TrimRight(n, pathSeparator)
-			}
-
-			parts = append(parts, n)
-		}
-		fullPath := strings.Join(parts, pathSeparator)
+		fullPath := makeFullPath(nodes)
 
 		fmt.Printf("   %s - %s\n", fullPath, humanize.IBytes(uint64(w)))
 	}
+}
+
+func makeFullPath(nodes []graph.Node) string {
+	var parts []string
+	for _, p := range nodes {
+		n := p.(*Node).Name
+
+		if strings.LastIndex(n, pathSeparator) == len(n)-1 {
+			n = strings.TrimRight(n, pathSeparator)
+		}
+
+		parts = append(parts, n)
+	}
+	fullPath := strings.Join(parts, pathSeparator)
+	return fullPath
 }
 
 func printTotals(t TotalInfo) {
