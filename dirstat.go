@@ -77,7 +77,7 @@ func main() {
 func runAnalyze(options Options) {
     total, stat, filesByRange := walk(options)
 
-    fmt.Printf("Total files stat:\n")
+    fmt.Printf("Total files stat:\n\n")
 
     const format = "%v\t%v\t%v\t%v\t%v\n"
     tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 4, ' ', 0)
