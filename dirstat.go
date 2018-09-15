@@ -5,13 +5,9 @@ import (
 	"fmt"
 	"github.com/dustin/go-humanize"
 	"github.com/voxelbrain/goptions"
-	"gonum.org/v1/gonum/graph"
-	"gonum.org/v1/gonum/graph/path"
-	"gonum.org/v1/gonum/graph/simple"
-	"gonum.org/v1/gonum/graph/traverse"
 	"log"
 	"os"
-	"strings"
+	"path/filepath"
 	"text/tabwriter"
 	"text/template"
 	"time"
@@ -48,14 +44,24 @@ type FileStat struct {
 	TotalFilesCount int64
 }
 
+type FileEntry struct {
+	Size int64
+	Path string
+}
+
+type WalkEntry struct {
+	Size   int64
+	Parent string
+	Name   string
+	IsDir  bool
+}
+
 type TotalInfo struct {
 	ReadingTime    time.Duration
 	CountFiles     int64
 	CountFolders   int64
 	TotalFilesSize uint64
 }
-
-var pathSeparator = fmt.Sprintf("%c", os.PathSeparator)
 
 func main() {
 	options := Options{}
@@ -68,62 +74,13 @@ func main() {
 
 	fmt.Printf("Root: %s\n\n", options.Path)
 
-	gr, root, elapsed := createFileSystemGraph(options.Path)
-
-	analyzeGraphAndOutputResults(gr, root, elapsed, options)
+	runAnalyze(options)
 
 	printMemUsage()
 }
 
-func analyzeGraphAndOutputResults(gr *simple.WeightedDirectedGraph, root *Node, elapsed time.Duration, options Options) {
-	verboseRanges := make(map[int]bool)
-	for _, x := range options.Range {
-		verboseRanges[x] = true
-	}
-
-	total := TotalInfo{ReadingTime: elapsed}
-	allPaths := path.DijkstraFrom(root, gr)
-	stat := make(map[Range]FileStat)
-	bfs := traverse.BreadthFirst{}
-
-	fileNodesByRange := map[Range][]*Node{}
-
-	includeIntoRange := func(i int) bool {
-		return options.Verbosity && verboseRanges[i+1]
-	}
-
-	bfs.Walk(gr, root, func(n graph.Node, d int) bool {
-		nn := n.(*Node)
-		if nn.IsDir {
-			total.CountFolders++
-		} else {
-			_, w := allPaths.To(nn.Id)
-			sz := uint64(w)
-			total.CountFiles++
-			total.TotalFilesSize += sz
-			for i, r := range fileSizeRanges {
-				if !r.contains(w) {
-					continue
-				}
-
-				s := stat[r]
-				s.TotalFilesCount++
-				s.TotalFilesSize += sz
-				stat[r] = s
-
-				if includeIntoRange(i) {
-					nodes, ok := fileNodesByRange[r]
-					if !ok {
-						fileNodesByRange[r] = []*Node{nn}
-					} else {
-						fileNodesByRange[r] = append(nodes, nn)
-					}
-				}
-			}
-		}
-
-		return false
-	})
+func runAnalyze(options Options) {
+	total, stat, fileNodesByRange := walk(options)
 
 	fmt.Printf("Total files stat:\n")
 
@@ -147,9 +104,13 @@ func analyzeGraphAndOutputResults(gr *simple.WeightedDirectedGraph, root *Node, 
 	if options.Verbosity && len(options.Range) > 0 {
 		fmt.Printf("\nDetailed files stat:\n")
 		for i, r := range fileSizeRanges {
-			if includeIntoRange(i) && stat[r].TotalFilesCount > 0 {
-				fmt.Printf("%s\n", heads[i])
-				outputFilesInfoWithinRange(fileNodesByRange[r], &allPaths, r)
+			if len(fileNodesByRange[r]) == 0 {
+				continue
+			}
+
+			fmt.Printf("%s\n", heads[i])
+			for _, item := range fileNodesByRange[r] {
+				fmt.Printf("   %s - %s\n", item.Path, humanize.IBytes(uint64(item.Size)))
 			}
 		}
 	}
@@ -157,37 +118,64 @@ func analyzeGraphAndOutputResults(gr *simple.WeightedDirectedGraph, root *Node, 
 	printTotals(total)
 }
 
-func outputFilesInfoWithinRange(nodes []*Node, allPaths *path.Shortest, r Range) {
-	for _, node := range nodes {
-		if node.IsDir {
-			continue
-		}
-
-		nodes, w := allPaths.To(node.Id)
-
-		if !r.contains(w) {
-			continue
-		}
-
-		fullPath := makeFullPath(nodes)
-
-		fmt.Printf("   %s - %s\n", fullPath, humanize.IBytes(uint64(w)))
+func walk(options Options) (TotalInfo, map[Range]FileStat, map[Range][]*FileEntry) {
+	verboseRanges := make(map[int]bool)
+	for _, x := range options.Range {
+		verboseRanges[x] = true
 	}
-}
+	total := TotalInfo{}
+	stat := make(map[Range]FileStat)
+	fileNodesByRange := map[Range][]*FileEntry{}
 
-func makeFullPath(nodes []graph.Node) string {
-	var parts []string
-	for _, p := range nodes {
-		n := p.(*Node).Name
+	ch := make(chan *WalkEntry, 1024)
 
-		if strings.LastIndex(n, pathSeparator) == len(n)-1 {
-			n = strings.TrimRight(n, pathSeparator)
+	start := time.Now()
+
+	go func(ch chan<- *WalkEntry) {
+		walkDirBreadthFirst(options.Path, func(parent string, entry os.FileInfo) {
+			ch <- &WalkEntry{IsDir: entry.IsDir(), Size: entry.Size(), Parent: parent, Name: entry.Name()}
+		})
+		close(ch)
+	}(ch)
+
+	for {
+		walkEntry, ok := <-ch
+		if !ok {
+			break
 		}
 
-		parts = append(parts, n)
+		if walkEntry.IsDir {
+			total.CountFolders++
+		} else {
+			// Accumulate file statistic
+			sz := uint64(walkEntry.Size)
+			total.CountFiles++
+			total.TotalFilesSize += sz
+			for i, r := range fileSizeRanges {
+				if !r.contains(float64(sz)) {
+					continue
+				}
+
+				s := stat[r]
+				s.TotalFilesCount++
+				s.TotalFilesSize += sz
+				stat[r] = s
+
+				if options.Verbosity && verboseRanges[i+1] {
+					fullPath := filepath.Join(walkEntry.Parent, walkEntry.Name)
+					nodes, ok := fileNodesByRange[r]
+					if !ok {
+						fileNodesByRange[r] = []*FileEntry{{Path: fullPath, Size: walkEntry.Size}}
+					} else {
+						fileNodesByRange[r] = append(nodes, &FileEntry{Path: fullPath, Size: walkEntry.Size})
+					}
+				}
+			}
+		}
 	}
-	fullPath := strings.Join(parts, pathSeparator)
-	return fullPath
+
+	total.ReadingTime = time.Since(start)
+	return total, stat, fileNodesByRange
 }
 
 func printTotals(t TotalInfo) {
