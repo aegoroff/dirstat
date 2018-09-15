@@ -44,11 +44,6 @@ type FileStat struct {
     TotalFilesCount int64
 }
 
-type FileEntry struct {
-    Size int64
-    Path string
-}
-
 type WalkEntry struct {
     Size   int64
     Parent string
@@ -110,7 +105,9 @@ func runAnalyze(options Options) {
 
             fmt.Printf("%s\n", heads[i])
             for _, item := range filesByRange[r] {
-                fmt.Printf("   %s - %s\n", item.Path, humanize.IBytes(uint64(item.Size)))
+                fullPath := filepath.Join(item.Parent, item.Name)
+                size := humanize.IBytes(uint64(item.Size))
+                fmt.Printf("   %s - %s\n", fullPath, size)
             }
         }
     }
@@ -118,14 +115,14 @@ func runAnalyze(options Options) {
     printTotals(total)
 }
 
-func walk(options Options) (TotalInfo, map[Range]FileStat, map[Range][]*FileEntry) {
+func walk(options Options) (TotalInfo, map[Range]FileStat, map[Range][]*WalkEntry) {
     verboseRanges := make(map[int]bool)
     for _, x := range options.Range {
         verboseRanges[x] = true
     }
     total := TotalInfo{}
     stat := make(map[Range]FileStat)
-    fileNodesByRange := map[Range][]*FileEntry{}
+    filesByRange := map[Range][]*WalkEntry{}
 
     ch := make(chan *WalkEntry, 1024)
 
@@ -161,21 +158,22 @@ func walk(options Options) (TotalInfo, map[Range]FileStat, map[Range][]*FileEntr
                 s.TotalFilesSize += sz
                 stat[r] = s
 
-                if options.Verbosity && verboseRanges[i+1] {
-                    fullPath := filepath.Join(walkEntry.Parent, walkEntry.Name)
-                    nodes, ok := fileNodesByRange[r]
-                    if !ok {
-                        fileNodesByRange[r] = []*FileEntry{{Path: fullPath, Size: walkEntry.Size}}
-                    } else {
-                        fileNodesByRange[r] = append(nodes, &FileEntry{Path: fullPath, Size: walkEntry.Size})
-                    }
+                if !options.Verbosity || !verboseRanges[i+1] {
+                    continue
+                }
+
+                nodes, ok := filesByRange[r]
+                if !ok {
+                    filesByRange[r] = []*WalkEntry{walkEntry}
+                } else {
+                    filesByRange[r] = append(nodes, walkEntry)
                 }
             }
         }
     }
 
     total.ReadingTime = time.Since(start)
-    return total, stat, fileNodesByRange
+    return total, stat, filesByRange
 }
 
 func printTotals(t TotalInfo) {
