@@ -80,7 +80,7 @@ func main() {
 }
 
 func runAnalyze(options Options) {
-	total, stat, fileNodesByRange := walk(options)
+	total, stat, filesByRange := walk(options)
 
 	fmt.Printf("Total files stat:\n")
 
@@ -104,12 +104,12 @@ func runAnalyze(options Options) {
 	if options.Verbosity && len(options.Range) > 0 {
 		fmt.Printf("\nDetailed files stat:\n")
 		for i, r := range fileSizeRanges {
-			if len(fileNodesByRange[r]) == 0 {
+			if len(filesByRange[r]) == 0 {
 				continue
 			}
 
 			fmt.Printf("%s\n", heads[i])
-			for _, item := range fileNodesByRange[r] {
+			for _, item := range filesByRange[r] {
 				fmt.Printf("   %s - %s\n", item.Path, humanize.IBytes(uint64(item.Size)))
 			}
 		}
