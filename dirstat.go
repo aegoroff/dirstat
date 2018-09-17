@@ -13,7 +13,7 @@ import (
     "time"
 )
 
-type Options struct {
+type options struct {
     Help      goptions.Help `goptions:"-h, --help, description='Show this help'"`
     Verbosity bool          `goptions:"-v, --verbose, description='Be verbose'"`
     Range     []int         `goptions:"-r, --range, description='Output verbose files info for fileSizeRanges specified'"`
@@ -39,19 +39,19 @@ var fileSizeRanges = [...]Range{
     {Min: 100 * Gbyte, Max: Tbyte},
 }
 
-type FileStat struct {
+type fileStat struct {
     TotalFilesSize  uint64
     TotalFilesCount int64
 }
 
-type WalkEntry struct {
+type walkEntry struct {
     Size   int64
     Parent string
     Name   string
     IsDir  bool
 }
 
-type TotalInfo struct {
+type totalInfo struct {
     ReadingTime    time.Duration
     CountFiles     int64
     CountFolders   int64
@@ -59,23 +59,23 @@ type TotalInfo struct {
 }
 
 func main() {
-    options := Options{}
+    opt := options{}
 
-    goptions.ParseAndFail(&options)
+    goptions.ParseAndFail(&opt)
 
-    if _, err := os.Stat(options.Path); os.IsNotExist(err) {
-        log.Fatalf("Directory '%s' does not exist. Details:\n  %v", options.Path, err)
+    if _, err := os.Stat(opt.Path); os.IsNotExist(err) {
+        log.Fatalf("Directory '%s' does not exist. Details:\n  %v", opt.Path, err)
     }
 
-    fmt.Printf("Root: %s\n\n", options.Path)
+    fmt.Printf("Root: %s\n\n", opt.Path)
 
-    runAnalyze(options)
+    runAnalyze(opt)
 
     printMemUsage()
 }
 
-func runAnalyze(options Options) {
-    total, stat, filesByRange := walk(options)
+func runAnalyze(opt options) {
+    total, stat, filesByRange := walk(opt)
 
     fmt.Printf("Total files stat:\n\n")
 
@@ -96,7 +96,7 @@ func runAnalyze(options Options) {
     }
     tw.Flush()
 
-    if options.Verbosity && len(options.Range) > 0 {
+    if opt.Verbosity && len(opt.Range) > 0 {
         fmt.Printf("\nDetailed files stat:\n")
         for i, r := range fileSizeRanges {
             if len(filesByRange[r]) == 0 {
@@ -115,37 +115,37 @@ func runAnalyze(options Options) {
     printTotals(total)
 }
 
-func walk(options Options) (TotalInfo, map[Range]FileStat, map[Range][]*WalkEntry) {
+func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry) {
     verboseRanges := make(map[int]bool)
-    for _, x := range options.Range {
+    for _, x := range opt.Range {
         verboseRanges[x] = true
     }
-    total := TotalInfo{}
-    stat := make(map[Range]FileStat)
-    filesByRange := map[Range][]*WalkEntry{}
+    total := totalInfo{}
+    stat := make(map[Range]fileStat)
+    filesByRange := map[Range][]*walkEntry{}
 
-    ch := make(chan *WalkEntry, 1024)
+    ch := make(chan *walkEntry, 1024)
 
     start := time.Now()
 
-    go func(ch chan<- *WalkEntry) {
-        walkDirBreadthFirst(options.Path, func(parent string, entry os.FileInfo) {
-            ch <- &WalkEntry{IsDir: entry.IsDir(), Size: entry.Size(), Parent: parent, Name: entry.Name()}
+    go func(ch chan<- *walkEntry) {
+        walkDirBreadthFirst(opt.Path, func(parent string, entry os.FileInfo) {
+            ch <- &walkEntry{IsDir: entry.IsDir(), Size: entry.Size(), Parent: parent, Name: entry.Name()}
         })
         close(ch)
     }(ch)
 
     for {
-        walkEntry, ok := <-ch
+        we, ok := <-ch
         if !ok {
             break
         }
 
-        if walkEntry.IsDir {
+        if we.IsDir {
             total.CountFolders++
         } else {
             // Accumulate file statistic
-            sz := uint64(walkEntry.Size)
+            sz := uint64(we.Size)
             total.CountFiles++
             total.TotalFilesSize += sz
             for i, r := range fileSizeRanges {
@@ -158,15 +158,15 @@ func walk(options Options) (TotalInfo, map[Range]FileStat, map[Range][]*WalkEntr
                 s.TotalFilesSize += sz
                 stat[r] = s
 
-                if !options.Verbosity || !verboseRanges[i+1] {
+                if !opt.Verbosity || !verboseRanges[i+1] {
                     continue
                 }
 
                 nodes, ok := filesByRange[r]
                 if !ok {
-                    filesByRange[r] = []*WalkEntry{walkEntry}
+                    filesByRange[r] = []*walkEntry{we}
                 } else {
-                    filesByRange[r] = append(nodes, walkEntry)
+                    filesByRange[r] = append(nodes, we)
                 }
             }
         }
@@ -176,7 +176,7 @@ func walk(options Options) (TotalInfo, map[Range]FileStat, map[Range][]*WalkEntr
     return total, stat, filesByRange
 }
 
-func printTotals(t TotalInfo) {
+func printTotals(t totalInfo) {
 
     const totalTemplate = `
 Total files:   {{.CountFiles}} ({{.TotalFilesSize | toBytesString }})

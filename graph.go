@@ -10,44 +10,44 @@ import (
 	"gonum.org/v1/gonum/graph/simple"
 )
 
-type Node struct {
+type node struct {
 	NodeID int64
 	Name   string
 	IsDir  bool
 }
 
-type DirNode struct {
-	Node *Node
+type dirNode struct {
+	Node *node
 	Path string
 }
 
-type WalkNode struct {
-	Node   *Node
+type walkNode struct {
+	Node   *node
 	Parent string
 	Size   int64
 }
 
-func (n Node) ID() int64 {
+func (n node) ID() int64 {
 	return n.NodeID
 }
 
-func (n Node) DOTID() string {
+func (n node) DOTID() string {
 	return fmt.Sprintf("\"%s\"", n.Name)
 }
 
-func createFileSystemGraph(path string) (graph *simple.WeightedDirectedGraph, root *Node, elapsed time.Duration) {
+func createFileSystemGraph(path string) (graph *simple.WeightedDirectedGraph, root *node, elapsed time.Duration) {
 	graph = simple.NewWeightedDirectedGraph(0, math.Inf(1))
 
 	start := time.Now()
 
-	root = &Node{NodeID: 0, Name: path, IsDir: true}
+	root = &node{NodeID: 0, Name: path, IsDir: true}
 	graph.AddNode(root)
 
-	ch := make(chan *WalkNode, 1024)
+	ch := make(chan *walkNode, 1024)
 
 	go runWalkingDir(path, 1, ch)
 
-	queue := []*DirNode{{Node: root, Path: path}}
+	queue := []*dirNode{{Node: root, Path: path}}
 
 	for {
 		walkNode, ok := <-ch
@@ -66,7 +66,7 @@ func createFileSystemGraph(path string) (graph *simple.WeightedDirectedGraph, ro
 
 		if node.IsDir {
 			fullPath := filepath.Join(walkNode.Parent, node.Name)
-			queue = append(queue, &DirNode{Node: node, Path: fullPath})
+			queue = append(queue, &dirNode{Node: node, Path: fullPath})
 		}
 
 		weight := float64(walkNode.Size)
@@ -78,10 +78,10 @@ func createFileSystemGraph(path string) (graph *simple.WeightedDirectedGraph, ro
 	return graph, root, elapsed
 }
 
-func runWalkingDir(path string, nextID int64, ch chan<- *WalkNode) {
+func runWalkingDir(path string, nextID int64, ch chan<- *walkNode) {
 	walkDirBreadthFirst(path, func(parent string, entry os.FileInfo) {
-		node := &Node{NodeID: nextID, Name: entry.Name(), IsDir: entry.IsDir()}
-		ch <- &WalkNode{Node: node, Parent: parent, Size: entry.Size()}
+		node := &node{NodeID: nextID, Name: entry.Name(), IsDir: entry.IsDir()}
+		ch <- &walkNode{Node: node, Parent: parent, Size: entry.Size()}
 		nextID++
 	})
 	close(ch)
