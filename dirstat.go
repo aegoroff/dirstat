@@ -56,11 +56,12 @@ type totalInfo struct {
     ReadingTime    time.Duration
     CountFiles     int64
     CountFolders   int64
+    CountFileExts  int
     TotalFilesSize uint64
 }
 
 type namedInt64 struct {
-    name  string;
+    name  string
     value int64
 }
 
@@ -96,6 +97,7 @@ func main() {
 
 func runAnalyze(opt options) {
     total, stat, filesByRange, sizeByExt, countByExt := walk(opt)
+    total.CountFileExts = len(sizeByExt)
 
     bySize := createSliceFromMap(sizeByExt)
     byCount := createSliceFromMap(countByExt)
@@ -251,8 +253,9 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
 func printTotals(t totalInfo) {
 
     const totalTemplate = `
-Total files:   {{.CountFiles}} ({{.TotalFilesSize | toBytesString }})
-Total folders: {{.CountFolders}}
+Total files:            {{.CountFiles}} ({{.TotalFilesSize | toBytesString }})
+Total folders:          {{.CountFolders}}
+Total file extensions:  {{.CountFileExts}}
 
 Read taken:    {{.ReadingTime}}
 `
