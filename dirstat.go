@@ -71,7 +71,7 @@ func (x namedInts64) Len() int {
 }
 
 func (x namedInts64) Less(i, j int) bool {
-    return x[i].value > x[j].value
+    return x[i].value < x[j].value
 }
 
 func (x namedInts64) Swap(i, j int) {
@@ -100,8 +100,8 @@ func runAnalyze(opt options) {
     bySize := createSliceFromMap(sizeByExt)
     byCount := createSliceFromMap(countByExt)
 
-    sort.Sort(bySize)
-    sort.Sort(byCount)
+    sort.Sort(sort.Reverse(bySize))
+    sort.Sort(sort.Reverse(byCount))
 
     fmt.Print("Total files stat:\n\n")
 
