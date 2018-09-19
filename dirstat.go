@@ -8,6 +8,7 @@ import (
     "log"
     "os"
     "path/filepath"
+    "sort"
     "text/tabwriter"
     "text/template"
     "time"
@@ -58,6 +59,25 @@ type totalInfo struct {
     TotalFilesSize uint64
 }
 
+type namedInt64 struct {
+    name  string;
+    value int64
+}
+
+type namedInts64 []*namedInt64
+
+func (x namedInts64) Len() int {
+    return len(x)
+}
+
+func (x namedInts64) Less(i, j int) bool {
+    return x[i].value > x[j].value
+}
+
+func (x namedInts64) Swap(i, j int) {
+    x[i], x[j] = x[j], x[i]
+}
+
 func main() {
     opt := options{}
 
@@ -75,9 +95,15 @@ func main() {
 }
 
 func runAnalyze(opt options) {
-    total, stat, filesByRange := walk(opt)
+    total, stat, filesByRange, sizeByExt, countByExt := walk(opt)
 
-    fmt.Printf("Total files stat:\n\n")
+    bySize := createSliceFromMap(sizeByExt)
+    byCount := createSliceFromMap(countByExt)
+
+    sort.Sort(bySize)
+    sort.Sort(byCount)
+
+    fmt.Print("Total files stat:\n\n")
 
     const format = "%v\t%v\t%v\t%v\t%v\n"
     tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 4, ' ', 0)
@@ -94,6 +120,36 @@ func runAnalyze(opt options) {
 
         fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", head, stat[r].TotalFilesCount, percentOfCount, humanize.IBytes(stat[r].TotalFilesSize), percentOfSize)
     }
+    tw.Flush()
+
+    fmt.Print("\nTOP 10 file extensions by size:\n\n")
+    fmt.Fprintf(tw, format, "Extension", "Count", "%", "Size", "%")
+    fmt.Fprintf(tw, format, "---------", "-----", "------", "----", "------")
+
+    for i := 0; i < 10; i++ {
+        h := bySize[i].name
+        percentOfCount := (float64(countByExt[h]) / float64(total.CountFiles)) * 100
+        percentOfSize := (float64(bySize[i].value) / float64(total.TotalFilesSize)) * 100
+
+        sz := uint64(bySize[i].value)
+        fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", h, countByExt[h], percentOfCount, humanize.IBytes(sz), percentOfSize)
+    }
+
+    tw.Flush()
+
+    fmt.Print("\nTOP 10 file extensions by count:\n\n")
+    fmt.Fprintf(tw, format, "Extension", "Count", "%", "Size", "%")
+    fmt.Fprintf(tw, format, "---------", "-----", "------", "----", "------")
+
+    for i := 0; i < 10; i++ {
+        h := byCount[i].name
+        percentOfCount := (float64(byCount[i].value) / float64(total.CountFiles)) * 100
+        percentOfSize := (float64(sizeByExt[h]) / float64(total.TotalFilesSize)) * 100
+
+        sz := uint64(sizeByExt[h])
+        fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", h, byCount[i].value, percentOfCount, humanize.IBytes(sz), percentOfSize)
+    }
+
     tw.Flush()
 
     if opt.Verbosity && len(opt.Range) > 0 {
@@ -115,13 +171,25 @@ func runAnalyze(opt options) {
     printTotals(total)
 }
 
-func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry) {
+func createSliceFromMap(sizeByExt map[string]int64) namedInts64 {
+    var result = make(namedInts64, len(sizeByExt))
+    i := 0
+    for k, v := range sizeByExt {
+        result[i] = &namedInt64{value: v, name: k}
+        i++
+    }
+    return result
+}
+
+func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, map[string]int64, map[string]int64) {
     verboseRanges := make(map[int]bool)
     for _, x := range opt.Range {
         verboseRanges[x] = true
     }
     total := totalInfo{}
     stat := make(map[Range]fileStat)
+    sizeByExt := make(map[string]int64)
+    countByExt := make(map[string]int64)
     filesByRange := map[Range][]*walkEntry{}
 
     ch := make(chan *walkEntry, 1024)
@@ -158,6 +226,10 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry) {
                 s.TotalFilesSize += sz
                 stat[r] = s
 
+                ext := filepath.Ext(we.Name)
+                sizeByExt[ext] += we.Size
+                countByExt[ext]++
+
                 if !opt.Verbosity || !verboseRanges[i+1] {
                     continue
                 }
@@ -173,7 +245,7 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry) {
     }
 
     total.ReadingTime = time.Since(start)
-    return total, stat, filesByRange
+    return total, stat, filesByRange, sizeByExt, countByExt
 }
 
 func printTotals(t totalInfo) {
