@@ -135,15 +135,16 @@ func runAnalyze(opt options) {
 
     var heads []string
     for i, r := range fileSizeRanges {
+        h := fmt.Sprintf("%d. Between %s and %s", i+1, humanize.IBytes(uint64(r.Min)), humanize.IBytes(uint64(r.Max)))
+        heads = append(heads, h)
+
         count := stat[r].TotalFilesCount
         sz := stat[r].TotalFilesSize
 
         percentOfCount := countPercent(count, total)
         percentOfSize := sizePercent(sz, total)
-        head := fmt.Sprintf("%d. Between %s and %s", i+1, humanize.IBytes(uint64(r.Min)), humanize.IBytes(uint64(r.Max)))
-        heads = append(heads, head)
 
-        fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", head, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
+        fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", h, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
     }
     tw.Flush()
 
@@ -153,6 +154,7 @@ func runAnalyze(opt options) {
 
     for i := 0; i < 10; i++ {
         h := extBySize[i].name
+
         count := byExt[h].Count
         sz := uint64(extBySize[i].value)
 
@@ -170,6 +172,7 @@ func runAnalyze(opt options) {
 
     for i := 0; i < 10; i++ {
         h := extByCount[i].name
+
         count := extByCount[i].value
         sz := byExt[h].Size
 
