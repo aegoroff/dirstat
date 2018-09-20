@@ -135,12 +135,15 @@ func runAnalyze(opt options) {
 
     var heads []string
     for i, r := range fileSizeRanges {
-        percentOfCount := (float64(stat[r].TotalFilesCount) / float64(total.FilesTotal.Count)) * 100
-        percentOfSize := (float64(stat[r].TotalFilesSize) / float64(total.FilesTotal.Size)) * 100
+        count := stat[r].TotalFilesCount
+        sz := stat[r].TotalFilesSize
+
+        percentOfCount := countPercent(count, total)
+        percentOfSize := sizePercent(sz, total)
         head := fmt.Sprintf("%d. Between %s and %s", i+1, humanize.IBytes(uint64(r.Min)), humanize.IBytes(uint64(r.Max)))
         heads = append(heads, head)
 
-        fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", head, stat[r].TotalFilesCount, percentOfCount, humanize.IBytes(stat[r].TotalFilesSize), percentOfSize)
+        fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", head, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
     }
     tw.Flush()
 
@@ -150,11 +153,13 @@ func runAnalyze(opt options) {
 
     for i := 0; i < 10; i++ {
         h := extBySize[i].name
-        percentOfCount := (float64(byExt[h].Count) / float64(total.FilesTotal.Count)) * 100
-        percentOfSize := (float64(extBySize[i].value) / float64(total.FilesTotal.Size)) * 100
-
+        count := byExt[h].Count
         sz := uint64(extBySize[i].value)
-        fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", h, byExt[h].Count, percentOfCount, humanize.IBytes(sz), percentOfSize)
+
+        percentOfCount := countPercent(count, total)
+        percentOfSize := sizePercent(sz, total)
+
+        fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", h, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
     }
 
     tw.Flush()
@@ -165,10 +170,13 @@ func runAnalyze(opt options) {
 
     for i := 0; i < 10; i++ {
         h := extByCount[i].name
-        percentOfCount := (float64(extByCount[i].value) / float64(total.FilesTotal.Count)) * 100
-        percentOfSize := (float64(byExt[h].Size) / float64(total.FilesTotal.Size)) * 100
+        count := extByCount[i].value
+        sz := byExt[h].Size
 
-        fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", h, extByCount[i].value, percentOfCount, humanize.IBytes(byExt[h].Size), percentOfSize)
+        percentOfCount := countPercent(count, total)
+        percentOfSize := sizePercent(sz, total)
+
+        fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", h, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
     }
 
     tw.Flush()
@@ -179,11 +187,14 @@ func runAnalyze(opt options) {
 
     for i := 0; i < 10; i++ {
         h := folderBySize[i].name
-        percentOfCount := (float64(byFolder[h].Count) / float64(total.FilesTotal.Count)) * 100
-        percentOfSize := (float64(folderBySize[i].value) / float64(total.FilesTotal.Size)) * 100
 
+        count := byFolder[h].Count
         sz := uint64(folderBySize[i].value)
-        fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", h, byFolder[h].Count, percentOfCount, humanize.IBytes(sz), percentOfSize)
+
+        percentOfCount := countPercent(count, total)
+        percentOfSize := sizePercent(sz, total)
+
+        fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", h, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
     }
 
     tw.Flush()
@@ -205,6 +216,14 @@ func runAnalyze(opt options) {
     }
 
     printTotals(total)
+}
+
+func countPercent(count int64, total totalInfo) float64 {
+    return (float64(count) / float64(total.FilesTotal.Count)) * 100
+}
+
+func sizePercent(size uint64, total totalInfo) float64 {
+    return (float64(size) / float64(total.FilesTotal.Size)) * 100
 }
 
 func createSliceFromMap(sizeByExt map[string]countSizeAggregate, mapper func(countSizeAggregate) int64) namedInts64 {
