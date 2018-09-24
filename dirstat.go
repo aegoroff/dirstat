@@ -2,6 +2,7 @@
 package main
 
 import (
+    "dirstat/tree"
     "fmt"
     "github.com/dustin/go-humanize"
     "github.com/voxelbrain/goptions"
@@ -69,6 +70,12 @@ type namedInt64 struct {
     value int64
 }
 
+type folderStat struct {
+    folder string
+    size   int64
+    count  int64
+}
+
 type namedInts64 []*namedInt64
 
 func (x namedInts64) Len() int {
@@ -81,6 +88,14 @@ func (x namedInts64) Less(i, j int) bool {
 
 func (x namedInts64) Swap(i, j int) {
     x[i], x[j] = x[j], x[i]
+}
+
+func (x folderStat) LessThan(y interface{}) bool {
+    return x.size < (y.(folderStat)).size
+}
+
+func (x folderStat) EqualTo(y interface{}) bool {
+    return x.size == (y.(folderStat)).size
 }
 
 func main() {
@@ -111,19 +126,16 @@ func runAnalyze(opt options) {
         return aggregate.Count
     })
 
-    folderBySize := createSliceFromMap(byFolder, func(aggregate countSizeAggregate) int64 {
-        return int64(aggregate.Size)
-    })
-
-    folderByCount := createSliceFromMap(byFolder, func(aggregate countSizeAggregate) int64 {
-        return aggregate.Count
-    })
-
     sort.Sort(sort.Reverse(extBySize))
     sort.Sort(sort.Reverse(extByCount))
 
-    sort.Sort(sort.Reverse(folderBySize))
-    sort.Sort(sort.Reverse(folderByCount))
+    var byFolders []folderStat
+    tree.TreeWalkInorder(byFolder.Root, func(n *tree.TreeNode) {
+        if n == nil {
+            return
+        }
+        byFolders = append(byFolders, (*n.Key).(folderStat))
+    })
 
     fmt.Print("Total files stat:\n\n")
 
@@ -188,11 +200,12 @@ func runAnalyze(opt options) {
     fmt.Fprintf(tw, format, "Folder", "Files", "%", "Size", "%")
     fmt.Fprintf(tw, format, "------", "-----", "------", "----", "------")
 
-    for i := 0; i < 10; i++ {
-        h := folderBySize[i].name
+    l := len(byFolders)
+    for i := l - 1; i >= 0; i-- {
+        h := fmt.Sprintf("%d. %s", l - i, byFolders[i].folder)
 
-        count := byFolder[h].Count
-        sz := uint64(folderBySize[i].value)
+        count := byFolders[i].count
+        sz := uint64(byFolders[i].size)
 
         percentOfCount := countPercent(count, total)
         percentOfSize := sizePercent(sz, total)
@@ -239,7 +252,7 @@ func createSliceFromMap(sizeByExt map[string]countSizeAggregate, mapper func(cou
     return result
 }
 
-func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, map[string]countSizeAggregate, map[string]countSizeAggregate) {
+func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, map[string]countSizeAggregate, *tree.RbTree) {
     verboseRanges := make(map[int]bool)
     for _, x := range opt.Range {
         verboseRanges[x] = true
@@ -249,8 +262,6 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
     filesByRange := make(map[Range][]*walkEntry)
 
     byExt := make(map[string]countSizeAggregate)
-
-    byFolder := make(map[string]countSizeAggregate)
 
     ch := make(chan *walkEntry, 1024)
 
@@ -262,6 +273,10 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
         })
         close(ch)
     }(ch)
+
+    folderSizeTree := tree.NewRbTree()
+
+    currFolderStat := folderStat{}
 
     for {
         we, ok := <-ch
@@ -283,10 +298,32 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
             a.Count++
             byExt[ext] = a
 
-            a = byFolder[we.Parent]
-            a.Size += uint64(we.Size)
-            a.Count++
-            byFolder[we.Parent] = a
+            if currFolderStat.folder == "" {
+                currFolderStat.folder = we.Parent
+            }
+
+            if currFolderStat.folder == we.Parent {
+                currFolderStat.size += we.Size
+                currFolderStat.count++
+            } else {
+                if folderSizeTree.Root == nil || folderSizeTree.Root.Size < 10 {
+                    var key tree.Comparable
+                    key = currFolderStat
+                    tree.RbTreeInsert(folderSizeTree, &tree.TreeNode{Key: &key})
+                } else {
+                    minSizeNode := tree.TreeMinimum(folderSizeTree.Root)
+                    if getSizeFromFolderNode(minSizeNode) < currFolderStat.size {
+                        tree.RbTreeDelete(folderSizeTree, minSizeNode)
+
+                        var key tree.Comparable
+                        key = currFolderStat
+                        tree.RbTreeInsert(folderSizeTree, &tree.TreeNode{Key: &key})
+                    }
+                }
+                currFolderStat.folder = we.Parent
+                currFolderStat.count = 1
+                currFolderStat.size = we.Size
+            }
 
             for i, r := range fileSizeRanges {
                 if !r.contains(float64(sz)) {
@@ -313,7 +350,11 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
     }
 
     total.ReadingTime = time.Since(start)
-    return total, stat, filesByRange, byExt, byFolder
+    return total, stat, filesByRange, byExt, folderSizeTree
+}
+
+func getSizeFromFolderNode(node *tree.TreeNode) int64 {
+    return (*node.Key).(folderStat).size
 }
 
 func printTotals(t totalInfo) {
