@@ -221,6 +221,17 @@ func TreeDelete(root *TreeNode, z *TreeNode) {
     }
 }
 
+func OrderStatisticSelect(root *TreeNode, i int64) *TreeNode {
+    r := root.Left.Size + 1
+    if i == r {
+        return root
+    } else if i < r {
+        return OrderStatisticSelect(root.Left, i)
+    } else {
+        return OrderStatisticSelect(root.Right, i - r)
+    }
+}
+
 // Deletes node specified from Red-black tree
 func RbTreeDelete(tree *RbTree, z *TreeNode) {
     y := z

@@ -129,14 +129,6 @@ func runAnalyze(opt options) {
     sort.Sort(sort.Reverse(extBySize))
     sort.Sort(sort.Reverse(extByCount))
 
-    var byFolders []folderStat
-    tree.TreeWalkInorder(byFolder.Root, func(n *tree.TreeNode) {
-        if n == nil {
-            return
-        }
-        byFolders = append(byFolders, (*n.Key).(folderStat))
-    })
-
     fmt.Print("Total files stat:\n\n")
 
     const format = "%v\t%v\t%v\t%v\t%v\n"
@@ -200,12 +192,14 @@ func runAnalyze(opt options) {
     fmt.Fprintf(tw, format, "Folder", "Files", "%", "Size", "%")
     fmt.Fprintf(tw, format, "------", "-----", "------", "----", "------")
 
-    l := len(byFolders)
-    for i := l - 1; i >= 0; i-- {
-        h := fmt.Sprintf("%d. %s", l - i, byFolders[i].folder)
+    l := byFolder.Root.Size
+    for i := l; i > 0; i-- {
+        n := tree.OrderStatisticSelect(byFolder.Root, i)
+        order := (*n.Key).(folderStat)
+        h := fmt.Sprintf("%d. %s", l - i + 1, order.folder)
 
-        count := byFolders[i].count
-        sz := uint64(byFolders[i].size)
+        count := order.count
+        sz := uint64(order.size)
 
         percentOfCount := countPercent(count, total)
         percentOfSize := sizePercent(sz, total)
