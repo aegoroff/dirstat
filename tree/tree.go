@@ -6,15 +6,15 @@ const (
 )
 
 type RbTree struct {
-    Root *TreeNode
-    tnil *TreeNode
+    Root *Node
+    tnil *Node
 }
 
-type TreeNode struct {
+type Node struct {
     Key    *Comparable
-    Parent *TreeNode
-    Left   *TreeNode
-    Right  *TreeNode
+    Parent *Node
+    Left   *Node
+    Right  *Node
     Color  int
     Size   int64
 }
@@ -26,31 +26,31 @@ type Comparable interface {
 
 // Creates new Red-Black empty tree
 func NewRbTree() *RbTree {
-    tnil := TreeNode{Color: Black}
+    tnil := Node{Color: Black}
     return &RbTree{tnil: &tnil}
 }
 
 // Walks tree inorder (left, node, right)
-func TreeWalkInorder(root *TreeNode, action func(*TreeNode)) {
+func WalkInorder(root *Node, action func(*Node)) {
     if root != nil && root.Key != nil {
-        TreeWalkInorder(root.Left, action)
+        WalkInorder(root.Left, action)
         action(root)
-        TreeWalkInorder(root.Right, action)
+        WalkInorder(root.Right, action)
     }
 }
 
 // Walks tree preorder (node, left, right)
-func TreeWalkPreorder(root *TreeNode, action func(*TreeNode)) {
+func WalkPreorder(root *Node, action func(*Node)) {
     if root != nil && root.Key != nil {
         action(root)
-        TreeWalkPreorder(root.Left, action)
-        TreeWalkPreorder(root.Right, action)
+        WalkPreorder(root.Left, action)
+        WalkPreorder(root.Right, action)
     }
 }
 
 // Inserts node into binary search tree
-func TreeInsert(root *TreeNode, z *TreeNode) {
-    var y *TreeNode
+func Insert(root *Node, z *Node) {
+    var y *Node
     x := root
     for x != nil {
         y = x
@@ -73,7 +73,7 @@ func TreeInsert(root *TreeNode, z *TreeNode) {
 
 // Inserts new node into Red-Black tree
 // Creates Root if tree is empty
-func RbTreeInsert(tree *RbTree, z *TreeNode) {
+func RbTreeInsert(tree *RbTree, z *Node) {
     if tree.Root == nil {
         tree.Root = z
         tree.Root.Color = Black
@@ -110,7 +110,7 @@ func RbTreeInsert(tree *RbTree, z *TreeNode) {
     rbInsertFixup(tree, z)
 }
 
-func rbInsertFixup(tree *RbTree, z *TreeNode) {
+func rbInsertFixup(tree *RbTree, z *Node) {
     for z.Parent.Color == Red {
         if z.Parent == z.Parent.Parent.Left {
             y := z.Parent.Parent.Right
@@ -148,8 +148,8 @@ func rbInsertFixup(tree *RbTree, z *TreeNode) {
 }
 
 // Searches value specified within search tree
-func TreeSearch(root *TreeNode, value *Comparable) (*TreeNode, bool) {
-    var x *TreeNode
+func Search(root *Node, value *Comparable) (*Node, bool) {
+    var x *Node
     x = root
     for x != nil && x.Key != nil && !(*value).EqualTo(*x.Key) {
         if (*value).LessThan(*x.Key) {
@@ -162,7 +162,7 @@ func TreeSearch(root *TreeNode, value *Comparable) (*TreeNode, bool) {
 }
 
 // Gets tree's min element
-func TreeMinimum(root *TreeNode) *TreeNode {
+func Minimum(root *Node) *Node {
     x := root
     for x.Left != nil && x.Left.Key != nil {
         x = x.Left
@@ -171,7 +171,7 @@ func TreeMinimum(root *TreeNode) *TreeNode {
 }
 
 // Gets tree's max element
-func TreeMaximum(root *TreeNode) *TreeNode {
+func Maximum(root *Node) *Node {
     x := root
     for x.Right != nil && x.Right.Key != nil {
         x = x.Right
@@ -180,9 +180,9 @@ func TreeMaximum(root *TreeNode) *TreeNode {
 }
 
 // Gets node specified successor
-func TreeSuccessor(n *TreeNode) *TreeNode {
+func Successor(n *Node) *Node {
     if n.Right != nil && n.Right.Key != nil {
-        return TreeMinimum(n.Right)
+        return Minimum(n.Right)
     }
 
     y := n.Parent
@@ -195,9 +195,9 @@ func TreeSuccessor(n *TreeNode) *TreeNode {
 }
 
 // Gets node specified predecessor
-func TreePredecessor(n *TreeNode) *TreeNode {
+func Predecessor(n *Node) *Node {
     if n.Left != nil && n.Left.Key != nil {
-        return TreeMaximum(n.Left)
+        return Maximum(n.Left)
     }
 
     y := n.Parent
@@ -210,13 +210,13 @@ func TreePredecessor(n *TreeNode) *TreeNode {
 }
 
 // Deletes node specified from binary search tree
-func TreeDelete(root *TreeNode, z *TreeNode) {
+func Delete(root *Node, z *Node) {
     if z.Left == nil {
         transplant(root, z, z.Right)
     } else if z.Right == nil {
         transplant(root, z, z.Left)
     } else {
-        y := TreeMinimum(z.Right)
+        y := Minimum(z.Right)
         if y.Parent != z {
             transplant(root, y, y.Right)
             y.Right = z.Right
@@ -229,7 +229,7 @@ func TreeDelete(root *TreeNode, z *TreeNode) {
 }
 
 // Gets i element from subtree
-func OrderStatisticSelect(root *TreeNode, i int64) *TreeNode {
+func OrderStatisticSelect(root *Node, i int64) *Node {
     r := root.Left.Size + 1
     if i == r {
         return root
@@ -241,7 +241,7 @@ func OrderStatisticSelect(root *TreeNode, i int64) *TreeNode {
 }
 
 // Deletes node specified from Red-black tree
-func RbTreeDelete(tree *RbTree, z *TreeNode) {
+func DeleteFromRbTree(tree *RbTree, z *Node) {
     y := z
 
     p := z.Parent
@@ -250,7 +250,7 @@ func RbTreeDelete(tree *RbTree, z *TreeNode) {
         p = p.Parent
     }
 
-    var x *TreeNode
+    var x *Node
     yOriginalColor := y.Color
     if z.Left == tree.tnil {
         x = z.Right
@@ -259,7 +259,7 @@ func RbTreeDelete(tree *RbTree, z *TreeNode) {
         x = z.Left
         rbTransplant(tree, z, z.Left)
     } else {
-        y := TreeMinimum(z.Right)
+        y := Minimum(z.Right)
         yOriginalColor = y.Color
         x = y.Right
         if y.Parent == z {
@@ -279,7 +279,7 @@ func RbTreeDelete(tree *RbTree, z *TreeNode) {
     }
 }
 
-func rbDeleteFixup(tree *RbTree, x *TreeNode) {
+func rbDeleteFixup(tree *RbTree, x *Node) {
     for x != tree.Root && x.Color == Black {
         if x == x.Parent.Left {
             w := x.Parent.Right
@@ -331,7 +331,7 @@ func rbDeleteFixup(tree *RbTree, x *TreeNode) {
     }
 }
 
-func transplant(root *TreeNode, u *TreeNode, v *TreeNode) {
+func transplant(root *Node, u *Node, v *Node) {
     if u.Parent == nil {
         root = v
     } else if u == u.Parent.Left {
@@ -344,7 +344,7 @@ func transplant(root *TreeNode, u *TreeNode, v *TreeNode) {
     }
 }
 
-func rbTransplant(tree *RbTree, u *TreeNode, v *TreeNode) {
+func rbTransplant(tree *RbTree, u *Node, v *Node) {
     if u.Parent == tree.tnil {
         tree.Root = v
     } else if u == u.Parent.Left {
@@ -355,7 +355,7 @@ func rbTransplant(tree *RbTree, u *TreeNode, v *TreeNode) {
     v.Parent = u.Parent
 }
 
-func leftRotate(tree *RbTree, x *TreeNode) {
+func leftRotate(tree *RbTree, x *Node) {
     y := x.Right
     x.Right = y.Left
     if y.Left != tree.tnil {
@@ -377,7 +377,7 @@ func leftRotate(tree *RbTree, x *TreeNode) {
     x.Size = x.Left.Size + x.Right.Size + 1
 }
 
-func rightRotate(tree *RbTree, x *TreeNode) {
+func rightRotate(tree *RbTree, x *Node) {
     y := x.Left
     x.Left = y.Right
     if y.Right != tree.tnil {

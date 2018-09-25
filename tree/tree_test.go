@@ -38,7 +38,7 @@ func TestInorderWalk(t *testing.T) {
     var result []int
 
     // Act
-    TreeWalkInorder(root, func(node *TreeNode) {
+    WalkInorder(root, func(node *Node) {
         result = append(result, getIntValueOf(node))
     })
 
@@ -53,7 +53,7 @@ func TestInorderWalkStringTree(t *testing.T) {
     var result []string
 
     // Act
-    TreeWalkInorder(root, func(node *TreeNode) {
+    WalkInorder(root, func(node *Node) {
         result = append(result, getStringValueOf(node))
     })
 
@@ -68,7 +68,7 @@ func TestSearchSuccess(t *testing.T) {
     v := createIntNode(13)
 
     // Act
-    found, ok := TreeSearch(root, v)
+    found, ok := Search(root, v)
 
     // Assert
     ass.True(ok)
@@ -82,7 +82,7 @@ func TestSearchFailure(t *testing.T) {
     v := createIntNode(22)
 
     // Act
-    found, ok := TreeSearch(root, v)
+    found, ok := Search(root, v)
 
     // Assert
     ass.False(ok)
@@ -94,10 +94,10 @@ func TestSuccessor(t *testing.T) {
     ass := assert.New(t)
     root := createIntegerTestTree()
     v := createIntNode(13)
-    r, _ := TreeSearch(root, v)
+    r, _ := Search(root, v)
 
     // Act
-    s := TreeSuccessor(r)
+    s := Successor(r)
 
     // Assert
     ass.Equal(15, getIntValueOf(s))
@@ -109,7 +109,7 @@ func TestPredecessor(t *testing.T) {
     root := createIntegerTestTree()
 
     // Act
-    p := TreePredecessor(root)
+    p := Predecessor(root)
 
     // Assert
     ass.Equal(13, getIntValueOf(p))
@@ -120,14 +120,14 @@ func TestDelete(t *testing.T) {
     ass := assert.New(t)
     root := createIntegerTestTree()
     v := createIntNode(6)
-    r, _ := TreeSearch(root, v)
+    r, _ := Search(root, v)
     var result []int
 
     // Act
-    TreeDelete(root, r)
+    Delete(root, r)
 
     // Assert
-    TreeWalkInorder(root, func(node *TreeNode) {
+    WalkInorder(root, func(node *Node) {
         result = append(result, getIntValueOf(node))
     })
     ass.ElementsMatch(result, []int{2, 3, 4, 7, 9, 13, 15, 17, 18, 20})
@@ -139,7 +139,7 @@ func TestTreeMinimum(t *testing.T) {
     root := createIntegerTestTree()
 
     // Act
-    r := TreeMinimum(root)
+    r := Minimum(root)
 
     // Assert
     ass.Equal(2, getIntValueOf(r))
@@ -151,7 +151,7 @@ func TestTreeMaximum(t *testing.T) {
     root := createIntegerTestTree()
 
     // Act
-    r := TreeMaximum(root)
+    r := Maximum(root)
 
     // Assert
     ass.Equal(20, getIntValueOf(r))
@@ -160,16 +160,16 @@ func TestTreeMaximum(t *testing.T) {
 func TestRightRotate(t *testing.T) {
     // Arrange
     ass := assert.New(t)
-    r := TreeNode{Key: createStringNode("root")}
+    r := Node{Key: createStringNode("root")}
 
     tree := NewRbTree()
     RbTreeInsert(tree, &r)
 
-    y := TreeNode{Key: createStringNode("y")}
-    x := TreeNode{Key: createStringNode("x")}
-    a := TreeNode{Key: createStringNode("a")}
-    b := TreeNode{Key: createStringNode("b")}
-    g := TreeNode{Key: createStringNode("g")}
+    y := Node{Key: createStringNode("y")}
+    x := Node{Key: createStringNode("x")}
+    a := Node{Key: createStringNode("a")}
+    b := Node{Key: createStringNode("b")}
+    g := Node{Key: createStringNode("g")}
 
     r.Right = &y
     y.Parent = &r
@@ -196,16 +196,16 @@ func TestRightRotate(t *testing.T) {
 func TestLeftRotate(t *testing.T) {
     // Arrange
     ass := assert.New(t)
-    r := TreeNode{Key: createStringNode("root")}
+    r := Node{Key: createStringNode("root")}
 
     tree := NewRbTree()
     RbTreeInsert(tree, &r)
 
-    x := TreeNode{Key: createStringNode("x")}
-    y := TreeNode{Key: createStringNode("y")}
-    a := TreeNode{Key: createStringNode("a")}
-    b := TreeNode{Key: createStringNode("b")}
-    g := TreeNode{Key: createStringNode("g")}
+    x := Node{Key: createStringNode("x")}
+    y := Node{Key: createStringNode("y")}
+    a := Node{Key: createStringNode("a")}
+    b := Node{Key: createStringNode("b")}
+    g := Node{Key: createStringNode("g")}
 
     r.Right = &x
     x.Parent = &r
@@ -229,12 +229,12 @@ func TestLeftRotate(t *testing.T) {
     ass.Equal("b", getStringValueOf(x.Right))
 }
 
-func createIntegerTestTree() *TreeNode {
+func createIntegerTestTree() *Node {
     r := createIntNode(15)
-    root := TreeNode{Key: r}
+    root := Node{Key: r}
     nodes := []int{6, 18, 3, 7, 2, 4, 13, 9, 17, 20}
     for _, n := range nodes {
-        TreeInsert(&root, &TreeNode{Key: createIntNode(n)})
+        Insert(&root, &Node{Key: createIntNode(n)})
     }
     return &root
 }
@@ -246,7 +246,7 @@ func TestRbTreeWalkInorder(t *testing.T) {
     var result []string
 
     // Act
-    TreeWalkInorder(tree.Root, func(node *TreeNode) {
+    WalkInorder(tree.Root, func(node *Node) {
         result = append(result, getStringValueOf(node))
     })
 
@@ -260,7 +260,7 @@ func TestRbTreeWalkPreorder(t *testing.T) {
     b := strings.Builder{}
 
     // Act
-    TreeWalkPreorder(tree.Root, func(node *TreeNode) {
+    WalkPreorder(tree.Root, func(node *Node) {
         margin := ""
         p := node.Parent
         for p != tree.tnil {
@@ -287,7 +287,7 @@ func TestRbTreeSearchSuccess(t *testing.T) {
     n := createStringNode("intel")
 
     // Act
-    found, ok := TreeSearch(tree.Root, n)
+    found, ok := Search(tree.Root, n)
 
     // Assert
     ass.True(ok)
@@ -300,10 +300,10 @@ func TestRbTreePredessor(t *testing.T) {
     ass := assert.New(t)
     tree := createTestRbTree()
     n := createStringNode("intel")
-    found, _ := TreeSearch(tree.Root, n)
+    found, _ := Search(tree.Root, n)
 
     // Act
-    p := TreePredecessor(found)
+    p := Predecessor(found)
 
     // Assert
     ass.Equal("fake", getStringValueOf(p))
@@ -314,10 +314,10 @@ func TestRbTreeSuccessor(t *testing.T) {
     ass := assert.New(t)
     tree := createTestRbTree()
     n := createStringNode("intel")
-    found, _ := TreeSearch(tree.Root, n)
+    found, _ := Search(tree.Root, n)
 
     // Act
-    s := TreeSuccessor(found)
+    s := Successor(found)
 
     // Assert
     ass.Equal("it", getStringValueOf(s))
@@ -328,17 +328,17 @@ func TestRbTreeDelete(t *testing.T) {
     ass := assert.New(t)
     tree := createTestRbTree()
     n := createStringNode("intel")
-    found, _ := TreeSearch(tree.Root, n)
+    found, _ := Search(tree.Root, n)
 
     // Act
-    RbTreeDelete(tree, found)
+    DeleteFromRbTree(tree, found)
 
     // Assert
-    found, ok := TreeSearch(tree.Root, n)
+    found, ok := Search(tree.Root, n)
     ass.False(ok)
     ass.Nil(found.Key)
 
-    found, ok = TreeSearch(tree.Root, createStringNode("microsoft"))
+    found, ok = Search(tree.Root, createStringNode("microsoft"))
     ass.True(ok)
     ass.Equal("microsoft", getStringValueOf(found))
 }
@@ -347,26 +347,26 @@ func createTestRbTree() *RbTree {
     nodes := []string{"abc", "amd", "cisco", "do", "fake", "intel", "it", "let", "microsoft", "russia", "usa", "xxx", "yyy", "zen"}
     tree := NewRbTree()
     for _, n := range nodes {
-        RbTreeInsert(tree, &TreeNode{Key: createStringNode(n)})
+        RbTreeInsert(tree, &Node{Key: createStringNode(n)})
     }
     return tree
 }
 
-func createStringTestTree() *TreeNode {
+func createStringTestTree() *Node {
     r := createStringNode("fake")
-    root := TreeNode{Key: r}
+    root := Node{Key: r}
     nodes := []string{"let", "zen", "yyy", "xxx", "do", "it", "amd", "intel", "cisco", "microsoft", "abc", "usa", "russia"}
     for _, n := range nodes {
-        TreeInsert(&root, &TreeNode{Key: createStringNode(n)})
+        Insert(&root, &Node{Key: createStringNode(n)})
     }
     return &root
 }
 
-func getIntValueOf(node *TreeNode) int {
+func getIntValueOf(node *Node) int {
     return (*node.Key).(IntNode).value
 }
 
-func getStringValueOf(node *TreeNode) string {
+func getStringValueOf(node *Node) string {
     return (*node.Key).(StringNode).value
 }
 

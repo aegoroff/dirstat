@@ -30,6 +30,8 @@ const (
     Tbyte
 )
 
+const Top = 10
+
 var fileSizeRanges = [...]Range{
     {Min: 0, Max: 100 * Kbyte},
     {Min: 100 * Kbyte, Max: Mbyte},
@@ -156,7 +158,7 @@ func runAnalyze(opt options) {
     fmt.Fprintf(tw, format, "Extension", "Count", "%", "Size", "%")
     fmt.Fprintf(tw, format, "---------", "-----", "------", "----", "------")
 
-    for i := 0; i < 10; i++ {
+    for i := 0; i < Top; i++ {
         h := extBySize[i].name
 
         count := byExt[h].Count
@@ -174,7 +176,7 @@ func runAnalyze(opt options) {
     fmt.Fprintf(tw, format, "Extension", "Count", "%", "Size", "%")
     fmt.Fprintf(tw, format, "---------", "-----", "------", "----", "------")
 
-    for i := 0; i < 10; i++ {
+    for i := 0; i < Top; i++ {
         h := extByCount[i].name
 
         count := extByCount[i].value
@@ -300,18 +302,18 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
                 currFolderStat.size += we.Size
                 currFolderStat.count++
             } else {
-                if folderSizeTree.Root == nil || folderSizeTree.Root.Size < 10 {
+                if folderSizeTree.Root == nil || folderSizeTree.Root.Size < Top {
                     var key tree.Comparable
                     key = currFolderStat
-                    tree.RbTreeInsert(folderSizeTree, &tree.TreeNode{Key: &key})
+                    tree.RbTreeInsert(folderSizeTree, &tree.Node{Key: &key})
                 } else {
-                    minSizeNode := tree.TreeMinimum(folderSizeTree.Root)
+                    minSizeNode := tree.Minimum(folderSizeTree.Root)
                     if getSizeFromFolderNode(minSizeNode) < currFolderStat.size {
-                        tree.RbTreeDelete(folderSizeTree, minSizeNode)
+                        tree.DeleteFromRbTree(folderSizeTree, minSizeNode)
 
                         var key tree.Comparable
                         key = currFolderStat
-                        tree.RbTreeInsert(folderSizeTree, &tree.TreeNode{Key: &key})
+                        tree.RbTreeInsert(folderSizeTree, &tree.Node{Key: &key})
                     }
                 }
                 currFolderStat.folder = we.Parent
@@ -347,7 +349,7 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
     return total, stat, filesByRange, byExt, folderSizeTree
 }
 
-func getSizeFromFolderNode(node *tree.TreeNode) int64 {
+func getSizeFromFolderNode(node *tree.Node) int64 {
     return (*node.Key).(folderStat).size
 }
 
