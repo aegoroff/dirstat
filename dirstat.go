@@ -303,17 +303,15 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
                 currFolderStat.count++
             } else {
                 if folderSizeTree.Root == nil || folderSizeTree.Root.Size < Top {
-                    var key tree.Comparable
-                    key = currFolderStat
-                    tree.Insert(folderSizeTree, &tree.Node{Key: &key})
+                    node := createTreeNode(currFolderStat)
+                    tree.Insert(folderSizeTree, node)
                 } else {
                     minSizeNode := tree.Minimum(folderSizeTree.Root)
                     if getSizeFromFolderNode(minSizeNode) < currFolderStat.size {
                         tree.Delete(folderSizeTree, minSizeNode)
 
-                        var key tree.Comparable
-                        key = currFolderStat
-                        tree.Insert(folderSizeTree, &tree.Node{Key: &key})
+                        node := createTreeNode(currFolderStat)
+                        tree.Insert(folderSizeTree, node)
                     }
                 }
                 currFolderStat.folder = we.Parent
@@ -347,6 +345,12 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
 
     total.ReadingTime = time.Since(start)
     return total, stat, filesByRange, byExt, folderSizeTree
+}
+
+func createTreeNode(si statItem) *tree.Node {
+    var key tree.Comparable
+    key = si
+    return &tree.Node{Key: &key}
 }
 
 func getSizeFromFolderNode(node *tree.Node) int64 {
