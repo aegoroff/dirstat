@@ -192,11 +192,11 @@ func runAnalyze(opt options) {
     fmt.Fprintf(tw, format, "Folder", "Files", "%", "Size", "%")
     fmt.Fprintf(tw, format, "------", "-----", "------", "----", "------")
 
-    l := byFolder.Root.Size
-    for i := l; i > 0; i-- {
+    treeSize := byFolder.Root.Size
+    for i := treeSize; i > 0; i-- {
         n := tree.OrderStatisticSelect(byFolder.Root, i)
         order := (*n.Key).(folderStat)
-        h := fmt.Sprintf("%d. %s", l - i + 1, order.folder)
+        h := fmt.Sprintf("%d. %s", treeSize-i+1, order.folder)
 
         count := order.count
         sz := uint64(order.size)

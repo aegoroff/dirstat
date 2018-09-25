@@ -30,6 +30,7 @@ func NewRbTree() *RbTree {
     return &RbTree{tnil: &tnil}
 }
 
+// Walks tree inorder (left, node, right)
 func TreeWalkInorder(root *TreeNode, action func(*TreeNode)) {
     if root != nil && root.Key != nil {
         TreeWalkInorder(root.Left, action)
@@ -38,6 +39,7 @@ func TreeWalkInorder(root *TreeNode, action func(*TreeNode)) {
     }
 }
 
+// Walks tree preorder (node, left, right)
 func TreeWalkPreorder(root *TreeNode, action func(*TreeNode)) {
     if root != nil && root.Key != nil {
         action(root)
@@ -46,6 +48,7 @@ func TreeWalkPreorder(root *TreeNode, action func(*TreeNode)) {
     }
 }
 
+// Inserts node into binary search tree
 func TreeInsert(root *TreeNode, z *TreeNode) {
     var y *TreeNode
     x := root
@@ -158,6 +161,7 @@ func TreeSearch(root *TreeNode, value *Comparable) (*TreeNode, bool) {
     return x, x != nil && x.Key != nil
 }
 
+// Gets tree's min element
 func TreeMinimum(root *TreeNode) *TreeNode {
     x := root
     for x.Left != nil && x.Left.Key != nil {
@@ -166,6 +170,7 @@ func TreeMinimum(root *TreeNode) *TreeNode {
     return x
 }
 
+// Gets tree's max element
 func TreeMaximum(root *TreeNode) *TreeNode {
     x := root
     for x.Right != nil && x.Right.Key != nil {
@@ -174,6 +179,7 @@ func TreeMaximum(root *TreeNode) *TreeNode {
     return x
 }
 
+// Gets node specified successor
 func TreeSuccessor(n *TreeNode) *TreeNode {
     if n.Right != nil && n.Right.Key != nil {
         return TreeMinimum(n.Right)
@@ -188,6 +194,7 @@ func TreeSuccessor(n *TreeNode) *TreeNode {
     return y
 }
 
+// Gets node specified predecessor
 func TreePredecessor(n *TreeNode) *TreeNode {
     if n.Left != nil && n.Left.Key != nil {
         return TreeMaximum(n.Left)
@@ -221,6 +228,7 @@ func TreeDelete(root *TreeNode, z *TreeNode) {
     }
 }
 
+// Gets i element from subtree
 func OrderStatisticSelect(root *TreeNode, i int64) *TreeNode {
     r := root.Left.Size + 1
     if i == r {
@@ -228,7 +236,7 @@ func OrderStatisticSelect(root *TreeNode, i int64) *TreeNode {
     } else if i < r {
         return OrderStatisticSelect(root.Left, i)
     } else {
-        return OrderStatisticSelect(root.Right, i - r)
+        return OrderStatisticSelect(root.Right, i-r)
     }
 }
 
