@@ -154,7 +154,7 @@ func runAnalyze(opt options) {
     }
     tw.Flush()
 
-    fmt.Print("\nTOP 10 file extensions by size:\n\n")
+    fmt.Printf("\nTOP %d file extensions by size:\n\n", Top)
     fmt.Fprintf(tw, format, "Extension", "Count", "%", "Size", "%")
     fmt.Fprintf(tw, format, "---------", "-----", "------", "----", "------")
 
@@ -172,7 +172,7 @@ func runAnalyze(opt options) {
 
     tw.Flush()
 
-    fmt.Print("\nTOP 10 file extensions by count:\n\n")
+    fmt.Printf("\nTOP %d file extensions by count:\n\n", Top)
     fmt.Fprintf(tw, format, "Extension", "Count", "%", "Size", "%")
     fmt.Fprintf(tw, format, "---------", "-----", "------", "----", "------")
 
@@ -190,7 +190,7 @@ func runAnalyze(opt options) {
 
     tw.Flush()
 
-    fmt.Print("\nTOP 10 folders by size:\n\n")
+    fmt.Printf("\nTOP %d folders by size:\n\n", Top)
     fmt.Fprintf(tw, format, "Folder", "Files", "%", "Size", "%")
     fmt.Fprintf(tw, format, "------", "-----", "------", "----", "------")
 
