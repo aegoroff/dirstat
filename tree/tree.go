@@ -48,32 +48,9 @@ func WalkPreorder(root *Node, action func(*Node)) {
     }
 }
 
-// Inserts node into binary search tree
-func Insert(root *Node, z *Node) {
-    var y *Node
-    x := root
-    for x != nil {
-        y = x
-        if (*z.Key).LessThan(*x.Key) {
-            x = x.Left
-        } else {
-            x = x.Right
-        }
-    }
-
-    z.Parent = y
-    if y == nil {
-        root = z
-    } else if (*z.Key).LessThan(*y.Key) {
-        y.Left = z
-    } else {
-        y.Right = z
-    }
-}
-
 // Inserts new node into Red-Black tree
 // Creates Root if tree is empty
-func RbTreeInsert(tree *RbTree, z *Node) {
+func Insert(tree *RbTree, z *Node) {
     if tree.Root == nil {
         tree.Root = z
         tree.Root.Color = Black
@@ -209,25 +186,6 @@ func Predecessor(n *Node) *Node {
     return y
 }
 
-// Deletes node specified from binary search tree
-func Delete(root *Node, z *Node) {
-    if z.Left == nil {
-        transplant(root, z, z.Right)
-    } else if z.Right == nil {
-        transplant(root, z, z.Left)
-    } else {
-        y := Minimum(z.Right)
-        if y.Parent != z {
-            transplant(root, y, y.Right)
-            y.Right = z.Right
-            y.Right.Parent = y
-        }
-        transplant(root, z, y)
-        y.Left = z.Left
-        y.Left.Parent = y
-    }
-}
-
 // Gets i element from subtree
 func OrderStatisticSelect(root *Node, i int64) *Node {
     r := root.Left.Size + 1
@@ -241,7 +199,7 @@ func OrderStatisticSelect(root *Node, i int64) *Node {
 }
 
 // Deletes node specified from Red-black tree
-func DeleteFromRbTree(tree *RbTree, z *Node) {
+func Delete(tree *RbTree, z *Node) {
     y := z
 
     p := z.Parent
@@ -328,19 +286,6 @@ func rbDeleteFixup(tree *RbTree, x *Node) {
                 x = tree.Root
             }
         }
-    }
-}
-
-func transplant(root *Node, u *Node, v *Node) {
-    if u.Parent == nil {
-        root = v
-    } else if u == u.Parent.Left {
-        u.Parent.Left = v
-    } else {
-        u.Parent.Right = v
-    }
-    if v != nil {
-        v.Parent = u.Parent
     }
 }
 

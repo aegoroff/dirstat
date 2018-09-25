@@ -305,15 +305,15 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
                 if folderSizeTree.Root == nil || folderSizeTree.Root.Size < Top {
                     var key tree.Comparable
                     key = currFolderStat
-                    tree.RbTreeInsert(folderSizeTree, &tree.Node{Key: &key})
+                    tree.Insert(folderSizeTree, &tree.Node{Key: &key})
                 } else {
                     minSizeNode := tree.Minimum(folderSizeTree.Root)
                     if getSizeFromFolderNode(minSizeNode) < currFolderStat.size {
-                        tree.DeleteFromRbTree(folderSizeTree, minSizeNode)
+                        tree.Delete(folderSizeTree, minSizeNode)
 
                         var key tree.Comparable
                         key = currFolderStat
-                        tree.RbTreeInsert(folderSizeTree, &tree.Node{Key: &key})
+                        tree.Insert(folderSizeTree, &tree.Node{Key: &key})
                     }
                 }
                 currFolderStat.folder = we.Parent
