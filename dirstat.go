@@ -72,7 +72,7 @@ type namedInt64 struct {
     value int64
 }
 
-type folderStat struct {
+type statItem struct {
     folder string
     size   int64
     count  int64
@@ -92,12 +92,12 @@ func (x namedInts64) Swap(i, j int) {
     x[i], x[j] = x[j], x[i]
 }
 
-func (x folderStat) LessThan(y interface{}) bool {
-    return x.size < (y.(folderStat)).size
+func (x statItem) LessThan(y interface{}) bool {
+    return x.size < (y.(statItem)).size
 }
 
-func (x folderStat) EqualTo(y interface{}) bool {
-    return x.size == (y.(folderStat)).size
+func (x statItem) EqualTo(y interface{}) bool {
+    return x.size == (y.(statItem)).size
 }
 
 func main() {
@@ -197,7 +197,7 @@ func runAnalyze(opt options) {
     treeSize := byFolder.Root.Size
     for i := treeSize; i > 0; i-- {
         n := tree.OrderStatisticSelect(byFolder.Root, i)
-        order := (*n.Key).(folderStat)
+        order := (*n.Key).(statItem)
         h := fmt.Sprintf("%d. %s", treeSize-i+1, order.folder)
 
         count := order.count
@@ -272,7 +272,7 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
 
     folderSizeTree := tree.NewRbTree()
 
-    currFolderStat := folderStat{}
+    currFolderStat := statItem{}
 
     for {
         we, ok := <-ch
@@ -350,7 +350,7 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
 }
 
 func getSizeFromFolderNode(node *tree.Node) int64 {
-    return (*node.Key).(folderStat).size
+    return (*node.Key).(statItem).size
 }
 
 func printTotals(t totalInfo) {
