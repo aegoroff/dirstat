@@ -73,9 +73,9 @@ type namedInt64 struct {
 }
 
 type statItem struct {
-    folder string
-    size   int64
-    count  int64
+    name  string
+    size  int64
+    count int64
 }
 
 type namedInts64 []*namedInt64
@@ -198,7 +198,7 @@ func runAnalyze(opt options) {
     for i := treeSize; i > 0; i-- {
         n := tree.OrderStatisticSelect(byFolder.Root, i)
         order := (*n.Key).(statItem)
-        h := fmt.Sprintf("%d. %s", treeSize-i+1, order.folder)
+        h := fmt.Sprintf("%d. %s", treeSize-i+1, order.name)
 
         count := order.count
         sz := uint64(order.size)
@@ -294,11 +294,11 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
             a.Count++
             byExt[ext] = a
 
-            if currFolderStat.folder == "" {
-                currFolderStat.folder = we.Parent
+            if currFolderStat.name == "" {
+                currFolderStat.name = we.Parent
             }
 
-            if currFolderStat.folder == we.Parent {
+            if currFolderStat.name == we.Parent {
                 currFolderStat.size += we.Size
                 currFolderStat.count++
             } else {
@@ -314,7 +314,7 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
                         tree.Insert(folderSizeTree, node)
                     }
                 }
-                currFolderStat.folder = we.Parent
+                currFolderStat.name = we.Parent
                 currFolderStat.count = 1
                 currFolderStat.size = we.Size
             }
