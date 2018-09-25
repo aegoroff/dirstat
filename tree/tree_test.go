@@ -318,6 +318,15 @@ func Test_Delete_NodeDeleted(t *testing.T) {
 
 func createIntegerTestTree() *RbTree {
     nodes := []int{6, 18, 3, 15, 7, 2, 4, 13, 9, 17, 20}
+    return createIntTree(nodes)
+}
+
+func createTestStringTree() *RbTree {
+    nodes := []string{"abc", "amd", "cisco", "do", "fake", "intel", "it", "let", "microsoft", "russia", "usa", "xxx", "yyy", "zen"}
+    return createStringTree(nodes)
+}
+
+func createIntTree(nodes []int) *RbTree {
     tree := NewRbTree()
     for _, n := range nodes {
         Insert(tree, &Node{Key: createIntNode(n)})
@@ -325,8 +334,7 @@ func createIntegerTestTree() *RbTree {
     return tree
 }
 
-func createTestStringTree() *RbTree {
-    nodes := []string{"abc", "amd", "cisco", "do", "fake", "intel", "it", "let", "microsoft", "russia", "usa", "xxx", "yyy", "zen"}
+func createStringTree(nodes []string) *RbTree {
     tree := NewRbTree()
     for _, n := range nodes {
         Insert(tree, &Node{Key: createStringNode(n)})
