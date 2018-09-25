@@ -61,7 +61,20 @@ func Test_InorderWalkString_AllElementsAscending(t *testing.T) {
     ass.ElementsMatch(result, []string{"abc", "amd", "cisco", "do", "fake", "intel", "it", "let", "microsoft", "russia", "usa", "xxx", "yyy", "zen"})
 }
 
-func TestSearchSuccess(t *testing.T) {
+func Test_OrderStatisticSelect_ValueAsExpected(t *testing.T) {
+    // Arrange
+    ass := assert.New(t)
+    tree := createIntegerTestTree()
+
+    // Act
+    found := OrderStatisticSelect(tree.Root, 2)
+
+    // Assert
+    ass.NotNil(found)
+    ass.Equal(3, getIntValueOf(found))
+}
+
+func Test_SearchIntTree_Success(t *testing.T) {
     // Arrange
     ass := assert.New(t)
     tree := createIntegerTestTree()
@@ -72,10 +85,26 @@ func TestSearchSuccess(t *testing.T) {
 
     // Assert
     ass.True(ok)
+    ass.NotNil(found)
     ass.Equal(13, getIntValueOf(found))
 }
 
-func TestSearchFailure(t *testing.T) {
+func Test_SearchStringTree_Success(t *testing.T) {
+    // Arrange
+    ass := assert.New(t)
+    tree := createTestStringTree()
+    n := createStringNode("intel")
+
+    // Act
+    found, ok := Search(tree.Root, n)
+
+    // Assert
+    ass.True(ok)
+    ass.NotNil(found)
+    ass.Equal("intel", getStringValueOf(found))
+}
+
+func Test_SearchIntTree_Failure(t *testing.T) {
     // Arrange
     ass := assert.New(t)
     tree := createIntegerTestTree()
@@ -86,10 +115,10 @@ func TestSearchFailure(t *testing.T) {
 
     // Assert
     ass.False(ok)
-    ass.Nil(found.Key)
+    ass.Nil(found)
 }
 
-func TestSuccessor(t *testing.T) {
+func Test_SuccessorInTheMiddle_ReturnSuccessor(t *testing.T) {
     // Arrange
     ass := assert.New(t)
     tree := createIntegerTestTree()
@@ -103,7 +132,21 @@ func TestSuccessor(t *testing.T) {
     ass.Equal(15, getIntValueOf(s))
 }
 
-func TestPredecessor(t *testing.T) {
+func Test_SuccessorOfMax_ReturnNil(t *testing.T) {
+    // Arrange
+    ass := assert.New(t)
+    tree := createIntegerTestTree()
+    v := createIntNode(20)
+    r, _ := Search(tree.Root, v)
+
+    // Act
+    s := Successor(r)
+
+    // Assert
+    ass.Nil(s)
+}
+
+func Test_PredecessorInTheMiddle_PredecessorFound(t *testing.T) {
     // Arrange
     ass := assert.New(t)
     tree := createIntegerTestTree()
@@ -117,7 +160,21 @@ func TestPredecessor(t *testing.T) {
     ass.Equal(9, getIntValueOf(p))
 }
 
-func TestTreeMinimum(t *testing.T) {
+func Test_PredecessorOfMin_ReturnNil(t *testing.T) {
+    // Arrange
+    ass := assert.New(t)
+    tree := createIntegerTestTree()
+    v := createIntNode(2)
+    r, _ := Search(tree.Root, v)
+
+    // Act
+    p := Predecessor(r)
+
+    // Assert
+    ass.Nil(p)
+}
+
+func Test_Minimum_ValueAsExpected(t *testing.T) {
     // Arrange
     ass := assert.New(t)
     tree := createIntegerTestTree()
@@ -129,7 +186,7 @@ func TestTreeMinimum(t *testing.T) {
     ass.Equal(2, getIntValueOf(r))
 }
 
-func TestTreeMaximum(t *testing.T) {
+func Test_Maximum_ValueAsExpected(t *testing.T) {
     // Arrange
     ass := assert.New(t)
     tree := createIntegerTestTree()
@@ -141,7 +198,7 @@ func TestTreeMaximum(t *testing.T) {
     ass.Equal(20, getIntValueOf(r))
 }
 
-func TestRightRotate(t *testing.T) {
+func Test_RightRotate_StructureAsExpected(t *testing.T) {
     // Arrange
     ass := assert.New(t)
     r := Node{Key: createStringNode("root")}
@@ -177,7 +234,7 @@ func TestRightRotate(t *testing.T) {
     ass.Equal("g", getStringValueOf(y.Right))
 }
 
-func TestLeftRotate(t *testing.T) {
+func Test_LeftRotate_StructureAsExpected(t *testing.T) {
     // Arrange
     ass := assert.New(t)
     r := Node{Key: createStringNode("root")}
@@ -213,7 +270,7 @@ func TestLeftRotate(t *testing.T) {
     ass.Equal("b", getStringValueOf(x.Right))
 }
 
-func TestRbTreeWalkPreorder(t *testing.T) {
+func Test_WalkPreorder(t *testing.T) {
     // Arrange
     tree := createTestStringTree()
     b := strings.Builder{}
@@ -239,50 +296,7 @@ func TestRbTreeWalkPreorder(t *testing.T) {
     t.Log(b.String())
 }
 
-func TestRbTreeSearchSuccess(t *testing.T) {
-    // Arrange
-    ass := assert.New(t)
-    tree := createTestStringTree()
-    n := createStringNode("intel")
-
-    // Act
-    found, ok := Search(tree.Root, n)
-
-    // Assert
-    ass.True(ok)
-    ass.NotNil(found)
-    ass.Equal("intel", getStringValueOf(found))
-}
-
-func TestRbTreePredessor(t *testing.T) {
-    // Arrange
-    ass := assert.New(t)
-    tree := createTestStringTree()
-    n := createStringNode("intel")
-    found, _ := Search(tree.Root, n)
-
-    // Act
-    p := Predecessor(found)
-
-    // Assert
-    ass.Equal("fake", getStringValueOf(p))
-}
-
-func TestRbTreeSuccessor(t *testing.T) {
-    // Arrange
-    ass := assert.New(t)
-    tree := createTestStringTree()
-    n := createStringNode("intel")
-    found, _ := Search(tree.Root, n)
-
-    // Act
-    s := Successor(found)
-
-    // Assert
-    ass.Equal("it", getStringValueOf(s))
-}
-
-func TestRbTreeDelete(t *testing.T) {
+func Test_Delete_NodeDeleted(t *testing.T) {
     // Arrange
     ass := assert.New(t)
     tree := createTestStringTree()
@@ -295,7 +309,7 @@ func TestRbTreeDelete(t *testing.T) {
     // Assert
     found, ok := Search(tree.Root, n)
     ass.False(ok)
-    ass.Nil(found.Key)
+    ass.Nil(found)
 
     found, ok = Search(tree.Root, createStringNode("microsoft"))
     ass.True(ok)

@@ -4,6 +4,10 @@ package tree
 // Inserts new node into Red-Black tree
 // Creates Root if tree is empty
 func Insert(tree *RbTree, z *Node) {
+    if z == nil {
+        return
+    }
+
     if tree.Root == nil {
         tree.Root = z
         tree.Root.Color = Black
@@ -79,6 +83,10 @@ func rbInsertFixup(tree *RbTree, z *Node) {
 
 // Deletes node specified from Red-black tree
 func Delete(tree *RbTree, z *Node) {
+    if z == nil {
+        return
+    }
+
     y := z
 
     p := z.Parent

@@ -12,7 +12,13 @@ func Search(root *Node, value *Comparable) (*Node, bool) {
             x = x.Right
         }
     }
-    return x, x != nil && x.Key != nil
+    ok := x != nil && x.Key != nil
+
+    if !ok {
+        return nil, ok
+    }
+
+    return x, ok
 }
 
 // Gets tree's min element
@@ -45,6 +51,10 @@ func Successor(n *Node) *Node {
         y = y.Parent
     }
 
+    if y.Key == nil {
+        return nil
+    }
+
     return y
 }
 
@@ -58,6 +68,10 @@ func Predecessor(n *Node) *Node {
     for y != nil && y.Key != nil && n == y.Left {
         n = y
         y = y.Parent
+    }
+
+    if y.Key == nil {
+        return nil
     }
 
     return y
@@ -74,4 +88,3 @@ func OrderStatisticSelect(root *Node, i int64) *Node {
         return OrderStatisticSelect(root.Right, i-r)
     }
 }
-
