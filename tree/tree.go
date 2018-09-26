@@ -11,13 +11,17 @@ type RbTree struct {
     tnil *Node
 }
 
+// Represent red-black tree node
 type Node struct {
+    // Node key (datas)
     Key    *Comparable
     Parent *Node
     Left   *Node
     Right  *Node
-    Color  int
-    Size   int64
+    // Node color (red or black)
+    Color int
+    // Subtree size including node itself
+    Size int64
 }
 
 type Comparable interface {
@@ -48,4 +52,3 @@ func WalkPreorder(root *Node, action func(*Node)) {
         WalkPreorder(root.Right, action)
     }
 }
-
