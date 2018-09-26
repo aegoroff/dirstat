@@ -50,8 +50,9 @@ func (n GraphNode) Attributes() []encoding.Attribute {
     fillcolor := encoding.Attribute{Key: "fillcolor", Value: fc}
     fontcolor := encoding.Attribute{Key: "fontcolor", Value: "white"}
     style := encoding.Attribute{Key: "style", Value: "filled"}
-    label := encoding.Attribute{Key: "label", Value: fmt.Sprintf(`"%s (sz=%d)"`, strings.Trim(n.DOTID(), `""`), node.Size)}
-    return []encoding.Attribute{fontcolor, fillcolor, style, label}
+    shape := encoding.Attribute{Key: "shape", Value: "box"}
+    label := encoding.Attribute{Key: "label", Value: fmt.Sprintf(`"%s [%d]"`, strings.Trim(n.DOTID(), `""`), node.Size)}
+    return []encoding.Attribute{fontcolor, fillcolor, style, label, shape}
 }
 
 func (x IntNode) LessThan(y interface{}) bool {
@@ -344,7 +345,7 @@ func Test_DeleteFromLargeTree_SpecifiedNodeColorBlack(t *testing.T) {
 
 func Test_GraphvizString(t *testing.T) {
     // Arrange
-    tree := createIntegerTestTree()
+    tree := createTestStringTree()
 
     // Act
     graphviz := getTreeAsGraphviz(tree)
