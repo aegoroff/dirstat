@@ -134,15 +134,18 @@ func rbDeleteFixup(tree *RbTree, x *Node) {
                 leftRotate(tree, x.Parent)
                 w = x.Parent.Right
             }
+
             if w.Left.Color == Black && w.Right.Color == Black {
                 w.Color = Red
                 x = x.Parent
-            } else if w.Right.Color == Black {
-                w.Left.Color = Black
-                w.Color = Red
-                rightRotate(tree, w)
-                w = x.Parent.Right
             } else {
+                if w.Right.Color == Black {
+                    w.Left.Color = Black
+                    w.Color = Red
+                    rightRotate(tree, w)
+                    w = x.Parent.Right
+                }
+
                 w.Color = x.Parent.Color
                 x.Parent.Color = Black
                 w.Right.Color = Black
@@ -157,15 +160,18 @@ func rbDeleteFixup(tree *RbTree, x *Node) {
                 rightRotate(tree, x.Parent)
                 w = x.Parent.Left
             }
+
             if w.Right.Color == Black && w.Left.Color == Black {
                 w.Color = Red
                 x = x.Parent
-            } else if w.Left.Color == Black {
-                w.Right.Color = Black
-                w.Color = Red
-                leftRotate(tree, w)
-                w = x.Parent.Left
             } else {
+                if w.Left.Color == Black {
+                    w.Right.Color = Black
+                    w.Color = Red
+                    leftRotate(tree, w)
+                    w = x.Parent.Left
+                }
+
                 w.Color = x.Parent.Color
                 x.Parent.Color = Black
                 w.Left.Color = Black
@@ -174,6 +180,7 @@ func rbDeleteFixup(tree *RbTree, x *Node) {
             }
         }
     }
+    x.Color = Black
 }
 
 func rbTransplant(tree *RbTree, u *Node, v *Node) {
