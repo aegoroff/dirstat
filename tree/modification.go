@@ -53,10 +53,12 @@ func rbInsertFixup(tree *RbTree, z *Node) {
                 y.Color = Black
                 z.Parent.Parent.Color = Red
                 z = z.Parent.Parent
-            } else if z == z.Parent.Right {
-                z = z.Parent
-                leftRotate(tree, z)
             } else {
+                if z == z.Parent.Right {
+                    z = z.Parent
+                    leftRotate(tree, z)
+                }
+
                 z.Parent.Color = Black
                 z.Parent.Parent.Color = Red
                 rightRotate(tree, z.Parent.Parent)
@@ -68,10 +70,12 @@ func rbInsertFixup(tree *RbTree, z *Node) {
                 y.Color = Black
                 z.Parent.Parent.Color = Red
                 z = z.Parent.Parent
-            } else if z == z.Parent.Left {
-                z = z.Parent
-                rightRotate(tree, z)
             } else {
+                if z == z.Parent.Left {
+                    z = z.Parent
+                    rightRotate(tree, z)
+                }
+
                 z.Parent.Color = Black
                 z.Parent.Parent.Color = Red
                 leftRotate(tree, z.Parent.Parent)
