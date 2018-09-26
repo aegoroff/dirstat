@@ -3,6 +3,9 @@ package tree
 import (
     "fmt"
     "github.com/stretchr/testify/assert"
+    "gonum.org/v1/gonum/graph/encoding"
+    "gonum.org/v1/gonum/graph/encoding/dot"
+    "gonum.org/v1/gonum/graph/simple"
     "strings"
     "testing"
 )
@@ -13,6 +16,43 @@ type IntNode struct {
 
 type StringNode struct {
     value string
+}
+
+type GraphNode struct {
+    Node *Node
+    NodeID int64
+}
+
+func (n GraphNode) ID() int64 {
+    return n.NodeID
+}
+
+func (n GraphNode) DOTID() string {
+    if realNode, ok := (*n.Node.Key).(StringNode); ok {
+        return fmt.Sprintf("\"%v\"", realNode.value)
+    }
+
+    if realNode, ok := (*n.Node.Key).(IntNode); ok {
+        return fmt.Sprintf("\"%d\"", realNode.value)
+    }
+
+    return ""
+}
+
+func (n GraphNode) Attributes() []encoding.Attribute {
+    node := *n.Node
+
+    fc := "black"
+    fontcolor := "white"
+    if node.Color == Red {
+        fc = "red"
+    }
+
+    fillcolor := encoding.Attribute{Key:"fillcolor", Value:fc}
+    color := encoding.Attribute{Key:"fontcolor", Value:fontcolor}
+    style := encoding.Attribute{Key:"style", Value:"filled"}
+    label := encoding.Attribute{Key:"label", Value:fmt.Sprintf(`"%s (sz=%d)"`, strings.Trim(n.DOTID(), `""`), node.Size)}
+    return []encoding.Attribute { color, fillcolor, style, label }
 }
 
 func (x IntNode) LessThan(y interface{}) bool {
@@ -270,27 +310,61 @@ func Test_LeftRotate_StructureAsExpected(t *testing.T) {
     ass.Equal("b", getStringValueOf(x.Right))
 }
 
-func Test_WalkPreorder(t *testing.T) {
+func Test_WalkPreorderStringTree(t *testing.T) {
     // Arrange
     tree := createTestStringTree()
     b := strings.Builder{}
+    graph := simple.NewUndirectedGraph()
+
+    var id int64
 
     // Act
     WalkPreorder(tree.Root, func(node *Node) {
-        margin := ""
-        p := node.Parent
-        for p != tree.tnil {
-            margin += "-"
-            p = p.Parent
-        }
 
-        c := "Black"
-        if node.Color == Red {
-            c = "Red"
+        gn := &GraphNode{ Node:node, NodeID: id}
+        graph.AddNode(gn)
+        id++
+        for _, n := range graph.Nodes() {
+            if node.Parent.Key != nil && n.(*GraphNode).Node.Key == node.Parent.Key {
+                edge := graph.NewEdge(n, gn)
+                graph.SetEdge(edge)
+            }
         }
-
-        b.WriteString(fmt.Sprintf("\n%s %v (%d): %s", margin, getStringValueOf(node), node.Size, c))
     })
+
+    data, _ := dot.Marshal(graph, "", " ", " ", false)
+
+    b.Write(data)
+
+    // Assert
+    t.Log(b.String())
+}
+
+func Test_WalkPreorderIntTree(t *testing.T) {
+    // Arrange
+    tree := createIntegerTestTree()
+    b := strings.Builder{}
+    graph := simple.NewUndirectedGraph()
+
+    var id int64
+
+    // Act
+    WalkPreorder(tree.Root, func(node *Node) {
+
+        gn := &GraphNode{ Node:node, NodeID: id}
+        graph.AddNode(gn)
+        id++
+        for _, n := range graph.Nodes() {
+            if node.Parent.Key != nil && n.(*GraphNode).Node.Key == node.Parent.Key {
+                edge := graph.NewEdge(n, gn)
+                graph.SetEdge(edge)
+            }
+        }
+    })
+
+    data, _ := dot.Marshal(graph, "", " ", " ", false)
+
+    b.Write(data)
 
     // Assert
     t.Log(b.String())
