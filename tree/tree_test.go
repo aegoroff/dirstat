@@ -51,7 +51,7 @@ func (n GraphNode) Attributes() []encoding.Attribute {
     fontcolor := encoding.Attribute{Key: "fontcolor", Value: "white"}
     style := encoding.Attribute{Key: "style", Value: "filled"}
     shape := encoding.Attribute{Key: "shape", Value: "box"}
-    label := encoding.Attribute{Key: "label", Value: fmt.Sprintf(`"%s [%d]"`, strings.Trim(n.DOTID(), `""`), node.Size)}
+    label := encoding.Attribute{Key: "label", Value: fmt.Sprintf(`"%s [%d]"`, strings.Trim(n.DOTID(), `"`), node.Size)}
     return []encoding.Attribute{fontcolor, fillcolor, style, label, shape}
 }
 
