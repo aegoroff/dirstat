@@ -13,7 +13,7 @@ type RbTree struct {
 
 // Represent red-black tree node
 type Node struct {
-    // Node key (datas)
+    // Node key (data)
     Key    *Comparable
     Parent *Node
     Left   *Node
