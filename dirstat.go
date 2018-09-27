@@ -100,6 +100,14 @@ func (x statItem) EqualTo(y interface{}) bool {
     return x.size == (y.(statItem)).size
 }
 
+func (x namedInt64) LessThan(y interface{}) bool {
+    return x.value < (y.(namedInt64)).value
+}
+
+func (x namedInt64) EqualTo(y interface{}) bool {
+    return x.value == (y.(namedInt64)).value
+}
+
 func main() {
     opt := options{}
 
@@ -117,7 +125,7 @@ func main() {
 }
 
 func runAnalyze(opt options) {
-    total, stat, filesByRange, byExt, byFolder := walk(opt)
+    total, stat, filesByRange, byExt, byFolder, topFiles := walk(opt)
     total.CountFileExts = len(byExt)
 
     extBySize := createSliceFromMap(byExt, func(aggregate countSizeAggregate) int64 {
@@ -190,6 +198,23 @@ func runAnalyze(opt options) {
 
     tw.Flush()
 
+    fmt.Printf("\nTOP %d files by size:\n\n", Top)
+    fmt.Fprintf(tw, "%v\t%v\n", "File", "Size")
+    fmt.Fprintf(tw, "%v\t%v\n", "------", "----")
+
+    fileTreeSize := topFiles.Root.Size
+    for i := fileTreeSize; i > 0; i-- {
+        n := tree.OrderStatisticSelect(topFiles.Root, i)
+        order := (*n.Key).(namedInt64)
+        h := fmt.Sprintf("%d. %s", fileTreeSize-i+1, order.name)
+
+        sz := uint64(order.value)
+
+        fmt.Fprintf(tw, "%v\t%v\n", h, humanize.IBytes(sz))
+    }
+
+    tw.Flush()
+
     fmt.Printf("\nTOP %d folders by size:\n\n", Top)
     fmt.Fprintf(tw, format, "Folder", "Files", "%", "Size", "%")
     fmt.Fprintf(tw, format, "------", "-----", "------", "----", "------")
@@ -248,7 +273,7 @@ func createSliceFromMap(sizeByExt map[string]countSizeAggregate, mapper func(cou
     return result
 }
 
-func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, map[string]countSizeAggregate, *tree.RbTree) {
+func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, map[string]countSizeAggregate, *tree.RbTree, *tree.RbTree) {
     verboseRanges := make(map[int]bool)
     for _, x := range opt.Range {
         verboseRanges[x] = true
@@ -271,6 +296,7 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
     }(ch)
 
     folderSizeTree := tree.NewRbTree()
+    fileSizeTree := tree.NewRbTree()
 
     currFolderStat := statItem{}
 
@@ -307,7 +333,7 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
                     tree.Insert(folderSizeTree, node)
                 } else {
                     minSizeNode := tree.Minimum(folderSizeTree.Root)
-                    if getSizeFromStatItemNode(minSizeNode) < currFolderStat.size {
+                    if getSizeFromNode(minSizeNode) < currFolderStat.size {
                         tree.Delete(folderSizeTree, minSizeNode)
 
                         node := createTreeNode(currFolderStat)
@@ -317,6 +343,21 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
                 currFolderStat.name = we.Parent
                 currFolderStat.count = 1
                 currFolderStat.size = we.Size
+            }
+
+            if fileSizeTree.Root == nil || fileSizeTree.Root.Size < Top {
+                fullPath := filepath.Join(we.Parent, we.Name)
+                node := createTreeNode(namedInt64{value: we.Size, name: fullPath})
+                tree.Insert(fileSizeTree, node)
+            } else {
+                minSizeNode := tree.Minimum(fileSizeTree.Root)
+                if getSizeFromNode(minSizeNode) < we.Size {
+                    tree.Delete(fileSizeTree, minSizeNode)
+
+                    fullPath := filepath.Join(we.Parent, we.Name)
+                    node := createTreeNode(namedInt64{value: we.Size, name: fullPath})
+                    tree.Insert(fileSizeTree, node)
+                }
             }
 
             for i, r := range fileSizeRanges {
@@ -344,17 +385,23 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
     }
 
     total.ReadingTime = time.Since(start)
-    return total, stat, filesByRange, byExt, folderSizeTree
+    return total, stat, filesByRange, byExt, folderSizeTree, fileSizeTree
 }
 
-func createTreeNode(si statItem) *tree.Node {
-    var key tree.Comparable
-    key = si
-    return &tree.Node{Key: &key}
+func createTreeNode(si tree.Comparable) *tree.Node {
+    return &tree.Node{Key: &si}
 }
 
-func getSizeFromStatItemNode(node *tree.Node) int64 {
-    return (*node.Key).(statItem).size
+func getSizeFromNode(node *tree.Node) int64 {
+    if k, ok := (*node.Key).(statItem); ok {
+        return k.size
+    }
+
+    if k, ok := (*node.Key).(namedInt64); ok {
+        return k.value
+    }
+
+    return 0
 }
 
 func printTotals(t totalInfo) {
