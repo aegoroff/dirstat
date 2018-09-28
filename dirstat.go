@@ -329,14 +329,14 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
                 currFolderStat.count++
             } else {
                 if folderSizeTree.Root == nil || folderSizeTree.Root.Size < Top {
-                    node := createTreeNode(currFolderStat)
+                    node := tree.NewNode(currFolderStat)
                     tree.Insert(folderSizeTree, node)
                 } else {
                     minSizeNode := tree.Minimum(folderSizeTree.Root)
                     if getSizeFromNode(minSizeNode) < currFolderStat.size {
                         tree.Delete(folderSizeTree, minSizeNode)
 
-                        node := createTreeNode(currFolderStat)
+                        node := tree.NewNode(currFolderStat)
                         tree.Insert(folderSizeTree, node)
                     }
                 }
@@ -347,7 +347,7 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
 
             if fileSizeTree.Root == nil || fileSizeTree.Root.Size < Top {
                 fullPath := filepath.Join(we.Parent, we.Name)
-                node := createTreeNode(namedInt64{value: we.Size, name: fullPath})
+                node := tree.NewNode(namedInt64{value: we.Size, name: fullPath})
                 tree.Insert(fileSizeTree, node)
             } else {
                 minSizeNode := tree.Minimum(fileSizeTree.Root)
@@ -355,7 +355,7 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
                     tree.Delete(fileSizeTree, minSizeNode)
 
                     fullPath := filepath.Join(we.Parent, we.Name)
-                    node := createTreeNode(namedInt64{value: we.Size, name: fullPath})
+                    node := tree.NewNode(namedInt64{value: we.Size, name: fullPath})
                     tree.Insert(fileSizeTree, node)
                 }
             }
@@ -386,10 +386,6 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
 
     total.ReadingTime = time.Since(start)
     return total, stat, filesByRange, byExt, folderSizeTree, fileSizeTree
-}
-
-func createTreeNode(si tree.Comparable) *tree.Node {
-    return &tree.Node{Key: &si}
 }
 
 func getSizeFromNode(node *tree.Node) int64 {

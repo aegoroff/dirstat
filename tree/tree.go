@@ -35,6 +35,11 @@ func NewRbTree() *RbTree {
     return &RbTree{tnil: &tnil}
 }
 
+// Creates new node
+func NewNode(si Comparable) *Node {
+    return &Node{Key: &si}
+}
+
 // Walks tree inorder (left, node, right)
 func WalkInorder(root *Node, action func(*Node)) {
     if root != nil && root.Key != nil {
