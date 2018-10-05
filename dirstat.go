@@ -204,7 +204,7 @@ func runAnalyze(opt options) {
 
     fileTreeSize := topFiles.Root.Size
     for i := fileTreeSize; i > 0; i-- {
-        n := tree.OrderStatisticSelect(topFiles.Root, i)
+        n := rbtree.OrderStatisticSelect(topFiles.Root, i)
         order := (*n.Key).(namedInt64)
         h := fmt.Sprintf("%d. %s", fileTreeSize-i+1, order.name)
 
@@ -221,7 +221,7 @@ func runAnalyze(opt options) {
 
     treeSize := byFolder.Root.Size
     for i := treeSize; i > 0; i-- {
-        n := tree.OrderStatisticSelect(byFolder.Root, i)
+        n := rbtree.OrderStatisticSelect(byFolder.Root, i)
         order := (*n.Key).(statItem)
         h := fmt.Sprintf("%d. %s", treeSize-i+1, order.name)
 
@@ -273,7 +273,7 @@ func createSliceFromMap(sizeByExt map[string]countSizeAggregate, mapper func(cou
     return result
 }
 
-func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, map[string]countSizeAggregate, *tree.RbTree, *tree.RbTree) {
+func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, map[string]countSizeAggregate, *rbtree.RbTree, *rbtree.RbTree) {
     verboseRanges := make(map[int]bool)
     for _, x := range opt.Range {
         verboseRanges[x] = true
@@ -295,8 +295,8 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
         close(ch)
     }(ch)
 
-    folderSizeTree := tree.NewRbTree()
-    fileSizeTree := tree.NewRbTree()
+    folderSizeTree := rbtree.NewRbTree()
+    fileSizeTree := rbtree.NewRbTree()
 
     currFolderStat := statItem{}
 
@@ -329,15 +329,15 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
                 currFolderStat.count++
             } else {
                 if folderSizeTree.Root == nil || folderSizeTree.Root.Size < Top {
-                    node := tree.NewNode(currFolderStat)
-                    tree.Insert(folderSizeTree, node)
+                    node := rbtree.NewNode(currFolderStat)
+                    rbtree.Insert(folderSizeTree, node)
                 } else {
-                    minSizeNode := tree.Minimum(folderSizeTree.Root)
+                    minSizeNode := rbtree.Minimum(folderSizeTree.Root)
                     if getSizeFromNode(minSizeNode) < currFolderStat.size {
-                        tree.Delete(folderSizeTree, minSizeNode)
+                        rbtree.Delete(folderSizeTree, minSizeNode)
 
-                        node := tree.NewNode(currFolderStat)
-                        tree.Insert(folderSizeTree, node)
+                        node := rbtree.NewNode(currFolderStat)
+                        rbtree.Insert(folderSizeTree, node)
                     }
                 }
                 currFolderStat.name = we.Parent
@@ -347,16 +347,16 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
 
             if fileSizeTree.Root == nil || fileSizeTree.Root.Size < Top {
                 fullPath := filepath.Join(we.Parent, we.Name)
-                node := tree.NewNode(namedInt64{value: we.Size, name: fullPath})
-                tree.Insert(fileSizeTree, node)
+                node := rbtree.NewNode(namedInt64{value: we.Size, name: fullPath})
+                rbtree.Insert(fileSizeTree, node)
             } else {
-                minSizeNode := tree.Minimum(fileSizeTree.Root)
+                minSizeNode := rbtree.Minimum(fileSizeTree.Root)
                 if getSizeFromNode(minSizeNode) < we.Size {
-                    tree.Delete(fileSizeTree, minSizeNode)
+                    rbtree.Delete(fileSizeTree, minSizeNode)
 
                     fullPath := filepath.Join(we.Parent, we.Name)
-                    node := tree.NewNode(namedInt64{value: we.Size, name: fullPath})
-                    tree.Insert(fileSizeTree, node)
+                    node := rbtree.NewNode(namedInt64{value: we.Size, name: fullPath})
+                    rbtree.Insert(fileSizeTree, node)
                 }
             }
 
@@ -388,7 +388,7 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
     return total, stat, filesByRange, byExt, folderSizeTree, fileSizeTree
 }
 
-func getSizeFromNode(node *tree.Node) int64 {
+func getSizeFromNode(node *rbtree.Node) int64 {
     if k, ok := (*node.Key).(statItem); ok {
         return k.size
     }
