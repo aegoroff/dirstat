@@ -2,8 +2,8 @@
 package main
 
 import (
-    "dirstat/tree"
     "fmt"
+    "github.com/aegoroff/godatastruct/rbtree"
     "github.com/dustin/go-humanize"
     "github.com/voxelbrain/goptions"
     "log"
