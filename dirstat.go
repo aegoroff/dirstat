@@ -202,7 +202,7 @@ func runAnalyze(opt options) {
 	fmt.Fprintf(tw, "%v\t%v\n", "File", "Size")
 	fmt.Fprintf(tw, "%v\t%v\n", "------", "----")
 
-	fileTreeSize := topFiles.Root.Size
+	fileTreeSize := topFiles.Len()
 	for i := fileTreeSize; i > 0; i-- {
 		n := topFiles.OrderStatisticSelect(i)
 		order := (*n.Key).(namedInt64)
@@ -219,7 +219,7 @@ func runAnalyze(opt options) {
 	fmt.Fprintf(tw, format, "Folder", "Files", "%", "Size", "%")
 	fmt.Fprintf(tw, format, "------", "-----", "------", "----", "------")
 
-	treeSize := byFolder.Root.Size
+	treeSize := byFolder.Len()
 	for i := treeSize; i > 0; i-- {
 		n := byFolder.OrderStatisticSelect(i)
 		order := (*n.Key).(statItem)
