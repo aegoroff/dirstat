@@ -202,16 +202,20 @@ func runAnalyze(opt options) {
 	fmt.Fprintf(tw, "%v\t%v\n", "File", "Size")
 	fmt.Fprintf(tw, "%v\t%v\n", "------", "----")
 
-	fileTreeSize := topFiles.Len()
-	for i := fileTreeSize; i > 0; i-- {
-		n := topFiles.OrderStatisticSelect(i)
-		order := (*n.Key).(namedInt64)
-		h := fmt.Sprintf("%d. %s", fileTreeSize-i+1, order.name)
+	i := 1
 
-		sz := uint64(order.value)
+	topFiles.Descend(func(c *rbtree.Comparable) bool {
+		file := (*c).(namedInt64)
+		h := fmt.Sprintf("%d. %s", i, file.name)
+
+		i++
+
+		sz := uint64(file.value)
 
 		fmt.Fprintf(tw, "%v\t%v\n", h, humanize.IBytes(sz))
-	}
+
+		return true
+	})
 
 	tw.Flush()
 
@@ -219,20 +223,25 @@ func runAnalyze(opt options) {
 	fmt.Fprintf(tw, format, "Folder", "Files", "%", "Size", "%")
 	fmt.Fprintf(tw, format, "------", "-----", "------", "----", "------")
 
-	treeSize := byFolder.Len()
-	for i := treeSize; i > 0; i-- {
-		n := byFolder.OrderStatisticSelect(i)
-		order := (*n.Key).(statItem)
-		h := fmt.Sprintf("%d. %s", treeSize-i+1, order.name)
+	i = 1
 
-		count := order.count
-		sz := uint64(order.size)
+	byFolder.Descend(func(c *rbtree.Comparable) bool {
+
+		folder := (*c).(statItem)
+		h := fmt.Sprintf("%d. %s", i, folder.name)
+
+		i++
+
+		count := folder.count
+		sz := uint64(folder.size)
 
 		percentOfCount := countPercent(count, total)
 		percentOfSize := sizePercent(sz, total)
 
 		fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", h, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
-	}
+
+		return true
+	})
 
 	tw.Flush()
 
@@ -345,7 +354,7 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
 				currFolderStat.size = we.Size
 			}
 
-			if fileSizeTree.Root == nil || fileSizeTree.Root.Size < Top {
+			if fileSizeTree.Len() < Top {
 				fullPath := filepath.Join(we.Parent, we.Name)
 				node := rbtree.NewNode(namedInt64{value: we.Size, name: fullPath})
 				fileSizeTree.Insert(node)
