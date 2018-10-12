@@ -337,7 +337,7 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
 				currFolderStat.size += we.Size
 				currFolderStat.count++
 			} else {
-				if folderSizeTree.Root == nil || folderSizeTree.Root.Size < Top {
+				if folderSizeTree.Len() < Top {
 					node := rbtree.NewNode(currFolderStat)
 					folderSizeTree.Insert(node)
 				} else {
