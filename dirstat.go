@@ -337,36 +337,29 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
 				currFolderStat.size += we.Size
 				currFolderStat.count++
 			} else {
-				if folderSizeTree.Len() < Top {
+				if folderSizeTree.Len() < Top || getSizeFromNode(folderSizeTree.Minimum()) < currFolderStat.size {
+					if folderSizeTree.Len() == Top {
+						folderSizeTree.Delete(folderSizeTree.Minimum())
+					}
+
 					node := rbtree.NewNode(currFolderStat)
 					folderSizeTree.Insert(node)
-				} else {
-					minSizeNode := folderSizeTree.Minimum()
-					if getSizeFromNode(minSizeNode) < currFolderStat.size {
-						folderSizeTree.Delete(minSizeNode)
-
-						node := rbtree.NewNode(currFolderStat)
-						folderSizeTree.Insert(node)
-					}
 				}
+
 				currFolderStat.name = we.Parent
 				currFolderStat.count = 1
 				currFolderStat.size = we.Size
 			}
 
-			if fileSizeTree.Len() < Top {
-				fullPath := filepath.Join(we.Parent, we.Name)
-				node := rbtree.NewNode(namedInt64{value: we.Size, name: fullPath})
-				fileSizeTree.Insert(node)
-			} else {
-				minSizeNode := fileSizeTree.Minimum()
-				if getSizeFromNode(minSizeNode) < we.Size {
-					fileSizeTree.Delete(minSizeNode)
-
-					fullPath := filepath.Join(we.Parent, we.Name)
-					node := rbtree.NewNode(namedInt64{value: we.Size, name: fullPath})
-					fileSizeTree.Insert(node)
+			if fileSizeTree.Len() < Top || getSizeFromNode(fileSizeTree.Minimum()) < we.Size {
+				if fileSizeTree.Len() == Top {
+					fileSizeTree.Delete(fileSizeTree.Minimum())
 				}
+
+				fullPath := filepath.Join(we.Parent, we.Name)
+				value := namedInt64{value: we.Size, name: fullPath}
+				node := rbtree.NewNode(value)
+				fileSizeTree.Insert(node)
 			}
 
 			for i, r := range fileSizeRanges {
