@@ -16,12 +16,10 @@ import (
 )
 
 type options struct {
-	Help       goptions.Help `goptions:"-h, --help, description='Show this help'"`
-	Verbosity  bool          `goptions:"-v, --verbose, description='Be verbose'"`
-	Range      []int         `goptions:"-r, --range, description='Output verbose files info for fileSizeRanges specified'"`
-	Path       string        `goptions:"-p, --path, obligatory, description='Name to the directory'"`
-	CpuProfile string        `goptions:"-c, --cpuprofile, description='CPU profile file'"`
-	MemProfile string        `goptions:"-m, --memprofile, description='Memory profile file'"`
+	Help      goptions.Help `goptions:"-h, --help, description='Show this help'"`
+	Verbosity bool          `goptions:"-v, --verbose, description='Be verbose'"`
+	Range     []int         `goptions:"-r, --range, description='Output verbose files info for fileSizeRanges specified'"`
+	Path      string        `goptions:"-p, --path, obligatory, description='Name to the directory'"`
 }
 
 const (
