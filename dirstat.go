@@ -9,7 +9,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"runtime/pprof"
 	"sort"
 	"text/tabwriter"
 	"text/template"
@@ -122,25 +121,7 @@ func main() {
 
 	fmt.Printf("Root: %s\n\n", opt.Path)
 
-	if opt.CpuProfile != "" {
-		f, err := os.Create(opt.CpuProfile)
-		if err != nil {
-			log.Fatal(err)
-		}
-		pprof.StartCPUProfile(f)
-		defer pprof.StopCPUProfile()
-	}
-
 	runAnalyze(opt)
-
-	if opt.MemProfile != "" {
-		f, err := os.Create(opt.MemProfile)
-		if err != nil {
-			log.Fatal(err)
-		}
-		pprof.WriteHeapProfile(f)
-		f.Close()
-	}
 
 	printMemUsage()
 }
