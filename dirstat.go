@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime/pprof"
 	"sort"
 	"text/tabwriter"
 	"text/template"
@@ -16,10 +17,12 @@ import (
 )
 
 type options struct {
-	Help      goptions.Help `goptions:"-h, --help, description='Show this help'"`
-	Verbosity bool          `goptions:"-v, --verbose, description='Be verbose'"`
-	Range     []int         `goptions:"-r, --range, description='Output verbose files info for fileSizeRanges specified'"`
-	Path      string        `goptions:"-p, --path, obligatory, description='Name to the directory'"`
+	Help       goptions.Help `goptions:"-h, --help, description='Show this help'"`
+	Verbosity  bool          `goptions:"-v, --verbose, description='Be verbose'"`
+	Range      []int         `goptions:"-r, --range, description='Output verbose files info for fileSizeRanges specified'"`
+	Path       string        `goptions:"-p, --path, obligatory, description='Name to the directory'"`
+	CpuProfile string        `goptions:"-c, --cpuprofile, description='CPU profile file'"`
+	MemProfile string        `goptions:"-m, --memprofile, description='Memory profile file'"`
 }
 
 const (
@@ -119,7 +122,25 @@ func main() {
 
 	fmt.Printf("Root: %s\n\n", opt.Path)
 
+	if opt.CpuProfile != "" {
+		f, err := os.Create(opt.CpuProfile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
+
 	runAnalyze(opt)
+
+	if opt.MemProfile != "" {
+		f, err := os.Create(opt.MemProfile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.WriteHeapProfile(f)
+		f.Close()
+	}
 
 	printMemUsage()
 }
