@@ -342,7 +342,9 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
 						folderSizeTree.Delete(folderSizeTree.Minimum())
 					}
 
-					node := rbtree.NewNode(currFolderStat)
+					var c rbtree.Comparable
+					c = currFolderStat
+					node := rbtree.NewNode(&c)
 					folderSizeTree.Insert(node)
 				}
 
@@ -358,7 +360,10 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
 
 				fullPath := filepath.Join(we.Parent, we.Name)
 				value := namedInt64{value: we.Size, name: fullPath}
-				node := rbtree.NewNode(value)
+
+				var c rbtree.Comparable
+				c = value
+				node := rbtree.NewNode(&c)
 				fileSizeTree.Insert(node)
 			}
 
