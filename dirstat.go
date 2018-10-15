@@ -337,9 +337,10 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
 				currFolderStat.size += we.Size
 				currFolderStat.count++
 			} else {
-				if folderSizeTree.Len() < Top || getSizeFromNode(folderSizeTree.Minimum()) < currFolderStat.size {
+				minfolder := folderSizeTree.Minimum()
+				if folderSizeTree.Len() < Top || getSizeFromNode(minfolder) < currFolderStat.size {
 					if folderSizeTree.Len() == Top {
-						folderSizeTree.Delete(folderSizeTree.Minimum())
+						folderSizeTree.Delete(minfolder)
 					}
 
 					var c rbtree.Comparable
@@ -353,9 +354,10 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
 				currFolderStat.size = we.Size
 			}
 
-			if fileSizeTree.Len() < Top || getSizeFromNode(fileSizeTree.Minimum()) < we.Size {
+			minfile := fileSizeTree.Minimum()
+			if fileSizeTree.Len() < Top || getSizeFromNode(minfile) < we.Size {
 				if fileSizeTree.Len() == Top {
-					fileSizeTree.Delete(fileSizeTree.Minimum())
+					fileSizeTree.Delete(minfile)
 				}
 
 				fullPath := filepath.Join(we.Parent, we.Name)
