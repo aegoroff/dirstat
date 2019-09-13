@@ -3,9 +3,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/aegoroff/godatastruct/rbtree"
-	"github.com/dustin/go-humanize"
-	"github.com/voxelbrain/goptions"
 	"log"
 	"os"
 	"path/filepath"
@@ -13,6 +10,10 @@ import (
 	"text/tabwriter"
 	"text/template"
 	"time"
+
+	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/dustin/go-humanize"
+	"github.com/voxelbrain/goptions"
 )
 
 type options struct {
@@ -166,7 +167,7 @@ func runAnalyze(opt options) {
 	fmt.Fprintf(tw, format, "Extension", "Count", "%", "Size", "%")
 	fmt.Fprintf(tw, format, "---------", "-----", "------", "----", "------")
 
-	for i := 0; i < Top; i++ {
+	for i := 0; i < Top && i < len(extBySize); i++ {
 		h := extBySize[i].name
 
 		count := byExt[h].Count
@@ -184,7 +185,7 @@ func runAnalyze(opt options) {
 	fmt.Fprintf(tw, format, "Extension", "Count", "%", "Size", "%")
 	fmt.Fprintf(tw, format, "---------", "-----", "------", "----", "------")
 
-	for i := 0; i < Top; i++ {
+	for i := 0; i < Top && i < len(extByCount); i++ {
 		h := extByCount[i].name
 
 		count := extByCount[i].value
