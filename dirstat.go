@@ -118,6 +118,10 @@ func main() {
 		log.Fatalf("Directory '%s' does not exist. Details:\n  %v", opt.Path, err)
 	}
 
+	if opt.Path[len(opt.Path)-1] == ':' {
+		opt.Path = filepath.Join(opt.Path, "\\")
+	}
+
 	fmt.Printf("Root: %s\n\n", opt.Path)
 
 	runAnalyze(opt)
