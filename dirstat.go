@@ -299,10 +299,10 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
 	start := time.Now()
 
 	go func(ch chan<- *walkEntry) {
+		defer close(ch)
 		walkDirBreadthFirst(opt.Path, func(parent string, entry os.FileInfo) {
 			ch <- &walkEntry{IsDir: entry.IsDir(), Size: entry.Size(), Parent: parent, Name: entry.Name()}
 		})
-		close(ch)
 	}(ch)
 
 	folderSizeTree := rbtree.NewRbTree()
@@ -310,12 +310,7 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
 
 	currFolderStat := statItem{}
 
-	for {
-		we, ok := <-ch
-		if !ok {
-			break
-		}
-
+	for we := range ch {
 		if we.IsDir {
 			total.CountFolders++
 		} else {
