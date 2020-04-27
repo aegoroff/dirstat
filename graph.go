@@ -49,11 +49,7 @@ func createFileSystemGraph(path string) (graph *simple.WeightedDirectedGraph, ro
 
 	queue := []*dirNode{{Node: root, Path: path}}
 
-	for {
-		walkNode, ok := <-ch
-		if !ok {
-			break
-		}
+	for walkNode := range ch  {
 		node := walkNode.Node
 
 		graph.AddNode(node)
