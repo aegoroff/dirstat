@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/dustin/go-humanize"
-	"io/ioutil"
+	"github.com/spf13/afero"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -21,7 +21,7 @@ func printMemUsage() {
 	fmt.Printf("\tNumGC = %v\n", m.NumGC)
 }
 
-func walkDirBreadthFirst(path string, action func(parent string, entry os.FileInfo)) {
+func walkDirBreadthFirst(path string, fs afero.Fs, action func(parent string, entry os.FileInfo)) {
 	queue := make([]string, 0)
 
 	queue = append(queue, path)
@@ -29,7 +29,7 @@ func walkDirBreadthFirst(path string, action func(parent string, entry os.FileIn
 	for len(queue) > 0 {
 		curr := queue[0]
 
-		for _, entry := range dirents(curr) {
+		for _, entry := range dirents(curr, fs) {
 			action(curr, entry)
 			if entry.IsDir() {
 				queue = append(queue, filepath.Join(curr, entry.Name()))
@@ -40,8 +40,14 @@ func walkDirBreadthFirst(path string, action func(parent string, entry os.FileIn
 	}
 }
 
-func dirents(path string) []os.FileInfo {
-	entries, err := ioutil.ReadDir(path)
+func dirents(path string, fs afero.Fs) []os.FileInfo {
+	f, err := fs.Open(path)
+	if err != nil {
+		return nil
+	}
+	defer f.Close()
+
+	entries, err := f.Readdir(-1)
 	if err != nil {
 		return nil
 	}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/spf13/afero"
 	"math"
 	"os"
 	"path/filepath"
@@ -35,7 +36,7 @@ func (n node) DOTID() string {
 	return fmt.Sprintf("\"%s\"", n.Name)
 }
 
-func createFileSystemGraph(path string) (graph *simple.WeightedDirectedGraph, root *node, elapsed time.Duration) {
+func createFileSystemGraph(path string, fs afero.Fs) (graph *simple.WeightedDirectedGraph, root *node, elapsed time.Duration) {
 	graph = simple.NewWeightedDirectedGraph(0, math.Inf(1))
 
 	start := time.Now()
@@ -45,7 +46,7 @@ func createFileSystemGraph(path string) (graph *simple.WeightedDirectedGraph, ro
 
 	ch := make(chan *walkNode, 1024)
 
-	go runWalkingDir(path, 1, ch)
+	go runWalkingDir(path, fs, 1, ch)
 
 	queue := []*dirNode{{Node: root, Path: path}}
 
@@ -74,8 +75,8 @@ func createFileSystemGraph(path string) (graph *simple.WeightedDirectedGraph, ro
 	return graph, root, elapsed
 }
 
-func runWalkingDir(path string, nextID int64, ch chan<- *walkNode) {
-	walkDirBreadthFirst(path, func(parent string, entry os.FileInfo) {
+func runWalkingDir(path string, fs afero.Fs, nextID int64, ch chan<- *walkNode) {
+	walkDirBreadthFirst(path, fs, func(parent string, entry os.FileInfo) {
 		node := &node{NodeID: nextID, Name: entry.Name(), IsDir: entry.IsDir()}
 		ch <- &walkNode{Node: node, Parent: parent, Size: entry.Size()}
 		nextID++

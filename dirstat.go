@@ -3,6 +3,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/spf13/afero"
 	"log"
 	"os"
 	"path/filepath"
@@ -75,7 +76,9 @@ func main() {
 
 	goptions.ParseAndFail(&opt)
 
-	if _, err := os.Stat(opt.Path); os.IsNotExist(err) {
+	fs := afero.NewOsFs()
+
+	if _, err := fs.Stat(opt.Path); os.IsNotExist(err) {
 		log.Fatalf("Directory '%s' does not exist. Details:\n  %v", opt.Path, err)
 	}
 
@@ -85,13 +88,13 @@ func main() {
 
 	fmt.Printf("Root: %s\n\n", opt.Path)
 
-	runAnalyze(opt)
+	runAnalyze(opt, fs)
 
 	printMemUsage()
 }
 
-func runAnalyze(opt options) {
-	total, stat, filesByRange, byExt, byFolder, topFiles := walk(opt)
+func runAnalyze(opt options, fs afero.Fs) {
+	total, stat, filesByRange, byExt, byFolder, topFiles := walk(opt, fs)
 	total.CountFileExts = len(byExt)
 
 	extBySize := createSliceFromMap(byExt, func(aggregate countSizeAggregate) int64 {
@@ -247,7 +250,7 @@ func createSliceFromMap(sizeByExt map[string]countSizeAggregate, mapper func(cou
 	return result
 }
 
-func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, map[string]countSizeAggregate, *rbtree.RbTree, *rbtree.RbTree) {
+func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, map[string]countSizeAggregate, *rbtree.RbTree, *rbtree.RbTree) {
 	verboseRanges := make(map[int]bool)
 	for _, x := range opt.Range {
 		verboseRanges[x] = true
@@ -264,7 +267,7 @@ func walk(opt options) (totalInfo, map[Range]fileStat, map[Range][]*walkEntry, m
 
 	go func(ch chan<- *walkEntry) {
 		defer close(ch)
-		walkDirBreadthFirst(opt.Path, func(parent string, entry os.FileInfo) {
+		walkDirBreadthFirst(opt.Path, fs, func(parent string, entry os.FileInfo) {
 			ch <- &walkEntry{IsDir: entry.IsDir(), Size: entry.Size(), Parent: parent, Name: entry.Name()}
 		})
 	}(ch)
