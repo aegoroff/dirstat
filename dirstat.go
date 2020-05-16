@@ -42,6 +42,8 @@ var fileSizeRanges = [...]Range{
 	{Min: Gbyte, Max: 10 * Gbyte},
 	{Min: 10 * Gbyte, Max: 100 * Gbyte},
 	{Min: 100 * Gbyte, Max: Tbyte},
+	{Min: Tbyte, Max: 10 * Tbyte},
+	{Min: 10 * Tbyte, Max: 100 * Tbyte},
 }
 
 type fileStat struct {
