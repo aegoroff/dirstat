@@ -4,6 +4,7 @@ package main
 import (
 	"fmt"
 	"github.com/spf13/afero"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -86,14 +87,16 @@ func main() {
 		opt.Path = filepath.Join(opt.Path, "\\")
 	}
 
-	fmt.Printf("Root: %s\n\n", opt.Path)
+	w := os.Stdout
 
-	runAnalyze(opt, fs)
+	fmt.Fprintf(w,"Root: %s\n\n", opt.Path)
 
-	printMemUsage()
+	runAnalyze(opt, fs, w)
+
+	printMemUsage(w)
 }
 
-func runAnalyze(opt options, fs afero.Fs) {
+func runAnalyze(opt options, fs afero.Fs, w io.Writer) {
 	total, stat, filesByRange, byExt, byFolder, topFiles := walk(opt, fs)
 	total.CountFileExts = len(byExt)
 
@@ -108,10 +111,10 @@ func runAnalyze(opt options, fs afero.Fs) {
 	sort.Sort(sort.Reverse(extBySize))
 	sort.Sort(sort.Reverse(extByCount))
 
-	fmt.Print("Total files stat:\n\n")
+	fmt.Fprintf(w,"Total files stat:\n\n")
 
 	const format = "%v\t%v\t%v\t%v\t%v\n"
-	tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 4, ' ', 0)
+	tw := new(tabwriter.Writer).Init(w, 0, 8, 4, ' ', 0)
 
 	fmt.Fprintf(tw, format, "File size", "Amount", "%", "Size", "%")
 	fmt.Fprintf(tw, format, "---------", "------", "------", "----", "------")
@@ -128,7 +131,7 @@ func runAnalyze(opt options, fs afero.Fs) {
 	}
 	tw.Flush()
 
-	fmt.Printf("\nTOP %d file extensions by size:\n\n", Top)
+	fmt.Fprintf(w,"\nTOP %d file extensions by size:\n\n", Top)
 	fmt.Fprintf(tw, format, "Extension", "Count", "%", "Size", "%")
 	fmt.Fprintf(tw, format, "---------", "-----", "------", "----", "------")
 
@@ -140,7 +143,7 @@ func runAnalyze(opt options, fs afero.Fs) {
 
 	tw.Flush()
 
-	fmt.Printf("\nTOP %d file extensions by count:\n\n", Top)
+	fmt.Fprintf(w,"\nTOP %d file extensions by count:\n\n", Top)
 	fmt.Fprintf(tw, format, "Extension", "Count", "%", "Size", "%")
 	fmt.Fprintf(tw, format, "---------", "-----", "------", "----", "------")
 
@@ -152,7 +155,7 @@ func runAnalyze(opt options, fs afero.Fs) {
 
 	tw.Flush()
 
-	fmt.Printf("\nTOP %d files by size:\n\n", Top)
+	fmt.Fprintf(w,"\nTOP %d files by size:\n\n", Top)
 	fmt.Fprintf(tw, "%v\t%v\n", "File", "Size")
 	fmt.Fprintf(tw, "%v\t%v\n", "------", "----")
 
@@ -173,7 +176,7 @@ func runAnalyze(opt options, fs afero.Fs) {
 
 	tw.Flush()
 
-	fmt.Printf("\nTOP %d folders by size:\n\n", Top)
+	fmt.Fprintf(w,"\nTOP %d folders by size:\n\n", Top)
 	fmt.Fprintf(tw, format, "Folder", "Files", "%", "Size", "%")
 	fmt.Fprintf(tw, format, "------", "-----", "------", "----", "------")
 
@@ -197,22 +200,22 @@ func runAnalyze(opt options, fs afero.Fs) {
 	tw.Flush()
 
 	if opt.Verbosity && len(opt.Range) > 0 {
-		fmt.Printf("\nDetailed files stat:\n")
+		fmt.Fprintf(w,"\nDetailed files stat:\n")
 		for i, r := range fileSizeRanges {
 			if len(filesByRange[r]) == 0 {
 				continue
 			}
 
-			fmt.Printf("%s\n", heads[i])
+			fmt.Fprintf(w,"%s\n", heads[i])
 			for _, item := range filesByRange[r] {
 				fullPath := filepath.Join(item.Parent, item.Name)
 				size := humanize.IBytes(uint64(item.Size))
-				fmt.Printf("   %s - %s\n", fullPath, size)
+				fmt.Fprintf(w,"   %s - %s\n", fullPath, size)
 			}
 		}
 	}
 
-	printTotals(total)
+	printTotals(total, w)
 }
 
 func outputTopTenExtensions(tw *tabwriter.Writer, data namedInts64, total totalInfo, selector func(data namedInts64, item *namedInt64) (int64, uint64)) {
@@ -372,7 +375,7 @@ func getSizeFromNode(node *rbtree.Node) int64 {
 	return 0
 }
 
-func printTotals(t totalInfo) {
+func printTotals(t totalInfo, w io.Writer) {
 
 	const totalTemplate = `
 Total files:            {{.FilesTotal.Count}} ({{.FilesTotal.Size | toBytesString }})
@@ -383,5 +386,5 @@ Read taken:    {{.ReadingTime}}
 `
 
 	var report = template.Must(template.New("totalstat").Funcs(template.FuncMap{"toBytesString": humanize.IBytes}).Parse(totalTemplate))
-	report.Execute(os.Stdout, t)
+	report.Execute(w, t)
 }
