@@ -119,10 +119,7 @@ func runAnalyze(opt options) {
 		count := stat[r].TotalFilesCount
 		sz := stat[r].TotalFilesSize
 
-		percentOfCount := countPercent(count, total)
-		percentOfSize := sizePercent(sz, total)
-
-		fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", h, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
+		outputTopStatLine(tw, count, total, sz, h)
 	}
 	tw.Flush()
 
@@ -187,10 +184,7 @@ func runAnalyze(opt options) {
 		count := folder.count
 		sz := uint64(folder.size)
 
-		percentOfCount := countPercent(count, total)
-		percentOfSize := sizePercent(sz, total)
-
-		fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", h, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
+		outputTopStatLine(tw, count, total, sz, h)
 
 		return true
 	})
@@ -222,11 +216,15 @@ func outputTopTenExtensions(tw *tabwriter.Writer, data namedInts64, total totalI
 
 		count, sz := selector(data, data[i])
 
-		percentOfCount := countPercent(count, total)
-		percentOfSize := sizePercent(sz, total)
-
-		fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", h, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
+		outputTopStatLine(tw, count, total, sz, h)
 	}
+}
+
+func outputTopStatLine(tw *tabwriter.Writer, count int64, total totalInfo, sz uint64, title string) {
+	percentOfCount := countPercent(count, total)
+	percentOfSize := sizePercent(sz, total)
+
+	fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", title, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
 }
 
 func countPercent(count int64, total totalInfo) float64 {
