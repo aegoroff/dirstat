@@ -68,47 +68,6 @@ type countSizeAggregate struct {
 	Size  uint64
 }
 
-type namedInt64 struct {
-	name  string
-	value int64
-}
-
-type statItem struct {
-	name  string
-	size  int64
-	count int64
-}
-
-type namedInts64 []*namedInt64
-
-func (x namedInts64) Len() int {
-	return len(x)
-}
-
-func (x namedInts64) Less(i, j int) bool {
-	return x[i].value < x[j].value
-}
-
-func (x namedInts64) Swap(i, j int) {
-	x[i], x[j] = x[j], x[i]
-}
-
-func (x statItem) LessThan(y interface{}) bool {
-	return x.size < (y.(statItem)).size
-}
-
-func (x statItem) EqualTo(y interface{}) bool {
-	return x.size == (y.(statItem)).size
-}
-
-func (x namedInt64) LessThan(y interface{}) bool {
-	return x.value < (y.(namedInt64)).value
-}
-
-func (x namedInt64) EqualTo(y interface{}) bool {
-	return x.value == (y.(namedInt64)).value
-}
-
 func main() {
 	opt := options{}
 
@@ -171,17 +130,11 @@ func runAnalyze(opt options) {
 	fmt.Fprintf(tw, format, "Extension", "Count", "%", "Size", "%")
 	fmt.Fprintf(tw, format, "---------", "-----", "------", "----", "------")
 
-	for i := 0; i < Top && i < len(extBySize); i++ {
-		h := extBySize[i].name
-
-		count := byExt[h].Count
-		sz := uint64(extBySize[i].value)
-
-		percentOfCount := countPercent(count, total)
-		percentOfSize := sizePercent(sz, total)
-
-		fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", h, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
-	}
+	outputTopTenExtensions(tw, extBySize, total, func(data namedInts64, item *namedInt64) (int64, uint64) {
+		count := byExt[item.name].Count
+		sz := uint64(item.value)
+		return count, sz
+	})
 
 	tw.Flush()
 
@@ -189,17 +142,11 @@ func runAnalyze(opt options) {
 	fmt.Fprintf(tw, format, "Extension", "Count", "%", "Size", "%")
 	fmt.Fprintf(tw, format, "---------", "-----", "------", "----", "------")
 
-	for i := 0; i < Top && i < len(extByCount); i++ {
-		h := extByCount[i].name
-
-		count := extByCount[i].value
-		sz := byExt[h].Size
-
-		percentOfCount := countPercent(count, total)
-		percentOfSize := sizePercent(sz, total)
-
-		fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", h, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
-	}
+	outputTopTenExtensions(tw, extByCount, total, func(data namedInts64, item *namedInt64) (int64, uint64) {
+		count := item.value
+		sz := byExt[item.name].Size
+		return count, sz
+	})
 
 	tw.Flush()
 
@@ -267,6 +214,19 @@ func runAnalyze(opt options) {
 	}
 
 	printTotals(total)
+}
+
+func outputTopTenExtensions(tw *tabwriter.Writer, data namedInts64, total totalInfo, selector func(data namedInts64, item *namedInt64) (int64, uint64)) {
+	for i := 0; i < Top && i < len(data); i++ {
+		h := data[i].name
+
+		count, sz := selector(data, data[i])
+
+		percentOfCount := countPercent(count, total)
+		percentOfSize := sizePercent(sz, total)
+
+		fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", h, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
+	}
 }
 
 func countPercent(count int64, total totalInfo) float64 {
