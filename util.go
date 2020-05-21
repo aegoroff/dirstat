@@ -16,10 +16,10 @@ func printMemUsage(w io.Writer) {
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
 	// For info on each, see: https://golang.org/pkg/runtime/#MemStats
-	fmt.Fprintf(w, "\nAlloc = %s", humanize.IBytes(m.Alloc))
-	fmt.Fprintf(w,"\tTotalAlloc = %s", humanize.IBytes(m.TotalAlloc))
-	fmt.Fprintf(w,"\tSys = %s", humanize.IBytes(m.Sys))
-	fmt.Fprintf(w,"\tNumGC = %v\n", m.NumGC)
+	_, _ = fmt.Fprintf(w, "\nAlloc = %s", humanize.IBytes(m.Alloc))
+	_, _ = fmt.Fprintf(w, "\tTotalAlloc = %s", humanize.IBytes(m.TotalAlloc))
+	_, _ = fmt.Fprintf(w, "\tSys = %s", humanize.IBytes(m.Sys))
+	_, _ = fmt.Fprintf(w, "\tNumGC = %v\n", m.NumGC)
 }
 
 func walkDirBreadthFirst(path string, fs afero.Fs, action func(parent string, entry os.FileInfo)) {
