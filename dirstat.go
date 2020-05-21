@@ -276,10 +276,7 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 		})
 	}(ch)
 
-	folderSizeTree := rbtree.NewRbTree()
 	fileSizeTree := rbtree.NewRbTree()
-
-	currFolderStat := statItem{}
 
 	fileSizeCh := make(chan *walkEntry, 1024)
 
@@ -331,6 +328,9 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 	}()
 
 	wg.Add(1)
+
+	folderSizeTree := rbtree.NewRbTree()
+	currFolderStat := statItem{}
 
 	for we := range ch {
 		if we.IsDir {
