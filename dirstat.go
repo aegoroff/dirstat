@@ -304,6 +304,7 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 			}
 			sz := uint64(we.Size)
 
+			// Calculate files range statistic
 			for i, r := range fileSizeRanges {
 				if !r.contains(float64(sz)) {
 					continue
@@ -314,6 +315,7 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 				s.TotalFilesSize += sz
 				stat[r] = s
 
+				// Store each file info within range only i verbose option set
 				if !opt.Verbosity || !verboseRanges[i+1] {
 					continue
 				}
