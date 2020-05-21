@@ -89,7 +89,7 @@ func main() {
 
 	w := os.Stdout
 
-	fmt.Fprintf(w,"Root: %s\n\n", opt.Path)
+	_, _ = fmt.Fprintf(w, "Root: %s\n\n", opt.Path)
 
 	runAnalyze(opt, fs, w)
 
@@ -111,13 +111,13 @@ func runAnalyze(opt options, fs afero.Fs, w io.Writer) {
 	sort.Sort(sort.Reverse(extBySize))
 	sort.Sort(sort.Reverse(extByCount))
 
-	fmt.Fprintf(w,"Total files stat:\n\n")
+	_, _ = fmt.Fprintf(w, "Total files stat:\n\n")
 
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 	tw := new(tabwriter.Writer).Init(w, 0, 8, 4, ' ', 0)
 
-	fmt.Fprintf(tw, format, "File size", "Amount", "%", "Size", "%")
-	fmt.Fprintf(tw, format, "---------", "------", "------", "----", "------")
+	_, _ = fmt.Fprintf(tw, format, "File size", "Amount", "%", "Size", "%")
+	_, _ = fmt.Fprintf(tw, format, "---------", "------", "------", "----", "------")
 
 	var heads []string
 	for i, r := range fileSizeRanges {
@@ -129,11 +129,11 @@ func runAnalyze(opt options, fs afero.Fs, w io.Writer) {
 
 		outputTopStatLine(tw, count, total, sz, h)
 	}
-	tw.Flush()
+	_ = tw.Flush()
 
-	fmt.Fprintf(w,"\nTOP %d file extensions by size:\n\n", Top)
-	fmt.Fprintf(tw, format, "Extension", "Count", "%", "Size", "%")
-	fmt.Fprintf(tw, format, "---------", "-----", "------", "----", "------")
+	_, _ = fmt.Fprintf(w, "\nTOP %d file extensions by size:\n\n", Top)
+	_, _ = fmt.Fprintf(tw, format, "Extension", "Count", "%", "Size", "%")
+	_, _ = fmt.Fprintf(tw, format, "---------", "-----", "------", "----", "------")
 
 	outputTopTenExtensions(tw, extBySize, total, func(data namedInts64, item *namedInt64) (int64, uint64) {
 		count := byExt[item.name].Count
@@ -141,11 +141,11 @@ func runAnalyze(opt options, fs afero.Fs, w io.Writer) {
 		return count, sz
 	})
 
-	tw.Flush()
+	_ = tw.Flush()
 
-	fmt.Fprintf(w,"\nTOP %d file extensions by count:\n\n", Top)
-	fmt.Fprintf(tw, format, "Extension", "Count", "%", "Size", "%")
-	fmt.Fprintf(tw, format, "---------", "-----", "------", "----", "------")
+	_, _ = fmt.Fprintf(w, "\nTOP %d file extensions by count:\n\n", Top)
+	_, _ = fmt.Fprintf(tw, format, "Extension", "Count", "%", "Size", "%")
+	_, _ = fmt.Fprintf(tw, format, "---------", "-----", "------", "----", "------")
 
 	outputTopTenExtensions(tw, extByCount, total, func(data namedInts64, item *namedInt64) (int64, uint64) {
 		count := item.value
@@ -153,11 +153,11 @@ func runAnalyze(opt options, fs afero.Fs, w io.Writer) {
 		return count, sz
 	})
 
-	tw.Flush()
+	_ = tw.Flush()
 
-	fmt.Fprintf(w,"\nTOP %d files by size:\n\n", Top)
-	fmt.Fprintf(tw, "%v\t%v\n", "File", "Size")
-	fmt.Fprintf(tw, "%v\t%v\n", "------", "----")
+	_, _ = fmt.Fprintf(w, "\nTOP %d files by size:\n\n", Top)
+	_, _ = fmt.Fprintf(tw, "%v\t%v\n", "File", "Size")
+	_, _ = fmt.Fprintf(tw, "%v\t%v\n", "------", "----")
 
 	i := 1
 
@@ -169,16 +169,16 @@ func runAnalyze(opt options, fs afero.Fs, w io.Writer) {
 
 		sz := uint64(file.value)
 
-		fmt.Fprintf(tw, "%v\t%v\n", h, humanize.IBytes(sz))
+		_, _ = fmt.Fprintf(tw, "%v\t%v\n", h, humanize.IBytes(sz))
 
 		return true
 	})
 
-	tw.Flush()
+	_ = tw.Flush()
 
-	fmt.Fprintf(w,"\nTOP %d folders by size:\n\n", Top)
-	fmt.Fprintf(tw, format, "Folder", "Files", "%", "Size", "%")
-	fmt.Fprintf(tw, format, "------", "-----", "------", "----", "------")
+	_, _ = fmt.Fprintf(w, "\nTOP %d folders by size:\n\n", Top)
+	_, _ = fmt.Fprintf(tw, format, "Folder", "Files", "%", "Size", "%")
+	_, _ = fmt.Fprintf(tw, format, "------", "-----", "------", "----", "------")
 
 	i = 1
 
@@ -197,20 +197,20 @@ func runAnalyze(opt options, fs afero.Fs, w io.Writer) {
 		return true
 	})
 
-	tw.Flush()
+	_ = tw.Flush()
 
 	if opt.Verbosity && len(opt.Range) > 0 {
-		fmt.Fprintf(w,"\nDetailed files stat:\n")
+		_, _ = fmt.Fprintf(w, "\nDetailed files stat:\n")
 		for i, r := range fileSizeRanges {
 			if len(filesByRange[r]) == 0 {
 				continue
 			}
 
-			fmt.Fprintf(w,"%s\n", heads[i])
+			_, _ = fmt.Fprintf(w, "%s\n", heads[i])
 			for _, item := range filesByRange[r] {
 				fullPath := filepath.Join(item.Parent, item.Name)
 				size := humanize.IBytes(uint64(item.Size))
-				fmt.Fprintf(w,"   %s - %s\n", fullPath, size)
+				_, _ = fmt.Fprintf(w, "   %s - %s\n", fullPath, size)
 			}
 		}
 	}
@@ -232,7 +232,7 @@ func outputTopStatLine(tw *tabwriter.Writer, count int64, total totalInfo, sz ui
 	percentOfCount := countPercent(count, total)
 	percentOfSize := sizePercent(sz, total)
 
-	fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", title, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
+	_, _ = fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", title, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
 }
 
 func countPercent(count int64, total totalInfo) float64 {
@@ -386,5 +386,5 @@ Read taken:    {{.ReadingTime}}
 `
 
 	var report = template.Must(template.New("totalstat").Funcs(template.FuncMap{"toBytesString": humanize.IBytes}).Parse(totalTemplate))
-	report.Execute(w, t)
+	_ = report.Execute(w, t)
 }
