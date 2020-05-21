@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"sync"
 	"text/tabwriter"
 	"text/template"
 	"time"
@@ -280,10 +281,60 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 
 	currFolderStat := statItem{}
 
+	fileSizeCh := make(chan *walkEntry, 1024)
+
+	var wg sync.WaitGroup
+
+	go func() {
+		defer wg.Done()
+		for we := range fileSizeCh {
+			minfile := fileSizeTree.Minimum()
+			if fileSizeTree.Len() < Top || getSizeFromNode(minfile) < we.Size {
+				if fileSizeTree.Len() == Top {
+					fileSizeTree.Delete(minfile)
+				}
+
+				fullPath := filepath.Join(we.Parent, we.Name)
+				value := namedInt64{value: we.Size, name: fullPath}
+
+				var c rbtree.Comparable
+				c = value
+				node := rbtree.NewNode(&c)
+				fileSizeTree.Insert(node)
+			}
+			sz := uint64(we.Size)
+
+			for i, r := range fileSizeRanges {
+				if !r.contains(float64(sz)) {
+					continue
+				}
+
+				s := stat[r]
+				s.TotalFilesCount++
+				s.TotalFilesSize += sz
+				stat[r] = s
+
+				if !opt.Verbosity || !verboseRanges[i+1] {
+					continue
+				}
+
+				nodes, ok := filesByRange[r]
+				if !ok {
+					filesByRange[r] = []*walkEntry{we}
+				} else {
+					filesByRange[r] = append(nodes, we)
+				}
+			}
+		}
+	}()
+
+	wg.Add(1)
+
 	for we := range ch {
 		if we.IsDir {
 			total.CountFolders++
 		} else {
+			fileSizeCh <- we
 			// Accumulate file statistic
 			sz := uint64(we.Size)
 			total.FilesTotal.Count++
@@ -319,45 +370,11 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 				currFolderStat.count = 1
 				currFolderStat.size = we.Size
 			}
-
-			minfile := fileSizeTree.Minimum()
-			if fileSizeTree.Len() < Top || getSizeFromNode(minfile) < we.Size {
-				if fileSizeTree.Len() == Top {
-					fileSizeTree.Delete(minfile)
-				}
-
-				fullPath := filepath.Join(we.Parent, we.Name)
-				value := namedInt64{value: we.Size, name: fullPath}
-
-				var c rbtree.Comparable
-				c = value
-				node := rbtree.NewNode(&c)
-				fileSizeTree.Insert(node)
-			}
-
-			for i, r := range fileSizeRanges {
-				if !r.contains(float64(sz)) {
-					continue
-				}
-
-				s := stat[r]
-				s.TotalFilesCount++
-				s.TotalFilesSize += sz
-				stat[r] = s
-
-				if !opt.Verbosity || !verboseRanges[i+1] {
-					continue
-				}
-
-				nodes, ok := filesByRange[r]
-				if !ok {
-					filesByRange[r] = []*walkEntry{we}
-				} else {
-					filesByRange[r] = append(nodes, we)
-				}
-			}
 		}
 	}
+	close(fileSizeCh)
+
+	wg.Wait()
 
 	total.ReadingTime = time.Since(start)
 	return total, stat, filesByRange, byExt, folderSizeTree, fileSizeTree
