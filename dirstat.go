@@ -267,7 +267,7 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 
 	start := time.Now()
 
-	filesystemCh := make(chan filesystemItem, 128)
+	filesystemCh := make(chan filesystemItem, 1024)
 	go func() {
 		walkDirBreadthFirst(opt.Path, fs, filesystemCh)
 	}()
@@ -275,7 +275,7 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 	var foldersMu sync.RWMutex
 	folders := make(map[string]*statItem)
 
-	walkChan := make(chan *walkEntry, 256)
+	walkChan := make(chan *walkEntry, 1024)
 
 	// Reading filesystem events
 	go func() {
