@@ -273,7 +273,6 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 	}()
 
 	var foldersMu sync.RWMutex
-	folderSizeTree := rbtree.NewRbTree()
 	folders := make(map[string]*statItem)
 
 	walkChan := make(chan *walkEntry, 256)
@@ -286,46 +285,7 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 				foldersMu.Lock()
 				folders[item.dir] = &statItem{name: item.dir}
 				foldersMu.Unlock()
-			} else if item.event == fsEventEnd {
-				//foldersMu.Lock()
-				//
-				//// folder completed
-				//cf := folders[item.dir]
-				//
-				//minfolder := folderSizeTree.Minimum()
-				//if folderSizeTree.Len() < Top || getSizeFromNode(minfolder) < cf.size {
-				//	if folderSizeTree.Len() == Top {
-				//		folderSizeTree.Delete(minfolder)
-				//	}
-				//
-				//	var c rbtree.Comparable
-				//	c = cf
-				//	node := rbtree.NewNode(&c)
-				//	folderSizeTree.Insert(node)
-				//}
-				//
-				//delete(folders, item.dir)
-				//foldersMu.Unlock()
 			} else {
-				foldersMu.Lock()
-
-				// folder completed
-				cf := folders[item.dir]
-
-				minfolder := folderSizeTree.Minimum()
-				if folderSizeTree.Len() < Top || getSizeFromNode(minfolder) < cf.size {
-					if folderSizeTree.Len() == Top {
-						folderSizeTree.Delete(minfolder)
-					}
-
-					var c rbtree.Comparable
-					c = cf
-					node := rbtree.NewNode(&c)
-					folderSizeTree.Insert(node)
-				}
-
-				foldersMu.Unlock()
-
 				entry := item.entry
 				walkChan <- &walkEntry{IsDir: entry.IsDir(), Size: entry.Size(), Parent: item.dir, Name: entry.Name()}
 			}
@@ -398,6 +358,21 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 			a.Size += sz
 			a.Count++
 			byExt[ext] = a
+		}
+	}
+
+	folderSizeTree := rbtree.NewRbTree()
+	for _, cf := range folders {
+		minfolder := folderSizeTree.Minimum()
+		if folderSizeTree.Len() < Top || getSizeFromNode(minfolder) < cf.size {
+			if folderSizeTree.Len() == Top {
+				folderSizeTree.Delete(minfolder)
+			}
+
+			var c rbtree.Comparable
+			c = cf
+			node := rbtree.NewNode(&c)
+			folderSizeTree.Insert(node)
 		}
 	}
 

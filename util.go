@@ -16,7 +16,6 @@ type fsEvent int
 const (
 	fsEventBegin    fsEvent = 0
 	fsEventContinue fsEvent = 1
-	fsEventEnd      fsEvent = 2
 )
 
 type filesystemItem struct {
@@ -88,12 +87,6 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- filesystemItem
 					mu.Unlock()
 				}
 			}
-
-			results <- filesystemItem{
-				dir:   d,
-				event: fsEventEnd,
-			}
-
 		}(currentDir)
 
 		// Pop
