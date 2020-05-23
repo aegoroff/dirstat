@@ -269,12 +269,17 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 
 	start := time.Now()
 
+	walkCh := make(chan filesystemItem, 1024)
 	go func(ch chan<- *walkEntry) {
-		defer close(ch)
-		walkDirBreadthFirst(opt.Path, fs, func(parent string, entry os.FileInfo) {
-			ch <- &walkEntry{IsDir: entry.IsDir(), Size: entry.Size(), Parent: parent, Name: entry.Name()}
-		})
+		walkDirBreadthFirst(opt.Path, fs, walkCh)
 	}(ch)
+
+	go func() {
+		defer close(ch)
+		for item := range walkCh {
+			ch <- &walkEntry{IsDir: item.entry.IsDir(), Size: item.entry.Size(), Parent: item.dir, Name: item.entry.Name()}
+		}
+	}()
 
 	fileSizeTree := rbtree.NewRbTree()
 

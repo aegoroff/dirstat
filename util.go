@@ -10,6 +10,11 @@ import (
 	"runtime"
 )
 
+type filesystemItem struct {
+	dir   string
+	entry os.FileInfo
+}
+
 // printMemUsage outputs the current, total and OS memory being used. As well as the number
 // of garage collection cycles completed.
 func printMemUsage(w io.Writer) {
@@ -22,7 +27,9 @@ func printMemUsage(w io.Writer) {
 	_, _ = fmt.Fprintf(w, "\tNumGC = %v\n", m.NumGC)
 }
 
-func walkDirBreadthFirst(path string, fs afero.Fs, action func(parent string, entry os.FileInfo)) {
+//func walkDirBreadthFirst(path string, fs afero.Fs, action func(parent string, entry os.FileInfo)) {
+func walkDirBreadthFirst(path string, fs afero.Fs, ch chan<- filesystemItem) {
+	defer close(ch)
 	queue := make([]string, 0)
 
 	queue = append(queue, path)
@@ -31,9 +38,17 @@ func walkDirBreadthFirst(path string, fs afero.Fs, action func(parent string, en
 		curr := queue[0]
 
 		for _, entry := range dirents(curr, fs) {
-			action(curr, entry)
+			// Send to channel
+			item := filesystemItem{
+				dir:   curr,
+				entry: entry,
+			}
+			ch <- item
+
+			// Queue subdirs to walk in a queue
 			if entry.IsDir() {
-				queue = append(queue, filepath.Join(curr, entry.Name()))
+				subdir := filepath.Join(curr, entry.Name())
+				queue = append(queue, subdir)
 			}
 		}
 

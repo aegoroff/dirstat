@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/spf13/afero"
 	"math"
-	"os"
 	"path/filepath"
 	"time"
 
@@ -50,7 +49,7 @@ func createFileSystemGraph(path string, fs afero.Fs) (graph *simple.WeightedDire
 
 	queue := []*dirNode{{Node: root, Path: path}}
 
-	for walkNode := range ch  {
+	for walkNode := range ch {
 		node := walkNode.Node
 
 		graph.AddNode(node)
@@ -76,10 +75,17 @@ func createFileSystemGraph(path string, fs afero.Fs) (graph *simple.WeightedDire
 }
 
 func runWalkingDir(path string, fs afero.Fs, nextID int64, ch chan<- *walkNode) {
-	walkDirBreadthFirst(path, fs, func(parent string, entry os.FileInfo) {
-		node := &node{NodeID: nextID, Name: entry.Name(), IsDir: entry.IsDir()}
-		ch <- &walkNode{Node: node, Parent: parent, Size: entry.Size()}
-		nextID++
-	})
-	close(ch)
+	walkCh := make(chan filesystemItem, 1024)
+	go func() {
+		walkDirBreadthFirst(path, fs, walkCh)
+	}()
+
+	go func() {
+		defer close(ch)
+		for item := range walkCh {
+			node := &node{NodeID: nextID, Name: item.entry.Name(), IsDir: item.entry.IsDir()}
+			ch <- &walkNode{Node: node, Parent: item.dir, Size: item.entry.Size()}
+			nextID++
+		}
+	}()
 }
