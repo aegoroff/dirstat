@@ -185,7 +185,7 @@ func runAnalyze(opt options, fs afero.Fs, w io.Writer) {
 
 	byFolder.Descend(func(c *rbtree.Comparable) bool {
 
-		folder := (*c).(statItem)
+		folder := (*c).(*statItem)
 		h := fmt.Sprintf("%d. %s", i, folder.name)
 
 		i++
@@ -265,33 +265,80 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 
 	byExt := make(map[string]countSizeAggregate)
 
-	ch := make(chan *walkEntry, 1024)
-
 	start := time.Now()
 
-	walkCh := make(chan filesystemItem, 1024)
-	go func(ch chan<- *walkEntry) {
-		walkDirBreadthFirst(opt.Path, fs, walkCh)
-	}(ch)
-
+	filesystemCh := make(chan filesystemItem, 128)
 	go func() {
-		defer close(ch)
-		for item := range walkCh {
-			ch <- &walkEntry{IsDir: item.entry.IsDir(), Size: item.entry.Size(), Parent: item.dir, Name: item.entry.Name()}
+		walkDirBreadthFirst(opt.Path, fs, filesystemCh)
+	}()
+
+	var foldersMu sync.RWMutex
+	folderSizeTree := rbtree.NewRbTree()
+	folders := make(map[string]*statItem)
+
+	walkChan := make(chan *walkEntry, 256)
+
+	// Reading filesystem events
+	go func() {
+		defer close(walkChan)
+		for item := range filesystemCh {
+			if item.event == fsEventBegin {
+				foldersMu.Lock()
+				folders[item.dir] = &statItem{name: item.dir}
+				foldersMu.Unlock()
+			} else if item.event == fsEventEnd {
+				//foldersMu.Lock()
+				//
+				//// folder completed
+				//cf := folders[item.dir]
+				//
+				//minfolder := folderSizeTree.Minimum()
+				//if folderSizeTree.Len() < Top || getSizeFromNode(minfolder) < cf.size {
+				//	if folderSizeTree.Len() == Top {
+				//		folderSizeTree.Delete(minfolder)
+				//	}
+				//
+				//	var c rbtree.Comparable
+				//	c = cf
+				//	node := rbtree.NewNode(&c)
+				//	folderSizeTree.Insert(node)
+				//}
+				//
+				//delete(folders, item.dir)
+				//foldersMu.Unlock()
+			} else {
+				foldersMu.Lock()
+
+				// folder completed
+				cf := folders[item.dir]
+
+				minfolder := folderSizeTree.Minimum()
+				if folderSizeTree.Len() < Top || getSizeFromNode(minfolder) < cf.size {
+					if folderSizeTree.Len() == Top {
+						folderSizeTree.Delete(minfolder)
+					}
+
+					var c rbtree.Comparable
+					c = cf
+					node := rbtree.NewNode(&c)
+					folderSizeTree.Insert(node)
+				}
+
+				foldersMu.Unlock()
+
+				entry := item.entry
+				walkChan <- &walkEntry{IsDir: entry.IsDir(), Size: entry.Size(), Parent: item.dir, Name: entry.Name()}
+			}
 		}
 	}()
 
 	fileSizeTree := rbtree.NewRbTree()
 
-	fileStatCh := make(chan *walkEntry, 512)
-	folderStatCh := make(chan *walkEntry, 512)
-
-	var wg sync.WaitGroup
-
-	// Files statistic procedure
-	go func() {
-		defer wg.Done()
-		for we := range fileStatCh {
+	// Main procedure
+	for we := range walkChan {
+		if we.IsDir {
+			total.CountFolders++
+		} else {
 			minfile := fileSizeTree.Minimum()
 			if fileSizeTree.Len() < Top || getSizeFromNode(minfile) < we.Size {
 				if fileSizeTree.Len() == Top {
@@ -306,6 +353,7 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 				node := rbtree.NewNode(&c)
 				fileSizeTree.Insert(node)
 			}
+
 			sz := uint64(we.Size)
 
 			// Calculate files range statistic
@@ -331,54 +379,17 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 					filesByRange[r] = append(nodes, we)
 				}
 			}
-		}
-	}()
 
-	currFolderStat := statItem{}
-	folderSizeTree := rbtree.NewRbTree()
+			foldersMu.RLock()
+			currFolder, ok := folders[we.Parent]
 
-	// Folders statistic procedure
-	go func() {
-		defer wg.Done()
-		for we := range folderStatCh {
-			if currFolderStat.name == "" {
-				currFolderStat.name = we.Parent
+			if ok {
+				currFolder.size += we.Size
+				currFolder.count++
 			}
+			foldersMu.RUnlock()
 
-			if currFolderStat.name == we.Parent {
-				currFolderStat.size += we.Size
-				currFolderStat.count++
-			} else {
-				minfolder := folderSizeTree.Minimum()
-				if folderSizeTree.Len() < Top || getSizeFromNode(minfolder) < currFolderStat.size {
-					if folderSizeTree.Len() == Top {
-						folderSizeTree.Delete(minfolder)
-					}
-
-					var c rbtree.Comparable
-					c = currFolderStat
-					node := rbtree.NewNode(&c)
-					folderSizeTree.Insert(node)
-				}
-
-				currFolderStat.name = we.Parent
-				currFolderStat.count = 1
-				currFolderStat.size = we.Size
-			}
-		}
-	}()
-
-	wg.Add(2)
-
-	// Main procedure
-	for we := range ch {
-		if we.IsDir {
-			total.CountFolders++
-		} else {
-			fileStatCh <- we
-			folderStatCh <- we
 			// Accumulate file statistic
-			sz := uint64(we.Size)
 			total.FilesTotal.Count++
 			total.FilesTotal.Size += sz
 
@@ -390,17 +401,12 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 		}
 	}
 
-	close(fileStatCh)
-	close(folderStatCh)
-
-	wg.Wait()
-
 	total.ReadingTime = time.Since(start)
 	return total, stat, filesByRange, byExt, folderSizeTree, fileSizeTree
 }
 
 func getSizeFromNode(node *rbtree.Node) int64 {
-	if k, ok := (*node.Key).(statItem); ok {
+	if k, ok := (*node.Key).(*statItem); ok {
 		return k.size
 	}
 

@@ -25,12 +25,12 @@ func (x namedInts64) Swap(i, j int) {
 	x[i], x[j] = x[j], x[i]
 }
 
-func (x statItem) LessThan(y interface{}) bool {
-	return x.size < (y.(statItem)).size
+func (x *statItem) LessThan(y interface{}) bool {
+	return x.size < (y.(*statItem)).size
 }
 
-func (x statItem) EqualTo(y interface{}) bool {
-	return x.size == (y.(statItem)).size
+func (x *statItem) EqualTo(y interface{}) bool {
+	return x.size == (y.(*statItem)).size
 }
 
 func (x namedInt64) LessThan(y interface{}) bool {

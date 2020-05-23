@@ -8,11 +8,21 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"sync"
+)
+
+type fsEvent int
+
+const (
+	fsEventBegin    fsEvent = 0
+	fsEventContinue fsEvent = 1
+	fsEventEnd      fsEvent = 2
 )
 
 type filesystemItem struct {
 	dir   string
 	entry os.FileInfo
+	event fsEvent
 }
 
 // printMemUsage outputs the current, total and OS memory being used. As well as the number
@@ -27,32 +37,79 @@ func printMemUsage(w io.Writer) {
 	_, _ = fmt.Fprintf(w, "\tNumGC = %v\n", m.NumGC)
 }
 
-//func walkDirBreadthFirst(path string, fs afero.Fs, action func(parent string, entry os.FileInfo)) {
-func walkDirBreadthFirst(path string, fs afero.Fs, ch chan<- filesystemItem) {
-	defer close(ch)
+func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- filesystemItem) {
+	defer close(results)
+
+	var wg sync.WaitGroup
+	var mu sync.RWMutex
 	queue := make([]string, 0)
 
 	queue = append(queue, path)
 
-	for len(queue) > 0 {
-		curr := queue[0]
+	ql := len(queue)
 
-		for _, entry := range dirents(curr, fs) {
-			// Send to channel
-			item := filesystemItem{
-				dir:   curr,
-				entry: entry,
+	for ql > 0 {
+		// Peek
+		mu.RLock()
+		currentDir := queue[0]
+		mu.RUnlock()
+
+		wg.Add(1)
+		go func(d string) {
+			defer wg.Done()
+
+			entries := dirents(d, fs)
+
+			if entries == nil {
+				return
 			}
-			ch <- item
 
-			// Queue subdirs to walk in a queue
-			if entry.IsDir() {
-				subdir := filepath.Join(curr, entry.Name())
-				queue = append(queue, subdir)
+			results <- filesystemItem{
+				dir:   d,
+				event: fsEventBegin,
 			}
-		}
 
+			for _, entry := range entries {
+				// Send to channel
+				item := filesystemItem{
+					dir:   d,
+					entry: entry,
+					event: fsEventContinue,
+				}
+				results <- item
+
+				// Queue subdirs to walk in a queue
+				if entry.IsDir() {
+					subdir := filepath.Join(d, entry.Name())
+
+					// Push
+					mu.Lock()
+					queue = append(queue, subdir)
+					mu.Unlock()
+				}
+			}
+
+			results <- filesystemItem{
+				dir:   d,
+				event: fsEventEnd,
+			}
+
+		}(currentDir)
+
+		// Pop
+		mu.Lock()
 		queue = queue[1:]
+		ql = len(queue)
+		mu.Unlock()
+
+		if ql == 0 {
+			// Waiting pending goroutines
+			wg.Wait()
+
+			mu.RLock()
+			ql = len(queue)
+			mu.RUnlock()
+		}
 	}
 }
 
