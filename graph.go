@@ -75,17 +75,21 @@ func createFileSystemGraph(path string, fs afero.Fs) (graph *simple.WeightedDire
 }
 
 func runWalkingDir(path string, fs afero.Fs, nextID int64, ch chan<- *walkNode) {
-	walkCh := make(chan filesystemItem, 1024)
+	filesystemCh := make(chan filesystemItem, 1024)
 	go func() {
-		walkDirBreadthFirst(path, fs, walkCh)
+		walkDirBreadthFirst(path, fs, filesystemCh)
 	}()
 
 	go func() {
 		defer close(ch)
-		for item := range walkCh {
-			node := &node{NodeID: nextID, Name: item.entry.Name(), IsDir: item.entry.IsDir()}
-			ch <- &walkNode{Node: node, Parent: item.dir, Size: item.entry.Size()}
-			nextID++
+		for item := range filesystemCh {
+			if item.event == fsEventFirst {
+				// Continue
+			} else {
+				node := &node{NodeID: nextID, Name: item.entry.Name(), IsDir: item.entry.IsDir()}
+				ch <- &walkNode{Node: node, Parent: item.dir, Size: item.entry.Size()}
+				nextID++
+			}
 		}
 	}()
 }
