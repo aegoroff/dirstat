@@ -281,7 +281,7 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 	go func() {
 		defer close(walkChan)
 		for item := range filesystemCh {
-			if item.event == fsEventBegin {
+			if item.event == fsEventFirst {
 				foldersMu.Lock()
 				folders[item.dir] = &statItem{name: item.dir}
 				foldersMu.Unlock()

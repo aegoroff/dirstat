@@ -14,8 +14,8 @@ import (
 type fsEvent int
 
 const (
-	fsEventBegin    fsEvent = 0
-	fsEventContinue fsEvent = 1
+	fsEventFirst fsEvent = 0
+	fsEventNext  fsEvent = 1
 )
 
 type filesystemItem struct {
@@ -65,7 +65,7 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- filesystemItem
 
 			results <- filesystemItem{
 				dir:   d,
-				event: fsEventBegin,
+				event: fsEventFirst,
 			}
 
 			for _, entry := range entries {
@@ -73,7 +73,7 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- filesystemItem
 				item := filesystemItem{
 					dir:   d,
 					entry: entry,
-					event: fsEventContinue,
+					event: fsEventNext,
 				}
 				results <- item
 
