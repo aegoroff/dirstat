@@ -106,7 +106,7 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- filesystemItem
 	}
 }
 
-var sema = make(chan struct{}, 128)
+var sema = make(chan struct{}, 32)
 
 func dirents(path string, fs afero.Fs) []os.FileInfo {
 	sema <- struct{}{}
