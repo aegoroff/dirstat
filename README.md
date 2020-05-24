@@ -8,13 +8,23 @@ file statistics by extension and by file size range.
 Syntax:
 ------
 ```
-Usage: dirstat [global options]
+ A small tool that shows selected folder or drive (on Windows) usage statistic
 
-Global options:
-        -h, --help    Show this help
-        -v, --verbose Be verbose
-        -r, --range   Output verbose files info for fileSizeRanges specified
-        -p, --path    Name to the directory (*)
+Usage:
+  dirstat [flags]
+  dirstat [command]
+
+Available Commands:
+  help        Help about any command
+  version     Print the version number of dirstat
+
+Flags:
+  -h, --help          help for dirstat
+  -p, --path string   REQUIRED. Directory path to show info.
+  -r, --range ints    Output verbose files info for fileSizeRanges specified
+  -v, --verbose       Be verbose
+
+Use "dirstat [command] --help" for more information about a command.
 ```
 Examples:
 ---------
