@@ -297,19 +297,9 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 
 	// Main procedure
 	for file := range filesChan {
-		minfile := topFilesTree.Minimum()
-		if topFilesTree.Len() < Top || getSizeFromNode(minfile) < file.Size {
-			if topFilesTree.Len() == Top {
-				topFilesTree.Delete(minfile)
-			}
-
-			fullPath := filepath.Join(file.Parent, file.Name)
-			value := container{size: file.Size, name: fullPath, count: 1}
-
-			comparable := newContainerNode(&value)
-			node := rbtree.NewNode(comparable)
-			topFilesTree.Insert(node)
-		}
+		fullPath := filepath.Join(file.Parent, file.Name)
+		value := container{size: file.Size, name: fullPath, count: 1}
+		updateTopTree(topFilesTree, &value)
 
 		sz := uint64(file.Size)
 
@@ -359,21 +349,25 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 	}
 
 	topFoldersTree := rbtree.NewRbTree()
-	for _, cf := range folders {
-		minfolder := topFoldersTree.Minimum()
-		if topFoldersTree.Len() < Top || getSizeFromNode(minfolder) < cf.size {
-			if topFoldersTree.Len() == Top {
-				topFoldersTree.Delete(minfolder)
-			}
-
-			comparable := newContainerNode(cf)
-			node := rbtree.NewNode(comparable)
-			topFoldersTree.Insert(node)
-		}
+	for _, cont := range folders {
+		updateTopTree(topFoldersTree, cont)
 	}
 
 	total.ReadingTime = time.Since(start)
 	return total, stat, filesByRange, byExt, topFoldersTree, topFilesTree
+}
+
+func updateTopTree(topTree *rbtree.RbTree, cont *container) {
+	minfolder := topTree.Minimum()
+	if topTree.Len() < Top || getSizeFromNode(minfolder) < cont.size {
+		if topTree.Len() == Top {
+			topTree.Delete(minfolder)
+		}
+
+		comparable := newContainerNode(cont)
+		node := rbtree.NewNode(comparable)
+		topTree.Insert(node)
+	}
 }
 
 func getSizeFromNode(node *rbtree.Node) int64 {
