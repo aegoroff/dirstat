@@ -20,14 +20,15 @@ const pathParamName = "path"
 const verboseParamName = "verbose"
 const rangeParamName = "range"
 
+var appFileSystem = afero.NewOsFs()
+var appWriter io.Writer
+
 // rootCmd represents the root command
 var rootCmd = &cobra.Command{
 	Use:   "dirstat",
 	Short: "Directory statistic tool",
 	Long:  ` A small tool that shows selected folder or drive (on Windows) usage statistic`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-
-		fs := afero.NewOsFs()
 
 		path, err := cmd.Flags().GetString(pathParamName)
 
@@ -49,7 +50,7 @@ var rootCmd = &cobra.Command{
 
 		opt := options{Verbosity: verbose, Path: path, Range: ranges}
 
-		if _, err := fs.Stat(opt.Path); os.IsNotExist(err) {
+		if _, err := appFileSystem.Stat(opt.Path); os.IsNotExist(err) {
 			return err
 		}
 
@@ -57,19 +58,18 @@ var rootCmd = &cobra.Command{
 			opt.Path = filepath.Join(opt.Path, "\\")
 		}
 
-		w := os.Stdout
+		_, _ = fmt.Fprintf(appWriter, "Root: %s\n\n", opt.Path)
 
-		_, _ = fmt.Fprintf(w, "Root: %s\n\n", opt.Path)
+		runAnalyze(opt, appFileSystem, appWriter)
 
-		runAnalyze(opt, fs, w)
-
-		printMemUsage(w)
+		printMemUsage(appWriter)
 		return nil
 	},
 }
 
 func init() {
 	cobra.MousetrapHelpText = ""
+	appWriter = os.Stdout
 	rootCmd.Flags().StringP(pathParamName, "p", "", "REQUIRED. Directory path to show info.")
 	rootCmd.Flags().IntSliceP(rangeParamName, "r", []int{}, "Output verbose files info for fileSizeRanges specified")
 	rootCmd.Flags().BoolP(verboseParamName, "v", false, "Be verbose")

@@ -24,7 +24,7 @@ install:
   - go env
   - go get -u "github.com/aegoroff/godatastruct/rbtree"
   - go get -u "github.com/spf13/afero"
-  - go get -u "github.com/voxelbrain/goptions"
+  - go get -u "github.com/spf13/cobra"
   - go get -u "github.com/dustin/go-humanize"
   - go get -u "gonum.org/v1/gonum/graph/simple"
   - go get "github.com/mitchellh/gox"
