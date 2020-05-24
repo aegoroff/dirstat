@@ -5,7 +5,6 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/spf13/afero"
 	"io"
-	"os"
 	"path/filepath"
 	"runtime"
 	"sync"
@@ -20,8 +19,14 @@ const (
 
 type filesystemItem struct {
 	dir   string
-	entry os.FileInfo
+	entry fileInfo
 	event fsEvent
+}
+
+type fileInfo struct {
+	isDir bool
+	name  string
+	size  int64
 }
 
 // printMemUsage outputs the current, total and OS memory being used. As well as the number
@@ -70,8 +75,8 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- filesystemItem
 
 			for _, entry := range entries {
 				// Queue subdirs to walk in a queue
-				if entry.IsDir() {
-					subdir := filepath.Join(d, entry.Name())
+				if entry.isDir {
+					subdir := filepath.Join(d, entry.name)
 
 					// Push
 					mu.Lock()
@@ -108,7 +113,7 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- filesystemItem
 
 var sema = make(chan struct{}, 32)
 
-func dirents(path string, fs afero.Fs) []os.FileInfo {
+func dirents(path string, fs afero.Fs) []fileInfo {
 	sema <- struct{}{}
 	defer func() { <-sema }()
 	f, err := fs.Open(path)
@@ -122,5 +127,10 @@ func dirents(path string, fs afero.Fs) []os.FileInfo {
 		return nil
 	}
 
-	return entries
+	var result = make([]fileInfo, len(entries))
+	for _, e := range entries {
+		result = append(result, fileInfo{name: e.Name(), size: e.Size(), isDir: e.IsDir()})
+	}
+
+	return result
 }

@@ -277,7 +277,7 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range]co
 			} else {
 				// Only files
 				entry := item.entry
-				filesChan <- &fileEntry{Size: entry.Size(), Parent: item.dir, Name: entry.Name()}
+				filesChan <- &fileEntry{Size: entry.size, Parent: item.dir, Name: entry.name}
 			}
 		}
 	}()
