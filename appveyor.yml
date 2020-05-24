@@ -34,7 +34,7 @@ stack: go 1.14
 image: Visual Studio 2017
 
 build_script:
-  - gox -osarch="linux/amd64 linux/arm linux/386 darwin/amd64 windows/amd64 windows/386 freebsd/386 freebsd/amd64 freebsd/arm openbsd/386 openbsd/amd64 netbsd/386 netbsd/amd64" -ldflags "-X copyto/cmd.Version=%APPVEYOR_BUILD_VERSION%" copyto
+  - gox -osarch="linux/amd64 linux/arm linux/386 darwin/amd64 windows/amd64 windows/386 freebsd/386 freebsd/amd64 freebsd/arm openbsd/386 openbsd/amd64 netbsd/386 netbsd/amd64" dirstat
 
 artifacts:
   - path: dirstat_windows_amd64.exe
