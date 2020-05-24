@@ -19,7 +19,7 @@ const (
 
 type filesystemItem struct {
 	dir   string
-	entry fileInfo
+	entry *fileInfo
 	event fsEvent
 }
 
@@ -113,7 +113,7 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- filesystemItem
 
 var sema = make(chan struct{}, 32)
 
-func dirents(path string, fs afero.Fs) []fileInfo {
+func dirents(path string, fs afero.Fs) []*fileInfo {
 	sema <- struct{}{}
 	defer func() { <-sema }()
 	f, err := fs.Open(path)
@@ -127,9 +127,10 @@ func dirents(path string, fs afero.Fs) []fileInfo {
 		return nil
 	}
 
-	var result = make([]fileInfo, len(entries))
+	var result = []*fileInfo{}
 	for _, e := range entries {
-		result = append(result, fileInfo{name: e.Name(), size: e.Size(), isDir: e.IsDir()})
+		fi := fileInfo{name: e.Name(), size: e.Size(), isDir: e.IsDir()}
+		result = append(result, &fi)
 	}
 
 	return result
