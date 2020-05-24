@@ -1,42 +1,56 @@
 package main
 
-type namedInt64 struct {
-	name  string
-	value int64
+import "github.com/aegoroff/godatastruct/rbtree"
+
+type fileNode struct {
+	name string
+	size int64
 }
 
-type statItem struct {
+type folderNode struct {
 	name  string
 	size  int64
 	count int64
 }
 
-type namedInts64 []*namedInt64
+type namedInts64 []*fileNode
 
 func (x namedInts64) Len() int {
 	return len(x)
 }
 
 func (x namedInts64) Less(i, j int) bool {
-	return x[i].value < x[j].value
+	return x[i].size < x[j].size
 }
 
 func (x namedInts64) Swap(i, j int) {
 	x[i], x[j] = x[j], x[i]
 }
 
-func (x *statItem) LessThan(y interface{}) bool {
-	return x.size < (y.(*statItem)).size
+func (x *folderNode) LessThan(y interface{}) bool {
+	return x.size < (y.(*folderNode)).size
 }
 
-func (x *statItem) EqualTo(y interface{}) bool {
-	return x.size == (y.(*statItem)).size
+func (x *folderNode) EqualTo(y interface{}) bool {
+	return x.size == (y.(*folderNode)).size
 }
 
-func (x namedInt64) LessThan(y interface{}) bool {
-	return x.value < (y.(namedInt64)).value
+func (x *fileNode) LessThan(y interface{}) bool {
+	return x.size < (y.(*fileNode)).size
 }
 
-func (x namedInt64) EqualTo(y interface{}) bool {
-	return x.value == (y.(namedInt64)).value
+func (x *fileNode) EqualTo(y interface{}) bool {
+	return x.size == (y.(*fileNode)).size
+}
+
+func newFolderTreeNode(f *folderNode) *rbtree.Comparable {
+	var r rbtree.Comparable
+	r = f
+	return &r
+}
+
+func newFileTreeNode(f *fileNode) *rbtree.Comparable {
+	var r rbtree.Comparable
+	r = f
+	return &r
 }

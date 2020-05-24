@@ -136,9 +136,9 @@ func runAnalyze(opt options, fs afero.Fs, w io.Writer) {
 	_, _ = fmt.Fprintf(tw, format, "Extension", "Count", "%", "Size", "%")
 	_, _ = fmt.Fprintf(tw, format, "---------", "-----", "------", "----", "------")
 
-	outputTopTenExtensions(tw, extBySize, total, func(data namedInts64, item *namedInt64) (int64, uint64) {
+	outputTopTenExtensions(tw, extBySize, total, func(data namedInts64, item *fileNode) (int64, uint64) {
 		count := byExt[item.name].Count
-		sz := uint64(item.value)
+		sz := uint64(item.size)
 		return count, sz
 	})
 
@@ -148,8 +148,8 @@ func runAnalyze(opt options, fs afero.Fs, w io.Writer) {
 	_, _ = fmt.Fprintf(tw, format, "Extension", "Count", "%", "Size", "%")
 	_, _ = fmt.Fprintf(tw, format, "---------", "-----", "------", "----", "------")
 
-	outputTopTenExtensions(tw, extByCount, total, func(data namedInts64, item *namedInt64) (int64, uint64) {
-		count := item.value
+	outputTopTenExtensions(tw, extByCount, total, func(data namedInts64, item *fileNode) (int64, uint64) {
+		count := item.size
 		sz := byExt[item.name].Size
 		return count, sz
 	})
@@ -163,12 +163,12 @@ func runAnalyze(opt options, fs afero.Fs, w io.Writer) {
 	i := 1
 
 	topFiles.Descend(func(c *rbtree.Comparable) bool {
-		file := (*c).(namedInt64)
+		file := (*c).(*fileNode)
 		h := fmt.Sprintf("%d. %s", i, file.name)
 
 		i++
 
-		sz := uint64(file.value)
+		sz := uint64(file.size)
 
 		_, _ = fmt.Fprintf(tw, "%v\t%v\n", h, humanize.IBytes(sz))
 
@@ -185,7 +185,7 @@ func runAnalyze(opt options, fs afero.Fs, w io.Writer) {
 
 	byFolder.Descend(func(c *rbtree.Comparable) bool {
 
-		folder := (*c).(*statItem)
+		folder := (*c).(*folderNode)
 		h := fmt.Sprintf("%d. %s", i, folder.name)
 
 		i++
@@ -219,7 +219,7 @@ func runAnalyze(opt options, fs afero.Fs, w io.Writer) {
 	printTotals(total, w)
 }
 
-func outputTopTenExtensions(tw *tabwriter.Writer, data namedInts64, total totalInfo, selector func(data namedInts64, item *namedInt64) (int64, uint64)) {
+func outputTopTenExtensions(tw *tabwriter.Writer, data namedInts64, total totalInfo, selector func(data namedInts64, item *fileNode) (int64, uint64)) {
 	for i := 0; i < Top && i < len(data); i++ {
 		h := data[i].name
 
@@ -248,7 +248,7 @@ func createSliceFromMap(sizeByExt map[string]countSizeAggregate, mapper func(cou
 	var result = make(namedInts64, len(sizeByExt))
 	i := 0
 	for k, v := range sizeByExt {
-		result[i] = &namedInt64{value: mapper(v), name: k}
+		result[i] = &fileNode{size: mapper(v), name: k}
 		i++
 	}
 	return result
@@ -273,7 +273,7 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 	}()
 
 	var foldersMu sync.RWMutex
-	folders := make(map[string]*statItem)
+	folders := make(map[string]*folderNode)
 
 	walkChan := make(chan *walkEntry, 1024)
 
@@ -283,7 +283,7 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 		for item := range filesystemCh {
 			if item.event == fsEventFirst {
 				foldersMu.Lock()
-				folders[item.dir] = &statItem{name: item.dir}
+				folders[item.dir] = &folderNode{name: item.dir}
 				foldersMu.Unlock()
 			} else {
 				entry := item.entry
@@ -306,11 +306,10 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 				}
 
 				fullPath := filepath.Join(we.Parent, we.Name)
-				value := namedInt64{value: we.Size, name: fullPath}
+				value := fileNode{size: we.Size, name: fullPath}
 
-				var c rbtree.Comparable
-				c = value
-				node := rbtree.NewNode(&c)
+				comparable := newFileTreeNode(&value)
+				node := rbtree.NewNode(comparable)
 				fileSizeTree.Insert(node)
 			}
 
@@ -369,9 +368,8 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 				folderSizeTree.Delete(minfolder)
 			}
 
-			var c rbtree.Comparable
-			c = cf
-			node := rbtree.NewNode(&c)
+			comparable := newFolderTreeNode(cf)
+			node := rbtree.NewNode(comparable)
 			folderSizeTree.Insert(node)
 		}
 	}
@@ -381,12 +379,12 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 }
 
 func getSizeFromNode(node *rbtree.Node) int64 {
-	if k, ok := (*node.Key).(*statItem); ok {
+	if k, ok := (*node.Key).(*folderNode); ok {
 		return k.size
 	}
 
-	if k, ok := (*node.Key).(namedInt64); ok {
-		return k.value
+	if k, ok := (*node.Key).(*fileNode); ok {
+		return k.size
 	}
 
 	return 0
