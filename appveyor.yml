@@ -1,0 +1,65 @@
+﻿# version format
+version: 0.1.{build}
+
+clone_folder: c:\gopath\src\dirstat
+
+# branches to build
+branches:
+  # whitelist
+  only:
+    - master
+
+# Do not build on tags (GitHub only)
+skip_tags: true
+
+# environment variables
+environment:
+  GOPATH: c:\gopath
+
+install:
+  - echo %PATH%
+  - echo %GOPATH%
+  - set PATH=%GOPATH%\bin;c:\go\bin;C:\msys64\usr\bin;%PATH%
+  - go version
+  - go env
+  - go get -u "github.com/aegoroff/godatastruct/rbtree"
+  - go get -u "github.com/spf13/afero"
+  - go get -u "github.com/voxelbrain/goptions"
+  - go get -u "github.com/dustin/go-humanize"
+  - go get -u "gonum.org/v1/gonum/graph/simple"
+  - go get "github.com/mitchellh/gox"
+
+stack: go 1.14
+
+image: Visual Studio 2017
+
+build_script:
+  - gox -osarch="linux/amd64 linux/arm linux/386 darwin/amd64 windows/amd64 windows/386 freebsd/386 freebsd/amd64 freebsd/arm openbsd/386 openbsd/amd64 netbsd/386 netbsd/amd64" -ldflags "-X copyto/cmd.Version=%APPVEYOR_BUILD_VERSION%" copyto
+
+artifacts:
+  - path: dirstat_windows_amd64.exe
+    name: binary
+  - path: dirstat_windows_386.exe
+    name: binary
+  - path: dirstat_linux_amd64
+    name: binary
+  - path: dirstat_linux_386
+    name: binary
+  - path: dirstat_linux_arm
+    name: binary
+  - path: dirstat_darwin_amd64
+    name: binary
+  - path: dirstat_freebsd_amd64
+    name: binary
+  - path: dirstat_freebsd_386
+    name: binary
+  - path: dirstat_freebsd_arm
+    name: binary
+  - path: dirstat_netbsd_amd64
+    name: binary
+  - path: dirstat_netbsd_386
+    name: binary
+  - path: dirstat_openbsd_amd64
+    name: binary
+  - path: dirstat_openbsd_386
+    name: binary
