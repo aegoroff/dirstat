@@ -1,7 +1,5 @@
 package main
 
-import "github.com/aegoroff/godatastruct/rbtree"
-
 // container represents file system container that described by name
 // and has size and the number of elements in it (count field). It the case of file
 // the number is 1 and if it's a folder count will be the number of files in it
@@ -31,10 +29,4 @@ func (x *container) LessThan(y interface{}) bool {
 
 func (x *container) EqualTo(y interface{}) bool {
 	return x.size == (y.(*container)).size
-}
-
-func newContainerNode(f *container) *rbtree.Comparable {
-	var r rbtree.Comparable
-	r = f
-	return &r
 }

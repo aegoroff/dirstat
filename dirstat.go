@@ -357,25 +357,18 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 	return total, stat, filesByRange, byExt, topFoldersTree, topFilesTree
 }
 
-func updateTopTree(topTree *rbtree.RbTree, cont *container) {
-	minfolder := topTree.Minimum()
-	if topTree.Len() < Top || getSizeFromNode(minfolder) < cont.size {
+func updateTopTree(topTree *rbtree.RbTree, cnt *container) {
+	min := topTree.Minimum()
+	if topTree.Len() < Top || (*min.Key).(*container).size < cnt.size {
 		if topTree.Len() == Top {
-			topTree.Delete(minfolder)
+			topTree.Delete(min)
 		}
 
-		comparable := newContainerNode(cont)
-		node := rbtree.NewNode(comparable)
+		var r rbtree.Comparable
+		r = cnt
+		node := rbtree.NewNode(&r)
 		topTree.Insert(node)
 	}
-}
-
-func getSizeFromNode(node *rbtree.Node) int64 {
-	if k, ok := (*node.Key).(*container); ok {
-		return k.size
-	}
-
-	return 0
 }
 
 func printTotals(t totalInfo, w io.Writer) {
