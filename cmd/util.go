@@ -106,7 +106,11 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- filesystemItem
 	}
 }
 
+var sema = make(chan struct{}, 128)
+
 func dirents(path string, fs afero.Fs) []os.FileInfo {
+	sema <- struct{}{}
+	defer func() { <-sema }()
 	f, err := fs.Open(path)
 	if err != nil {
 		return nil
