@@ -304,17 +304,17 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range]co
 		fileContainer := container{size: file.Size, name: fullPath, count: 1}
 		updateTopTree(topFilesTree, &fileContainer)
 
-		sz := uint64(file.Size)
+		unsignedSize := uint64(file.Size)
 
 		// Calculate files range statistic
 		for i, r := range fileSizeRanges {
-			if !r.contains(float64(sz)) {
+			if !r.contains(file.Size) {
 				continue
 			}
 
 			s := stat[r]
 			s.TotalFilesCount++
-			s.TotalFilesSize += sz
+			s.TotalFilesSize += unsignedSize
 			stat[r] = s
 
 			// Store each file info within range only i verbose option set
@@ -340,11 +340,11 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range]co
 
 		// Accumulate file statistic
 		total.FilesTotal.Count++
-		total.FilesTotal.Size += sz
+		total.FilesTotal.Size += unsignedSize
 
 		ext := filepath.Ext(file.Name)
 		a := byExt[ext]
-		a.Size += sz
+		a.Size += unsignedSize
 		a.Count++
 		byExt[ext] = a
 	}
