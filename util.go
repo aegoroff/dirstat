@@ -14,8 +14,8 @@ import (
 type fsEvent int
 
 const (
-	fsEventFirst fsEvent = 0
-	fsEventNext  fsEvent = 1
+	fsEventDir  fsEvent = 0
+	fsEventFile fsEvent = 1
 )
 
 type filesystemItem struct {
@@ -65,18 +65,10 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- filesystemItem
 
 			results <- filesystemItem{
 				dir:   d,
-				event: fsEventFirst,
+				event: fsEventDir,
 			}
 
 			for _, entry := range entries {
-				// Send to channel
-				item := filesystemItem{
-					dir:   d,
-					entry: entry,
-					event: fsEventNext,
-				}
-				results <- item
-
 				// Queue subdirs to walk in a queue
 				if entry.IsDir() {
 					subdir := filepath.Join(d, entry.Name())
@@ -85,6 +77,14 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- filesystemItem
 					mu.Lock()
 					queue = append(queue, subdir)
 					mu.Unlock()
+				} else {
+					// Send to channel
+					item := filesystemItem{
+						dir:   d,
+						entry: entry,
+						event: fsEventFile,
+					}
+					results <- item
 				}
 			}
 		}(currentDir)

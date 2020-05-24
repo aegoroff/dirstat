@@ -283,12 +283,12 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range]co
 	go func() {
 		defer close(filesChan)
 		for item := range filesystemCh {
-			if item.event == fsEventFirst {
+			if item.event == fsEventDir {
 				foldersMu.Lock()
 				folders[item.dir] = &container{name: item.dir}
 				total.CountFolders++
 				foldersMu.Unlock()
-			} else if !item.entry.IsDir() {
+			} else {
 				// Only files
 				entry := item.entry
 				filesChan <- &fileEntry{Size: entry.Size(), Parent: item.dir, Name: entry.Name()}
