@@ -295,7 +295,7 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 
 	topFilesTree := rbtree.NewRbTree()
 
-	// Main procedure
+	// Read all files from channel
 	for file := range filesChan {
 		fullPath := filepath.Join(file.Parent, file.Name)
 		value := container{size: file.Size, name: fullPath, count: 1}
@@ -345,7 +345,6 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 		a.Size += sz
 		a.Count++
 		byExt[ext] = a
-
 	}
 
 	topFoldersTree := rbtree.NewRbTree()
