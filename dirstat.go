@@ -207,10 +207,13 @@ func runAnalyze(opt options, fs afero.Fs, w io.Writer) {
 			}
 
 			_, _ = fmt.Fprintf(w, "%s\n", heads[i])
-			for _, item := range filesByRange[r] {
-				fullPath := filepath.Join(item.Parent, item.Name)
-				size := humanize.IBytes(uint64(item.Size))
-				_, _ = fmt.Fprintf(w, "   %s - %s\n", fullPath, size)
+
+			items := filesByRange[r]
+			sort.Sort(sort.Reverse(items))
+
+			for _, item := range items {
+				size := humanize.IBytes(uint64(item.size))
+				_, _ = fmt.Fprintf(w, "   %s - %s\n", item.name, size)
 			}
 		}
 	}
@@ -253,14 +256,14 @@ func createSliceFromMap(sizeByExt map[string]countSizeAggregate, mapper func(cou
 	return result
 }
 
-func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]*fileEntry, map[string]countSizeAggregate, *rbtree.RbTree, *rbtree.RbTree) {
+func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range]containers, map[string]countSizeAggregate, *rbtree.RbTree, *rbtree.RbTree) {
 	verboseRanges := make(map[int]bool)
 	for _, x := range opt.Range {
 		verboseRanges[x] = true
 	}
 	total := totalInfo{}
 	stat := make(map[Range]fileStat)
-	filesByRange := make(map[Range][]*fileEntry)
+	filesByRange := make(map[Range]containers)
 
 	byExt := make(map[string]countSizeAggregate)
 
@@ -298,8 +301,8 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 	// Read all files from channel
 	for file := range filesChan {
 		fullPath := filepath.Join(file.Parent, file.Name)
-		value := container{size: file.Size, name: fullPath, count: 1}
-		updateTopTree(topFilesTree, &value)
+		fileContainer := container{size: file.Size, name: fullPath, count: 1}
+		updateTopTree(topFilesTree, &fileContainer)
 
 		sz := uint64(file.Size)
 
@@ -321,10 +324,9 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range][]
 
 			nodes, ok := filesByRange[r]
 			if !ok {
-				filesByRange[r] = []*fileEntry{file}
-			} else {
-				filesByRange[r] = append(nodes, file)
+				filesByRange[r] = make(containers, 0)
 			}
+			filesByRange[r] = append(nodes, &fileContainer)
 		}
 
 		foldersMu.RLock()
