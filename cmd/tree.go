@@ -1,4 +1,4 @@
-package main
+package cmd
 
 // container represents file system container that described by name
 // and has size and the number of elements in it (count field). It the case of file

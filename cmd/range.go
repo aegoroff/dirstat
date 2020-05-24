@@ -1,4 +1,4 @@
-package main
+package cmd
 
 // Range defined integer value range
 type Range struct {
