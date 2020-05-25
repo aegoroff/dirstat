@@ -1,5 +1,7 @@
 package cmd
 
+import "github.com/aegoroff/godatastruct/rbtree"
+
 // container represents file system container that described by name
 // and has size and the number of elements in it (count field). It the case of file
 // the number is 1 and if it's a folder count will be the number of files in it
@@ -23,10 +25,28 @@ func (x containers) Swap(i, j int) {
 	x[i], x[j] = x[j], x[i]
 }
 
-func (x *container) LessThan(y interface{}) bool {
-	return x.size < (y.(*container)).size
+func (c *container) LessThan(y interface{}) bool {
+	return c.size < (y.(*container)).size
 }
 
-func (x *container) EqualTo(y interface{}) bool {
-	return x.size == (y.(*container)).size
+func (c *container) EqualTo(y interface{}) bool {
+	return c.size == (y.(*container)).size
+}
+
+func (c *container) insertTo(topTree *rbtree.RbTree) {
+	min := topTree.Minimum()
+	if topTree.Len() < Top || (*min.Key).(*container).size < c.size {
+		if topTree.Len() == Top {
+			topTree.Delete(min)
+		}
+
+		node := rbtree.NewNode(c.toComparable())
+		topTree.Insert(node)
+	}
+}
+
+func (c *container) toComparable() *rbtree.Comparable {
+	var r rbtree.Comparable
+	r = c
+	return &r
 }

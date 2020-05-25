@@ -255,46 +255,30 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range]co
 
 	start := time.Now()
 
-	filesystemCh := make(chan *filesystemItem, 1024)
-	go func() {
-		walkDirBreadthFirst(opt.Path, fs, filesystemCh)
-	}()
-
 	var foldersMu sync.RWMutex
 	folders := make(map[string]*container)
 
-	filesChan := make(chan *fileEntry, 1024)
-
-	// Reading filesystem events
-	go func() {
-		defer close(filesChan)
-		for item := range filesystemCh {
-			if item.event == fsEventDir {
-				foldersMu.Lock()
-				folders[item.dir] = &container{name: item.dir}
-				total.CountFolders++
-				foldersMu.Unlock()
-			} else {
-				// Only files
-				entry := item.entry
-				filesChan <- &fileEntry{Size: entry.size, Parent: item.dir, Name: entry.name}
-			}
-		}
-	}()
+	foldersHandler := func(fsi *filesystemItem) {
+		foldersMu.Lock()
+		folders[fsi.dir] = &container{name: fsi.dir}
+		total.CountFolders++
+		foldersMu.Unlock()
+	}
 
 	topFilesTree := rbtree.NewRbTree()
 
-	// Read all files from channel
-	for file := range filesChan {
-		fullPath := filepath.Join(file.Parent, file.Name)
-		fileContainer := container{size: file.Size, name: fullPath, count: 1}
-		updateTopTree(topFilesTree, &fileContainer)
+	topFilesHandler := func(f *fileEntry) {
+		fullPath := filepath.Join(f.Parent, f.Name)
+		fileContainer := container{size: f.Size, name: fullPath, count: 1}
+		fileContainer.insertTo(topFilesTree)
+	}
 
-		unsignedSize := uint64(file.Size)
+	filesByRangeHandler := func(f *fileEntry) {
+		unsignedSize := uint64(f.Size)
 
 		// Calculate files range statistic
 		for i, r := range fileSizeRanges {
-			if !r.contains(file.Size) {
+			if !r.contains(f.Size) {
 				continue
 			}
 
@@ -312,49 +296,76 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range]co
 			if !ok {
 				filesByRange[r] = make(containers, 0)
 			}
+			fileContainer := container{size: f.Size, name: filepath.Join(f.Parent, f.Name), count: 1}
 			filesByRange[r] = append(nodes, &fileContainer)
 		}
+	}
 
+	folderSizeHanler := func(f *fileEntry) {
 		foldersMu.RLock()
-		currFolder, ok := folders[file.Parent]
+		currFolder, ok := folders[f.Parent]
 
 		if ok {
-			currFolder.size += file.Size
+			currFolder.size += f.Size
 			currFolder.count++
 		}
 		foldersMu.RUnlock()
+	}
 
+	accumulatorHanler := func(f *fileEntry) {
 		// Accumulate file statistic
+		unsignedSize := uint64(f.Size)
+
 		total.FilesTotal.Count++
 		total.FilesTotal.Size += unsignedSize
 
-		ext := filepath.Ext(file.Name)
+		ext := filepath.Ext(f.Name)
 		a := byExt[ext]
 		a.Size += unsignedSize
 		a.Count++
 		byExt[ext] = a
 	}
 
+	handlers := []fileHandler{topFilesHandler, filesByRangeHandler, folderSizeHanler, accumulatorHanler}
+
+	scan(opt.Path, fs, foldersHandler, handlers)
+
 	topFoldersTree := rbtree.NewRbTree()
 	for _, cont := range folders {
-		updateTopTree(topFoldersTree, cont)
+		cont.insertTo(topFoldersTree)
 	}
 
 	total.ReadingTime = time.Since(start)
 	return total, stat, filesByRange, byExt, topFoldersTree, topFilesTree
 }
 
-func updateTopTree(topTree *rbtree.RbTree, cnt *container) {
-	min := topTree.Minimum()
-	if topTree.Len() < Top || (*min.Key).(*container).size < cnt.size {
-		if topTree.Len() == Top {
-			topTree.Delete(min)
-		}
+func scan(path string, fs afero.Fs, fh folderHandler, handlers []fileHandler) {
+	filesystemCh := make(chan *filesystemItem, 1024)
+	go func() {
+		walkDirBreadthFirst(path, fs, filesystemCh)
+	}()
 
-		var r rbtree.Comparable
-		r = cnt
-		node := rbtree.NewNode(&r)
-		topTree.Insert(node)
+	filesChan := make(chan *fileEntry, 1024)
+
+	// Reading filesystem events
+	go func() {
+		defer close(filesChan)
+		for item := range filesystemCh {
+			if item.event == fsEventDir {
+				fh(item)
+			} else {
+				// Only files
+				entry := item.entry
+				filesChan <- &fileEntry{Size: entry.size, Parent: item.dir, Name: entry.name}
+			}
+		}
+	}()
+
+	// Read all files from channel
+	for file := range filesChan {
+		for _, h := range handlers {
+			h(file)
+		}
 	}
 }
 

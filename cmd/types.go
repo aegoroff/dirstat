@@ -55,3 +55,6 @@ type countSizeAggregate struct {
 	Count int64
 	Size  uint64
 }
+
+type fileHandler func(f *fileEntry)
+type folderHandler func(f *filesystemItem)
