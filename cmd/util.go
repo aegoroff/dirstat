@@ -41,7 +41,7 @@ func printMemUsage(w io.Writer) {
 	_, _ = fmt.Fprintf(w, "\tNumGC = %v\n", m.NumGC)
 }
 
-func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- filesystemItem) {
+func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- *filesystemItem) {
 	defer close(results)
 
 	var wg sync.WaitGroup
@@ -68,10 +68,11 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- filesystemItem
 				return
 			}
 
-			results <- filesystemItem{
+			dirEvent := filesystemItem{
 				dir:   d,
 				event: fsEventDir,
 			}
+			results <- &dirEvent
 
 			for _, entry := range entries {
 				// Queue subdirs to walk in a queue
@@ -84,12 +85,12 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- filesystemItem
 					mu.Unlock()
 				} else {
 					// Send to channel
-					item := filesystemItem{
+					fileEvent := filesystemItem{
 						dir:   d,
 						entry: entry,
 						event: fsEventFile,
 					}
-					results <- item
+					results <- &fileEvent
 				}
 			}
 		}(currentDir)

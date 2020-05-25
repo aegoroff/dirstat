@@ -75,7 +75,7 @@ func createFileSystemGraph(path string, fs afero.Fs) (graph *simple.WeightedDire
 }
 
 func runWalkingDir(path string, fs afero.Fs, nextID int64, ch chan<- *walkNode) {
-	filesystemCh := make(chan filesystemItem, 1024)
+	filesystemCh := make(chan *filesystemItem, 1024)
 	go func() {
 		walkDirBreadthFirst(path, fs, filesystemCh)
 	}()

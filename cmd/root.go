@@ -255,7 +255,7 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range]co
 
 	start := time.Now()
 
-	filesystemCh := make(chan filesystemItem, 1024)
+	filesystemCh := make(chan *filesystemItem, 1024)
 	go func() {
 		walkDirBreadthFirst(opt.Path, fs, filesystemCh)
 	}()
