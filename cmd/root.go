@@ -339,36 +339,6 @@ func walk(opt options, fs afero.Fs) (totalInfo, map[Range]fileStat, map[Range]co
 	return total, stat, filesByRange, byExt, topFoldersTree, topFilesTree
 }
 
-func scan(path string, fs afero.Fs, fh folderHandler, handlers []fileHandler) {
-	filesystemCh := make(chan *filesystemItem, 1024)
-	go func() {
-		walkDirBreadthFirst(path, fs, filesystemCh)
-	}()
-
-	filesChan := make(chan *fileEntry, 1024)
-
-	// Reading filesystem events
-	go func() {
-		defer close(filesChan)
-		for item := range filesystemCh {
-			if item.event == fsEventDir {
-				fh(item)
-			} else {
-				// Only files
-				entry := item.entry
-				filesChan <- &fileEntry{Size: entry.size, Parent: item.dir, Name: entry.name}
-			}
-		}
-	}()
-
-	// Read all files from channel
-	for file := range filesChan {
-		for _, h := range handlers {
-			h(file)
-		}
-	}
-}
-
 func printTotals(t totalInfo, w io.Writer) {
 
 	const totalTemplate = `
