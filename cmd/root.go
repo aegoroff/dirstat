@@ -67,7 +67,7 @@ func init() {
 	cobra.MousetrapHelpText = ""
 	appWriter = os.Stdout
 	rootCmd.Flags().StringP(pathParamName, "p", "", "REQUIRED. Directory path to show info.")
-	rootCmd.Flags().IntSliceP(rangeParamName, "r", []int{}, "Output verbose files info for fileSizeRanges specified")
+	rootCmd.Flags().IntSliceP(rangeParamName, "r", []int{}, "Output verbose files info for range specified. Range is the number between 1 and 10")
 	rootCmd.Flags().BoolP(verboseParamName, "v", false, "Be verbose")
 }
 
