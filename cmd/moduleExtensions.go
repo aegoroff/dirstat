@@ -8,16 +8,16 @@ import (
 	"text/tabwriter"
 )
 
-type moduleAggregate struct {
+type moduleExtensions struct {
 	aggregator map[string]countSizeAggregate
 	total      *totalInfo
 }
 
-func (m *moduleAggregate) postScan() {
+func (m *moduleExtensions) postScan() {
 
 }
 
-func (m *moduleAggregate) handler() fileHandler {
+func (m *moduleExtensions) handler() fileHandler {
 	return func(f *fileEntry) {
 		ext := filepath.Ext(f.Name)
 		a := m.aggregator[ext]
@@ -27,7 +27,7 @@ func (m *moduleAggregate) handler() fileHandler {
 	}
 }
 
-func (m *moduleAggregate) output(tw *tabwriter.Writer, w io.Writer) {
+func (m *moduleExtensions) output(tw *tabwriter.Writer, w io.Writer) {
 	m.total.CountFileExts = len(m.aggregator)
 
 	extBySize := createSliceFromMap(m.aggregator, func(aggregate countSizeAggregate) int64 {

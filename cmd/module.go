@@ -72,8 +72,8 @@ func execute(path string, fs afero.Fs, w io.Writer, verbose bool, enabledRanges 
 		distribution:  make(map[Range]containers),
 	}
 
-	// Aggregate module
-	am := moduleAggregate{
+	// File extensions statistic module
+	em := moduleExtensions{
 		total:      &total,
 		aggregator: make(map[string]countSizeAggregate),
 	}
@@ -85,7 +85,7 @@ func execute(path string, fs afero.Fs, w io.Writer, verbose bool, enabledRanges 
 	}
 
 	// Modules order in the slice is important
-	modules := []module{&totfm, &am, &tfm, &fm, &rm, &tm}
+	modules := []module{&totfm, &em, &tfm, &fm, &rm, &tm}
 
 	foldersHandler := func(fsi *filesystemItem) {
 		foldersMu.Lock()
