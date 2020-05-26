@@ -15,14 +15,14 @@ Usage:
   dirstat [command]
 
 Available Commands:
+  a           Show all information about folder/volume
+  fi          Show information about files only
+  fo          Show information about folders only
   help        Help about any command
   version     Print the version number of dirstat
 
 Flags:
-  -h, --help          help for dirstat
-  -p, --path string   REQUIRED. Directory path to show info.
-  -r, --range ints    Output verbose files info for fileSizeRanges specified
-  -v, --verbose       Be verbose
+  -h, --help   help for dirstat
 
 Use "dirstat [command] --help" for more information about a command.
 ```
@@ -30,15 +30,15 @@ Examples:
 ---------
 Show statistic about all D drive (on Windows)
 ```
-dirstat -p d:
+dirstat a -p d:
 ```
-Show statistic about specific folder d:\folder
+Show all statistic about specific folder d:\folder
 ```
-dirstat -p d:\folder
+dirstat a -p d:\folder
 ```
-Show statistic and additional verbose statistic about files in ranges Between 10 GiB and 100 GiB and Between 100 GiB and 1.0 TiB 
+Show all statistic and additional verbose statistic about files in ranges Between 10 GiB and 100 GiB and Between 100 GiB and 1.0 TiB 
 ```
-dirstat -p d:\ -v -r 7 -r 8
+dirstat a -p d:\ -v -r 7 -r 8
 ```
 Output example:
 ---------------
