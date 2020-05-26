@@ -16,6 +16,9 @@ type moduleFolders struct {
 	tree    *rbtree.RbTree
 }
 
+func (m *moduleFolders) init() {
+}
+
 func (m *moduleFolders) postScan() {
 	for _, cont := range m.folders {
 		cont.insertTo(m.tree)

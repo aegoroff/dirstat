@@ -14,6 +14,9 @@ type moduleTopFiles struct {
 	tree *rbtree.RbTree
 }
 
+func (m *moduleTopFiles) init() {
+}
+
 func (m *moduleTopFiles) postScan() {
 
 }

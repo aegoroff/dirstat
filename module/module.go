@@ -16,6 +16,7 @@ type module interface {
 	handler() sys.FileHandler
 	output(tw *tabwriter.Writer, w io.Writer)
 	postScan()
+	init()
 }
 
 // Execute runs all modules over path specified
@@ -44,16 +45,11 @@ func Execute(path string, fs afero.Fs, w io.Writer, verbose bool, enabledRanges 
 		tree: rbtree.NewRbTree(),
 	}
 
-	// verbose module
-	verboseRanges := make(map[int]bool)
-	for _, x := range enabledRanges {
-		verboseRanges[x] = true
-	}
-
+	// range module
 	rangeAggregate := make(map[Range]fileStat)
 	rm := moduleRange{
 		verbose:       verbose,
-		enabledRanges: verboseRanges,
+		enabledRanges: enabledRanges,
 		aggregate:     rangeAggregate,
 		distribution:  make(map[Range]containers),
 	}

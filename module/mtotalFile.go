@@ -12,6 +12,9 @@ type moduleTotalFile struct {
 	aggregate map[Range]fileStat
 }
 
+func (m *moduleTotalFile) init() {
+}
+
 func (m *moduleTotalFile) postScan() {
 
 }

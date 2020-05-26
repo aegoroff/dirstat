@@ -25,10 +25,18 @@ func (r Range) Contains(num int64) bool {
 }
 
 type moduleRange struct {
-	distribution  map[Range]containers
-	aggregate     map[Range]fileStat
-	verbose       bool
-	enabledRanges map[int]bool
+	distribution     map[Range]containers
+	aggregate        map[Range]fileStat
+	verbose          bool
+	enabledRanges    []int
+	enabledRangesMap map[int]bool
+}
+
+func (m *moduleRange) init() {
+	m.enabledRangesMap = make(map[int]bool)
+	for _, x := range m.enabledRanges {
+		m.enabledRangesMap[x] = true
+	}
 }
 
 func (m *moduleRange) postScan() {
@@ -51,7 +59,7 @@ func (m *moduleRange) handler() sys.FileHandler {
 			m.aggregate[r] = s
 
 			// Store each file info within range only i verbose option set
-			if !m.verbose || !m.enabledRanges[i+1] {
+			if !m.verbose || !m.enabledRangesMap[i+1] {
 				continue
 			}
 

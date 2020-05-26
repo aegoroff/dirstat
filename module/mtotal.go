@@ -14,6 +14,9 @@ type moduleTotal struct {
 	start time.Time
 }
 
+func (m *moduleTotal) init() {
+}
+
 func (m *moduleTotal) postScan() {
 	m.total.ReadingTime = time.Since(m.start)
 }

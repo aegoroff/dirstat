@@ -14,6 +14,9 @@ type moduleExtensions struct {
 	aggregator map[string]countSizeAggregate
 }
 
+func (m *moduleExtensions) init() {
+}
+
 func (m *moduleExtensions) postScan() {
 	m.total.CountFileExts = len(m.aggregator)
 }
