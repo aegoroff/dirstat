@@ -35,12 +35,9 @@ var folderCmd = &cobra.Command{
 		ctx := module.NewContext()
 		foldersmod := module.NewFoldersModule(ctx)
 		totalmod := module.NewTotalModule(ctx)
-		rangemod := module.NewRangeHiddenModule(ctx)
-		totalfilemod := module.NewTotalHiddenFileModule(ctx)
 		extmod := module.NewExtensionHiddenModule(ctx)
-		topfilesmod := module.NewTopFilesHiddenModule(ctx)
 
-		modules := []module.Module{totalfilemod, extmod, topfilesmod, foldersmod, rangemod, totalmod}
+		modules := []module.Module{extmod, foldersmod, totalmod}
 
 		module.Execute(opt.Path, appFileSystem, appWriter, ctx, modules)
 

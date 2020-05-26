@@ -93,17 +93,6 @@ func NewTotalFileModule(ctx *Context) Module {
 	return &m
 }
 
-func NewTotalHiddenFileModule(ctx *Context) Module {
-	m := moduleTotalFile{
-		total:     ctx.total,
-		aggregate: ctx.rangeAggregate,
-	}
-	h := moduleTotalFileNoOut{
-		m,
-	}
-	return &h
-}
-
 func NewRangeModule(ctx *Context, verbose bool, enabledRanges []int) Module {
 	m := moduleRange{
 		verbose:       verbose,
