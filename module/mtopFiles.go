@@ -33,6 +33,7 @@ func (m *moduleTopFiles) handler() sys.FileHandler {
 	}
 }
 
+// Mute parent output
 func (m *moduleTopFilesNoOut) output(tw *tabwriter.Writer, w io.Writer) {
 
 }

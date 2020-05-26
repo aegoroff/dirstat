@@ -42,6 +42,7 @@ func (m *moduleFolders) handler() sys.FileHandler {
 	}
 }
 
+// Mute parent output
 func (m *moduleFoldersNoOut) output(tw *tabwriter.Writer, w io.Writer) {
 
 }

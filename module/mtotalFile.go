@@ -28,6 +28,7 @@ func (m *moduleTotalFile) handler() sys.FileHandler {
 	}
 }
 
+// Mute parent output
 func (m *moduleTotalFileNoOut) output(tw *tabwriter.Writer, w io.Writer) {
 
 }

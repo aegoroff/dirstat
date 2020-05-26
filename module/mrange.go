@@ -76,6 +76,11 @@ func (m *moduleRange) handler() sys.FileHandler {
 	}
 }
 
+// Mute parent output
+func (m *moduleRangeNoOut) output(tw *tabwriter.Writer, w io.Writer) {
+
+}
+
 func (m *moduleRange) output(tw *tabwriter.Writer, w io.Writer) {
 	if m.verbose && len(m.enabledRanges) > 0 {
 		heads := createRangesHeads()
