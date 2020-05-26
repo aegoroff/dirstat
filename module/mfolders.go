@@ -16,6 +16,10 @@ type moduleFolders struct {
 	tree    *rbtree.RbTree
 }
 
+type moduleFoldersNoOut struct {
+	moduleFolders
+}
+
 func (m *moduleFolders) init() {
 }
 
@@ -36,6 +40,10 @@ func (m *moduleFolders) handler() sys.FileHandler {
 		}
 		m.RUnlock()
 	}
+}
+
+func (m *moduleFoldersNoOut) output(tw *tabwriter.Writer, w io.Writer) {
+
 }
 
 func (m *moduleFolders) output(tw *tabwriter.Writer, w io.Writer) {

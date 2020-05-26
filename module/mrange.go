@@ -32,6 +32,9 @@ type moduleRange struct {
 	enabledRangesMap map[int]bool
 }
 
+type moduleRangeNoOut struct {
+}
+
 func (m *moduleRange) init() {
 	m.enabledRangesMap = make(map[int]bool)
 	for _, x := range m.enabledRanges {

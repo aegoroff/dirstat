@@ -12,6 +12,10 @@ type moduleTotalFile struct {
 	aggregate map[Range]fileStat
 }
 
+type moduleTotalFileNoOut struct {
+	moduleTotalFile
+}
+
 func (m *moduleTotalFile) init() {
 }
 
@@ -22,6 +26,10 @@ func (m *moduleTotalFile) postScan() {
 func (m *moduleTotalFile) handler() sys.FileHandler {
 	return func(f *sys.FileEntry) {
 	}
+}
+
+func (m *moduleTotalFileNoOut) output(tw *tabwriter.Writer, w io.Writer) {
+
 }
 
 func (m *moduleTotalFile) output(tw *tabwriter.Writer, w io.Writer) {

@@ -14,6 +14,10 @@ type moduleExtensions struct {
 	aggregator map[string]countSizeAggregate
 }
 
+type moduleExtensionsNoOut struct {
+	moduleExtensions
+}
+
 func (m *moduleExtensions) init() {
 }
 
@@ -68,6 +72,10 @@ func (m *moduleExtensions) output(tw *tabwriter.Writer, w io.Writer) {
 	})
 
 	_ = tw.Flush()
+}
+
+// Mute parent output
+func (m *moduleExtensionsNoOut) output(tw *tabwriter.Writer, w io.Writer) {
 }
 
 func outputTopTenExtensions(tw *tabwriter.Writer, data containers, total *totalInfo, selector func(data containers, item *container) (int64, uint64)) {

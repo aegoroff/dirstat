@@ -14,6 +14,10 @@ type moduleTopFiles struct {
 	tree *rbtree.RbTree
 }
 
+type moduleTopFilesNoOut struct {
+	moduleTopFiles
+}
+
 func (m *moduleTopFiles) init() {
 }
 
@@ -27,6 +31,10 @@ func (m *moduleTopFiles) handler() sys.FileHandler {
 		fileContainer := container{size: f.Size, name: fullPath, count: 1}
 		fileContainer.insertTo(m.tree)
 	}
+}
+
+func (m *moduleTopFilesNoOut) output(tw *tabwriter.Writer, w io.Writer) {
+
 }
 
 func (m *moduleTopFiles) output(tw *tabwriter.Writer, w io.Writer) {
