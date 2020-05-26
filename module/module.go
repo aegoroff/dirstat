@@ -18,24 +18,7 @@ type module interface {
 	postScan()
 }
 
-func executeModules(path string, fs afero.Fs, w io.Writer, fh sys.FolderHandler, modules []module) {
-	var handlers []sys.FileHandler
-	for _, m := range modules {
-		handlers = append(handlers, m.handler())
-	}
-	sys.Scan(path, fs, fh, handlers)
-
-	for _, m := range modules {
-		m.postScan()
-	}
-
-	tw := new(tabwriter.Writer).Init(w, 0, 8, 4, ' ', 0)
-
-	for _, m := range modules {
-		m.output(tw, w)
-	}
-}
-
+// Execute runs all modules over path specified
 func Execute(path string, fs afero.Fs, w io.Writer, verbose bool, enabledRanges []int) {
 	total := totalInfo{}
 
@@ -98,6 +81,24 @@ func Execute(path string, fs afero.Fs, w io.Writer, verbose bool, enabledRanges 
 	}
 
 	executeModules(path, fs, w, foldersHandler, modules)
+}
+
+func executeModules(path string, fs afero.Fs, w io.Writer, fh sys.FolderHandler, modules []module) {
+	var handlers []sys.FileHandler
+	for _, m := range modules {
+		handlers = append(handlers, m.handler())
+	}
+	sys.Scan(path, fs, fh, handlers)
+
+	for _, m := range modules {
+		m.postScan()
+	}
+
+	tw := new(tabwriter.Writer).Init(w, 0, 8, 4, ' ', 0)
+
+	for _, m := range modules {
+		m.output(tw, w)
+	}
 }
 
 func outputTopStatLine(tw *tabwriter.Writer, count int64, total *totalInfo, sz uint64, title string) {
