@@ -6,12 +6,22 @@ import (
 	"sync"
 )
 
+// FileEntry represent file description
 type FileEntry struct {
-	Size   int64
+	// File size in bytes
+	Size int64
+
+	// File's directory
 	Parent string
-	Name   string
+
+	// File name
+	Name string
 }
+
+// FileHandler defines function prototype that handles each file event received
 type FileHandler func(f *FileEntry)
+
+// FolderHandler defines function prototype that handles each folder event received
 type FolderHandler func(f *FilesystemItem)
 
 // FilesystemItem defines filesystem abstraction (file or folder)
