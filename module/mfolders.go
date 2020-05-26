@@ -29,6 +29,9 @@ func (m *moduleFolders) postScan() {
 	}
 }
 
+func (m *moduleFoldersNoOut) postScan() {
+}
+
 func (m *moduleFolders) handler() sys.FileHandler {
 	return func(f *sys.FileEntry) {
 		m.RLock()

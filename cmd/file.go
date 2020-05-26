@@ -8,11 +8,11 @@ import (
 	"path/filepath"
 )
 
-// allCmd represents the all command
-var allCmd = &cobra.Command{
-	Use:     "a",
-	Aliases: []string{"all"},
-	Short:   "Show all information about folder/volume",
+// fileCmd represents the file command
+var fileCmd = &cobra.Command{
+	Use:     "fi",
+	Aliases: []string{"file"},
+	Short:   "Show information about files only",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		path, err := cmd.Flags().GetString(pathParamName)
 
@@ -45,7 +45,7 @@ var allCmd = &cobra.Command{
 		_, _ = fmt.Fprintf(appWriter, "Root: %s\n\n", opt.Path)
 
 		ctx := module.NewContext()
-		foldersmod := module.NewFoldersModule(ctx)
+		foldersmod := module.NewFoldersHiddenModule(ctx)
 		totalmod := module.NewTotalModule(ctx)
 		rangemod := module.NewRangeModule(ctx, opt.Verbosity, opt.Range)
 		totalfilemod := module.NewTotalFileModule(ctx)
@@ -62,8 +62,8 @@ var allCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(allCmd)
-	allCmd.Flags().StringP(pathParamName, "p", "", "REQUIRED. Directory path to show info.")
-	allCmd.Flags().IntSliceP(rangeParamName, "r", []int{}, "Output verbose files info for range specified. Range is the number between 1 and 10")
-	allCmd.Flags().BoolP(verboseParamName, "v", false, "Be verbose")
+	rootCmd.AddCommand(fileCmd)
+	fileCmd.Flags().StringP(pathParamName, "p", "", "REQUIRED. Directory path to show info.")
+	fileCmd.Flags().IntSliceP(rangeParamName, "r", []int{}, "Output verbose files info for range specified. Range is the number between 1 and 10")
+	fileCmd.Flags().BoolP(verboseParamName, "v", false, "Be verbose")
 }
