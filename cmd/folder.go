@@ -12,7 +12,7 @@ import (
 var folderCmd = &cobra.Command{
 	Use:     "fo",
 	Aliases: []string{"folder"},
-	Short:   "Show information about folders only",
+	Short:   "Show information about folders within folder on volume only",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		path, err := cmd.Flags().GetString(pathParamName)
 

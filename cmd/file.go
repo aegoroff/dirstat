@@ -12,7 +12,7 @@ import (
 var fileCmd = &cobra.Command{
 	Use:     "fi",
 	Aliases: []string{"file"},
-	Short:   "Show information about files only",
+	Short:   "Show information about files within folder on volume only",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		path, err := cmd.Flags().GetString(pathParamName)
 

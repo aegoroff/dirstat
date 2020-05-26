@@ -16,8 +16,8 @@ Usage:
 
 Available Commands:
   a           Show all information about folder/volume
-  fi          Show information about files only
-  fo          Show information about folders only
+  fi          Show information about files within folder on volume only
+  fo          Show information about folders within folder on volume only
   help        Help about any command
   version     Print the version number of dirstat
 
