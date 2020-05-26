@@ -82,6 +82,7 @@ func Execute(path string, fs afero.Fs, w io.Writer, verbose bool, enabledRanges 
 func executeModules(path string, fs afero.Fs, w io.Writer, fh sys.FolderHandler, modules []module) {
 	var handlers []sys.FileHandler
 	for _, m := range modules {
+		m.init()
 		handlers = append(handlers, m.handler())
 	}
 	sys.Scan(path, fs, fh, handlers)
