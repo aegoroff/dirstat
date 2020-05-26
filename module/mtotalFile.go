@@ -8,7 +8,7 @@ import (
 )
 
 type moduleTotalFile struct {
-	moduleTotal
+	total     *totalInfo
 	aggregate map[Range]fileStat
 }
 

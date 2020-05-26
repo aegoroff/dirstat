@@ -34,7 +34,7 @@ func Execute(path string, fs afero.Fs, w io.Writer, verbose bool, enabledRanges 
 	// folders module
 	fm := moduleFolders{
 		&foldersMu,
-		totalm,
+		&total,
 		folders,
 		rbtree.NewRbTree(),
 	}
@@ -60,14 +60,14 @@ func Execute(path string, fs afero.Fs, w io.Writer, verbose bool, enabledRanges 
 
 	// File extensions statistic module
 	em := moduleExtensions{
-		totalm,
-		make(map[string]countSizeAggregate),
+		total:      &total,
+		aggregator: make(map[string]countSizeAggregate),
 	}
 
 	// Total file stat module
 	totfm := moduleTotalFile{
-		totalm,
-		rangeAggregate,
+		total:     &total,
+		aggregate: rangeAggregate,
 	}
 
 	// Modules order in the slice is important

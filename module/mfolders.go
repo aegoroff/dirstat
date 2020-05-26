@@ -11,7 +11,7 @@ import (
 
 type moduleFolders struct {
 	*sync.RWMutex
-	moduleTotal
+	total   *totalInfo
 	folders map[string]*container
 	tree    *rbtree.RbTree
 }

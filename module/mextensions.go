@@ -10,7 +10,7 @@ import (
 )
 
 type moduleExtensions struct {
-	moduleTotal
+	total      *totalInfo
 	aggregator map[string]countSizeAggregate
 }
 
