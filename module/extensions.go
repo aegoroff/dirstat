@@ -15,7 +15,7 @@ type moduleExtensions struct {
 }
 
 func (m *moduleExtensions) postScan() {
-
+	m.total.CountFileExts = len(m.aggregator)
 }
 
 func (m *moduleExtensions) handler() sys.FileHandler {
@@ -29,8 +29,6 @@ func (m *moduleExtensions) handler() sys.FileHandler {
 }
 
 func (m *moduleExtensions) output(tw *tabwriter.Writer, w io.Writer) {
-	m.total.CountFileExts = len(m.aggregator)
-
 	extBySize := createSliceFromMap(m.aggregator, func(aggregate countSizeAggregate) int64 {
 		return int64(aggregate.Size)
 	})
