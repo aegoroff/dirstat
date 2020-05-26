@@ -1,6 +1,7 @@
-package cmd
+package module
 
 import (
+	"dirstat/module/internal/sys"
 	"fmt"
 	"io"
 	"text/tabwriter"
@@ -15,8 +16,8 @@ func (m *moduleTotalFile) postScan() {
 
 }
 
-func (m *moduleTotalFile) handler() fileHandler {
-	return func(f *fileEntry) {
+func (m *moduleTotalFile) handler() sys.FileHandler {
+	return func(f *sys.FileEntry) {
 	}
 }
 

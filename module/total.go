@@ -1,6 +1,7 @@
-package cmd
+package module
 
 import (
+	"dirstat/module/internal/sys"
 	"github.com/dustin/go-humanize"
 	"io"
 	"text/tabwriter"
@@ -17,8 +18,8 @@ func (m *moduleTotal) postScan() {
 	m.info.ReadingTime = time.Since(m.start)
 }
 
-func (m *moduleTotal) handler() fileHandler {
-	return func(f *fileEntry) {
+func (m *moduleTotal) handler() sys.FileHandler {
+	return func(f *sys.FileEntry) {
 		// Accumulate file statistic
 		m.info.FilesTotal.Count++
 		m.info.FilesTotal.Size += uint64(f.Size)

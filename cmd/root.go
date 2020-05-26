@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"dirstat/module"
 	"fmt"
 	"github.com/dustin/go-humanize"
 	"github.com/spf13/afero"
@@ -9,8 +10,13 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"text/tabwriter"
 )
+
+type options struct {
+	Verbosity bool
+	Range     []int
+	Path      string
+}
 
 const pathParamName = "path"
 const verboseParamName = "verbose"
@@ -56,7 +62,7 @@ var rootCmd = &cobra.Command{
 
 		_, _ = fmt.Fprintf(appWriter, "Root: %s\n\n", opt.Path)
 
-		execute(opt.Path, appFileSystem, appWriter, opt.Verbosity, opt.Range)
+		module.Execute(opt.Path, appFileSystem, appWriter, opt.Verbosity, opt.Range)
 
 		printMemUsage(appWriter)
 		return nil
@@ -76,21 +82,6 @@ func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
-}
-
-func outputTopStatLine(tw *tabwriter.Writer, count int64, total *totalInfo, sz uint64, title string) {
-	percentOfCount := countPercent(count, total)
-	percentOfSize := sizePercent(sz, total)
-
-	_, _ = fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", title, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
-}
-
-func countPercent(count int64, total *totalInfo) float64 {
-	return (float64(count) / float64(total.FilesTotal.Count)) * 100
-}
-
-func sizePercent(size uint64, total *totalInfo) float64 {
-	return (float64(size) / float64(total.FilesTotal.Size)) * 100
 }
 
 // printMemUsage outputs the current, total and OS memory being used. As well as the number

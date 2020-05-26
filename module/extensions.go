@@ -1,6 +1,7 @@
-package cmd
+package module
 
 import (
+	"dirstat/module/internal/sys"
 	"fmt"
 	"io"
 	"path/filepath"
@@ -17,8 +18,8 @@ func (m *moduleExtensions) postScan() {
 
 }
 
-func (m *moduleExtensions) handler() fileHandler {
-	return func(f *fileEntry) {
+func (m *moduleExtensions) handler() sys.FileHandler {
+	return func(f *sys.FileEntry) {
 		ext := filepath.Ext(f.Name)
 		a := m.aggregator[ext]
 		a.Size += uint64(f.Size)
@@ -43,7 +44,7 @@ func (m *moduleExtensions) output(tw *tabwriter.Writer, w io.Writer) {
 
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
-	_, _ = fmt.Fprintf(w, "\nTOP %d file extensions by size:\n\n", Top)
+	_, _ = fmt.Fprintf(w, "\nTOP %d file extensions by size:\n\n", top)
 	_, _ = fmt.Fprintf(tw, format, "Extension", "Count", "%", "Size", "%")
 	_, _ = fmt.Fprintf(tw, format, "---------", "-----", "------", "----", "------")
 
@@ -55,7 +56,7 @@ func (m *moduleExtensions) output(tw *tabwriter.Writer, w io.Writer) {
 
 	_ = tw.Flush()
 
-	_, _ = fmt.Fprintf(w, "\nTOP %d file extensions by count:\n\n", Top)
+	_, _ = fmt.Fprintf(w, "\nTOP %d file extensions by count:\n\n", top)
 	_, _ = fmt.Fprintf(tw, format, "Extension", "Count", "%", "Size", "%")
 	_, _ = fmt.Fprintf(tw, format, "---------", "-----", "------", "----", "------")
 
@@ -69,7 +70,7 @@ func (m *moduleExtensions) output(tw *tabwriter.Writer, w io.Writer) {
 }
 
 func outputTopTenExtensions(tw *tabwriter.Writer, data containers, total *totalInfo, selector func(data containers, item *container) (int64, uint64)) {
-	for i := 0; i < Top && i < len(data); i++ {
+	for i := 0; i < top && i < len(data); i++ {
 		h := data[i].name
 
 		count, sz := selector(data, data[i])

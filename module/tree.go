@@ -1,4 +1,4 @@
-package cmd
+package module
 
 import "github.com/aegoroff/godatastruct/rbtree"
 
@@ -35,8 +35,8 @@ func (c *container) EqualTo(y interface{}) bool {
 
 func (c *container) insertTo(topTree *rbtree.RbTree) {
 	min := topTree.Minimum()
-	if topTree.Len() < Top || (*min.Key).(*container).size < c.size {
-		if topTree.Len() == Top {
+	if topTree.Len() < top || (*min.Key).(*container).size < c.size {
+		if topTree.Len() == top {
 			topTree.Delete(min)
 		}
 

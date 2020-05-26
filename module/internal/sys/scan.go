@@ -1,4 +1,4 @@
-package cmd
+package sys
 
 import (
 	"github.com/spf13/afero"
@@ -6,34 +6,42 @@ import (
 	"sync"
 )
 
+type FileEntry struct {
+	Size   int64
+	Parent string
+	Name   string
+}
+type FileHandler func(f *FileEntry)
+type FolderHandler func(f *FilesystemItem)
+
+type FilesystemItem struct {
+	Dir   string
+	Entry *FileInfo
+	event fsEvent
+}
+
+type FileInfo struct {
+	isDir bool
+	name  string
+	size  int64
+}
+
 type fsEvent int
-type fileHandler func(f *fileEntry)
-type folderHandler func(f *filesystemItem)
 
 const (
 	fsEventDir  fsEvent = 0
 	fsEventFile fsEvent = 1
 )
 
-type filesystemItem struct {
-	dir   string
-	entry *fileInfo
-	event fsEvent
-}
-
-type fileInfo struct {
-	isDir bool
-	name  string
-	size  int64
-}
-
-func scan(path string, fs afero.Fs, fh folderHandler, handlers []fileHandler) {
-	filesystemCh := make(chan *filesystemItem, 1024)
+// Scan do specified path scanning and executes folder handler on each folder
+// and all file handlers on each file
+func Scan(path string, fs afero.Fs, fh FolderHandler, handlers []FileHandler) {
+	filesystemCh := make(chan *FilesystemItem, 1024)
 	go func() {
 		walkDirBreadthFirst(path, fs, filesystemCh)
 	}()
 
-	filesChan := make(chan *fileEntry, 1024)
+	filesChan := make(chan *FileEntry, 1024)
 
 	// Reading filesystem events
 	go func() {
@@ -43,8 +51,8 @@ func scan(path string, fs afero.Fs, fh folderHandler, handlers []fileHandler) {
 				fh(item)
 			} else {
 				// Only files
-				entry := item.entry
-				filesChan <- &fileEntry{Size: entry.size, Parent: item.dir, Name: entry.name}
+				entry := item.Entry
+				filesChan <- &FileEntry{Size: entry.size, Parent: item.Dir, Name: entry.name}
 			}
 		}
 	}()
@@ -57,7 +65,7 @@ func scan(path string, fs afero.Fs, fh folderHandler, handlers []fileHandler) {
 	}
 }
 
-func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- *filesystemItem) {
+func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- *FilesystemItem) {
 	defer close(results)
 
 	var wg sync.WaitGroup
@@ -84,8 +92,8 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- *filesystemIte
 				return
 			}
 
-			dirEvent := filesystemItem{
-				dir:   d,
+			dirEvent := FilesystemItem{
+				Dir:   d,
 				event: fsEventDir,
 			}
 			results <- &dirEvent
@@ -101,9 +109,9 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- *filesystemIte
 					mu.Unlock()
 				} else {
 					// Send to channel
-					fileEvent := filesystemItem{
-						dir:   d,
-						entry: entry,
+					fileEvent := FilesystemItem{
+						Dir:   d,
+						Entry: entry,
 						event: fsEventFile,
 					}
 					results <- &fileEvent
@@ -130,7 +138,7 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- *filesystemIte
 
 var sema = make(chan struct{}, 32)
 
-func dirents(path string, fs afero.Fs) []*fileInfo {
+func dirents(path string, fs afero.Fs) []*FileInfo {
 	sema <- struct{}{}
 	defer func() { <-sema }()
 	f, err := fs.Open(path)
@@ -144,9 +152,9 @@ func dirents(path string, fs afero.Fs) []*fileInfo {
 		return nil
 	}
 
-	var result = []*fileInfo{}
+	var result = []*FileInfo{}
 	for _, e := range entries {
-		fi := fileInfo{name: e.Name(), size: e.Size(), isDir: e.IsDir()}
+		fi := FileInfo{name: e.Name(), size: e.Size(), isDir: e.IsDir()}
 		result = append(result, &fi)
 	}
 

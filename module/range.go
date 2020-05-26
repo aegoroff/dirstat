@@ -1,6 +1,7 @@
-package cmd
+package module
 
 import (
+	"dirstat/module/internal/sys"
 	"fmt"
 	"github.com/dustin/go-humanize"
 	"io"
@@ -8,6 +9,20 @@ import (
 	"sort"
 	"text/tabwriter"
 )
+
+// Range defined integer value range
+type Range struct {
+	// Min value
+	Min int64
+
+	// Max value
+	Max int64
+}
+
+// Contains defines whether the number specified within range
+func (r Range) Contains(num int64) bool {
+	return num >= r.Min && num <= r.Max
+}
 
 type moduleRange struct {
 	distribution  map[Range]containers
@@ -20,13 +35,13 @@ func (m *moduleRange) postScan() {
 
 }
 
-func (m *moduleRange) handler() fileHandler {
-	return func(f *fileEntry) {
+func (m *moduleRange) handler() sys.FileHandler {
+	return func(f *sys.FileEntry) {
 		unsignedSize := uint64(f.Size)
 
 		// Calculate files range statistic
 		for i, r := range fileSizeRanges {
-			if !r.contains(f.Size) {
+			if !r.Contains(f.Size) {
 				continue
 			}
 

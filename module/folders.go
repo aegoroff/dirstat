@@ -1,6 +1,7 @@
-package cmd
+package module
 
 import (
+	"dirstat/module/internal/sys"
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"io"
@@ -21,8 +22,8 @@ func (m *moduleFolders) postScan() {
 	}
 }
 
-func (m *moduleFolders) handler() fileHandler {
-	return func(f *fileEntry) {
+func (m *moduleFolders) handler() sys.FileHandler {
+	return func(f *sys.FileEntry) {
 		m.RLock()
 		currFolder, ok := m.folders[f.Parent]
 
@@ -37,7 +38,7 @@ func (m *moduleFolders) handler() fileHandler {
 func (m *moduleFolders) output(tw *tabwriter.Writer, w io.Writer) {
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
-	_, _ = fmt.Fprintf(w, "\nTOP %d folders by size:\n\n", Top)
+	_, _ = fmt.Fprintf(w, "\nTOP %d folders by size:\n\n", top)
 	_, _ = fmt.Fprintf(tw, format, "Folder", "Files", "%", "Size", "%")
 	_, _ = fmt.Fprintf(tw, format, "------", "-----", "------", "----", "------")
 
