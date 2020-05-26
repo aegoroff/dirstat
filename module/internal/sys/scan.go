@@ -14,12 +14,17 @@ type FileEntry struct {
 type FileHandler func(f *FileEntry)
 type FolderHandler func(f *FilesystemItem)
 
+// FilesystemItem defines filesystem abstraction (file or folder)
 type FilesystemItem struct {
-	Dir   string
+	// Item's dir
+	Dir string
+
+	// Items filesystem info like size, name, etc.
 	Entry *FileInfo
 	event fsEvent
 }
 
+// FileInfo defines filesystem item data like size, name, etc.
 type FileInfo struct {
 	isDir bool
 	name  string

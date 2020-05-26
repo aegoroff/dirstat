@@ -40,6 +40,7 @@ func Execute(path string, fs afero.Fs, w io.Writer, ctx *Context, modules []Modu
 	executeModules(path, fs, w, foldersHandler, modules)
 }
 
+// NewContext create new module's context that needed to create new modules
 func NewContext() *Context {
 	total := totalInfo{}
 	folders := make(map[string]*container)
@@ -54,6 +55,7 @@ func NewContext() *Context {
 	return &ctx
 }
 
+// NewFoldersModule creates new folders module
 func NewFoldersModule(ctx *Context) Module {
 	m := moduleFolders{
 		ctx.foldersMu,
@@ -64,6 +66,7 @@ func NewFoldersModule(ctx *Context) Module {
 	return &m
 }
 
+// NewFoldersHiddenModule creates new folders module that has disabled output
 func NewFoldersHiddenModule(ctx *Context) Module {
 	m := moduleFolders{
 		ctx.foldersMu,
@@ -77,6 +80,7 @@ func NewFoldersHiddenModule(ctx *Context) Module {
 	return &h
 }
 
+// NewTotalModule creates new total statistic module
 func NewTotalModule(ctx *Context) Module {
 	m := moduleTotal{
 		start: time.Now(),
@@ -85,6 +89,7 @@ func NewTotalModule(ctx *Context) Module {
 	return &m
 }
 
+// NewTotalFileModule creates new total file statistic module
 func NewTotalFileModule(ctx *Context) Module {
 	m := moduleTotalFile{
 		total:     ctx.total,
@@ -93,6 +98,7 @@ func NewTotalFileModule(ctx *Context) Module {
 	return &m
 }
 
+// NewRangeModule creates new file statistic by file size range module
 func NewRangeModule(ctx *Context, verbose bool, enabledRanges []int) Module {
 	m := moduleRange{
 		verbose:       verbose,
@@ -103,6 +109,8 @@ func NewRangeModule(ctx *Context, verbose bool, enabledRanges []int) Module {
 	return &m
 }
 
+// NewRangeHiddenModule creates new file statistic by file size range module
+// that has disabled output
 func NewRangeHiddenModule(ctx *Context) Module {
 	m := moduleRange{
 		verbose:       false,
@@ -116,6 +124,7 @@ func NewRangeHiddenModule(ctx *Context) Module {
 	return &h
 }
 
+// NewExtensionModule creates new file extensions statistic module
 func NewExtensionModule(ctx *Context) Module {
 	m := moduleExtensions{
 		total:      ctx.total,
@@ -124,6 +133,8 @@ func NewExtensionModule(ctx *Context) Module {
 	return &m
 }
 
+// NewExtensionHiddenModule creates new file extensions statistic module
+// that has disabled output
 func NewExtensionHiddenModule(ctx *Context) Module {
 	m := moduleExtensions{
 		total:      ctx.total,
@@ -135,6 +146,7 @@ func NewExtensionHiddenModule(ctx *Context) Module {
 	return &h
 }
 
+// NewTopFilesModule creates new top files statistic module
 func NewTopFilesModule(_ *Context) Module {
 	m := moduleTopFiles{
 		tree: rbtree.NewRbTree(),
@@ -142,6 +154,8 @@ func NewTopFilesModule(_ *Context) Module {
 	return &m
 }
 
+// NewTopFilesHiddenModule creates new top files statistic module
+// that has disabled output
 func NewTopFilesHiddenModule(_ *Context) Module {
 	m := moduleTopFiles{
 		tree: rbtree.NewRbTree(),
