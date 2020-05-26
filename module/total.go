@@ -10,19 +10,19 @@ import (
 )
 
 type moduleTotal struct {
-	info  *totalInfo
+	total *totalInfo
 	start time.Time
 }
 
 func (m *moduleTotal) postScan() {
-	m.info.ReadingTime = time.Since(m.start)
+	m.total.ReadingTime = time.Since(m.start)
 }
 
 func (m *moduleTotal) handler() sys.FileHandler {
 	return func(f *sys.FileEntry) {
 		// Accumulate file statistic
-		m.info.FilesTotal.Count++
-		m.info.FilesTotal.Size += uint64(f.Size)
+		m.total.FilesTotal.Count++
+		m.total.FilesTotal.Size += uint64(f.Size)
 	}
 }
 
@@ -36,5 +36,5 @@ Read taken:    {{.ReadingTime}}
 `
 
 	var report = template.Must(template.New("totalstat").Funcs(template.FuncMap{"toBytesString": humanize.IBytes}).Parse(totalTemplate))
-	_ = report.Execute(w, m.info)
+	_ = report.Execute(w, m.total)
 }

@@ -26,17 +26,17 @@ func Execute(path string, fs afero.Fs, w io.Writer, verbose bool, enabledRanges 
 	folders := make(map[string]*container)
 
 	// total module
-	tm := moduleTotal{
+	totalm := moduleTotal{
 		start: time.Now(),
-		info:  &total,
+		total: &total,
 	}
 
 	// folders module
 	fm := moduleFolders{
 		&foldersMu,
+		totalm,
 		folders,
 		rbtree.NewRbTree(),
-		&total,
 	}
 
 	// Top files module
@@ -60,18 +60,18 @@ func Execute(path string, fs afero.Fs, w io.Writer, verbose bool, enabledRanges 
 
 	// File extensions statistic module
 	em := moduleExtensions{
-		total:      &total,
-		aggregator: make(map[string]countSizeAggregate),
+		totalm,
+		make(map[string]countSizeAggregate),
 	}
 
 	// Total file stat module
 	totfm := moduleTotalFile{
-		total:     &total,
-		aggregate: rangeAggregate,
+		totalm,
+		rangeAggregate,
 	}
 
 	// Modules order in the slice is important
-	modules := []module{&totfm, &em, &tfm, &fm, &rm, &tm}
+	modules := []module{&totfm, &em, &tfm, &fm, &rm, &totalm}
 
 	foldersHandler := func(fsi *sys.FilesystemItem) {
 		foldersMu.Lock()

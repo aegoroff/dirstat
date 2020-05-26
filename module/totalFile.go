@@ -8,8 +8,8 @@ import (
 )
 
 type moduleTotalFile struct {
+	moduleTotal
 	aggregate map[Range]fileStat
-	total     *totalInfo
 }
 
 func (m *moduleTotalFile) postScan() {

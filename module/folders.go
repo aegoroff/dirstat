@@ -11,9 +11,9 @@ import (
 
 type moduleFolders struct {
 	*sync.RWMutex
+	moduleTotal
 	folders map[string]*container
 	tree    *rbtree.RbTree
-	info    *totalInfo
 }
 
 func (m *moduleFolders) postScan() {
@@ -54,7 +54,7 @@ func (m *moduleFolders) output(tw *tabwriter.Writer, w io.Writer) {
 		count := folder.count
 		sz := uint64(folder.size)
 
-		outputTopStatLine(tw, count, m.info, sz, h)
+		outputTopStatLine(tw, count, m.total, sz, h)
 
 		return true
 	})

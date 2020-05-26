@@ -10,8 +10,8 @@ import (
 )
 
 type moduleExtensions struct {
+	moduleTotal
 	aggregator map[string]countSizeAggregate
-	total      *totalInfo
 }
 
 func (m *moduleExtensions) postScan() {
