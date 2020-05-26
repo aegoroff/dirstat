@@ -33,6 +33,7 @@ type moduleRange struct {
 }
 
 type moduleRangeNoOut struct {
+	moduleRange
 }
 
 func (m *moduleRange) init() {
