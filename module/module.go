@@ -23,7 +23,6 @@ type Module interface {
 // Context defines modules context
 type Context struct {
 	total          *totalInfo
-	folders        map[string]*container
 	rangeAggregate map[Range]fileStat
 }
 
@@ -60,11 +59,9 @@ func scanEventHandler(m Module) sys.ScanHandler {
 // NewContext create new module's context that needed to create new modules
 func NewContext() *Context {
 	total := totalInfo{}
-	folders := make(map[string]*container)
 
 	ctx := Context{
 		total:          &total,
-		folders:        folders,
 		rangeAggregate: make(map[Range]fileStat),
 	}
 	return &ctx
@@ -74,7 +71,7 @@ func NewContext() *Context {
 func NewFoldersModule(ctx *Context) Module {
 	m := moduleFolders{
 		ctx.total,
-		ctx.folders,
+		make(map[string]*container),
 		rbtree.NewRbTree(),
 	}
 	return &m
@@ -85,7 +82,7 @@ func NewFoldersModule(ctx *Context) Module {
 func NewFoldersHiddenModule(ctx *Context) Module {
 	m := moduleFolders{
 		ctx.total,
-		ctx.folders,
+		make(map[string]*container),
 		rbtree.NewRbTree(),
 	}
 	h := moduleFoldersNoOut{
