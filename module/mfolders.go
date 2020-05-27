@@ -8,10 +8,23 @@ import (
 	"text/tabwriter"
 )
 
+type folderNode struct {
+	path  string
+	value *container
+}
+
+func (f *folderNode) LessThan(y interface{}) bool {
+	return f.path < y.(*folderNode).path
+}
+
+func (f *folderNode) EqualTo(y interface{}) bool {
+	return f.path == y.(*folderNode).path
+}
+
 type moduleFolders struct {
 	total   *totalInfo
-	folders map[string]*container
-	tree    *rbtree.RbTree
+	folders *rbtree.RbTree
+	top     *rbtree.RbTree
 }
 
 type moduleFoldersNoOut struct {
@@ -22,14 +35,22 @@ func (m *moduleFolders) init() {
 }
 
 func (m *moduleFolders) postScan() {
-	for _, cont := range m.folders {
-		cont.insertTo(m.tree)
-	}
+	m.folders.WalkInorder(func(node *rbtree.Node) {
+		n := (*node.Key).(*folderNode)
+		cont := n.value
+		cont.insertTo(m.top)
+	})
+
+	m.total.CountFolders = m.folders.Root.Size
 }
 
 func (m *moduleFolders) folderHandler(fe *sys.FolderEntry) {
-	m.folders[fe.Name] = &container{name: fe.Name, count: fe.Count, size: fe.Size}
-	m.total.CountFolders++
+	var cmp rbtree.Comparable
+	cmp = &folderNode{
+		path:  fe.Name,
+		value: &container{name: fe.Name, count: fe.Count, size: fe.Size},
+	}
+	m.folders.Insert(rbtree.NewNode(&cmp))
 }
 
 func (m *moduleFolders) fileHandler(_ *sys.FileEntry) {
@@ -50,7 +71,7 @@ func (m *moduleFolders) output(tw *tabwriter.Writer, w io.Writer) {
 
 	i := 1
 
-	m.tree.Descend(func(c *rbtree.Comparable) bool {
+	m.top.Descend(func(c *rbtree.Comparable) bool {
 
 		folder := (*c).(*container)
 		h := fmt.Sprintf("%d. %s", i, folder.name)

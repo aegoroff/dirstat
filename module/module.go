@@ -71,7 +71,7 @@ func NewContext() *Context {
 func NewFoldersModule(ctx *Context) Module {
 	m := moduleFolders{
 		ctx.total,
-		make(map[string]*container),
+		rbtree.NewRbTree(),
 		rbtree.NewRbTree(),
 	}
 	return &m
@@ -82,7 +82,7 @@ func NewFoldersModule(ctx *Context) Module {
 func NewFoldersHiddenModule(ctx *Context) Module {
 	m := moduleFolders{
 		ctx.total,
-		make(map[string]*container),
+		rbtree.NewRbTree(),
 		rbtree.NewRbTree(),
 	}
 	h := moduleFoldersNoOut{
