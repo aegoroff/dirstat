@@ -5,12 +5,10 @@ import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"io"
-	"sync"
 	"text/tabwriter"
 )
 
 type moduleFolders struct {
-	*sync.RWMutex
 	total   *totalInfo
 	folders map[string]*container
 	tree    *rbtree.RbTree
@@ -34,14 +32,6 @@ func (m *moduleFoldersNoOut) postScan() {
 
 func (m *moduleFolders) handler() sys.FileHandler {
 	return func(f *sys.FileEntry) {
-		m.RLock()
-		currFolder, ok := m.folders[f.Parent]
-
-		if ok {
-			currFolder.size += f.Size
-			currFolder.count++
-		}
-		m.RUnlock()
 	}
 }
 

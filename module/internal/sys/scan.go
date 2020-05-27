@@ -18,24 +18,33 @@ type FileEntry struct {
 	Name string
 }
 
+// FileEntry represent file description
+type FolderEntry struct {
+	// All folder's files size in bytes
+	Size int64
+
+	// The number of files in a folder
+	Count int64
+
+	// Folder name
+	Name string
+}
+
 // FileHandler defines function prototype that handles each file event received
 type FileHandler func(f *FileEntry)
 
 // FolderHandler defines function prototype that handles each folder event received
-type FolderHandler func(f *FilesystemItem)
+type FolderHandler func(f *FolderEntry)
 
-// FilesystemItem defines filesystem abstraction (file or folder)
-type FilesystemItem struct {
-	// Item's dir
-	Dir string
-
-	// Items filesystem info like size, name, etc.
-	Entry *FileInfo
+type filesystemItem struct {
+	dir   string
+	name  string
 	event fsEvent
+	count int64
+	size  int64
 }
 
-// FileInfo defines filesystem item data like size, name, etc.
-type FileInfo struct {
+type filesysEntry struct {
 	isDir bool
 	name  string
 	size  int64
@@ -51,7 +60,7 @@ const (
 // Scan do specified path scanning and executes folder handler on each folder
 // and all file handlers on each file
 func Scan(path string, fs afero.Fs, fh FolderHandler, handlers []FileHandler) {
-	filesystemCh := make(chan *FilesystemItem, 1024)
+	filesystemCh := make(chan *filesystemItem, 1024)
 	go func() {
 		walkDirBreadthFirst(path, fs, filesystemCh)
 	}()
@@ -63,11 +72,19 @@ func Scan(path string, fs afero.Fs, fh FolderHandler, handlers []FileHandler) {
 		defer close(filesChan)
 		for item := range filesystemCh {
 			if item.event == fsEventDir {
-				fh(item)
+				foe := FolderEntry{
+					Name:  item.dir,
+					Size:  item.size,
+					Count: item.count,
+				}
+				fh(&foe)
 			} else {
-				// Only files
-				entry := item.Entry
-				filesChan <- &FileEntry{Size: entry.size, Parent: item.Dir, Name: entry.name}
+				fie := FileEntry{
+					Size:   item.size,
+					Parent: item.dir,
+					Name:   item.name,
+				}
+				filesChan <- &fie
 			}
 		}
 	}()
@@ -80,7 +97,7 @@ func Scan(path string, fs afero.Fs, fh FolderHandler, handlers []FileHandler) {
 	}
 }
 
-func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- *FilesystemItem) {
+func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- *filesystemItem) {
 	defer close(results)
 
 	var wg sync.WaitGroup
@@ -107,11 +124,9 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- *FilesystemIte
 				return
 			}
 
-			dirEvent := FilesystemItem{
-				Dir:   d,
-				event: fsEventDir,
-			}
-			results <- &dirEvent
+			// Folder stat
+			var count int64
+			var size int64
 
 			for _, entry := range entries {
 				// Queue subdirs to walk in a queue
@@ -124,14 +139,29 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- *FilesystemIte
 					mu.Unlock()
 				} else {
 					// Send to channel
-					fileEvent := FilesystemItem{
-						Dir:   d,
-						Entry: entry,
+					fileEvent := filesystemItem{
+						dir:   d,
+						name:  entry.name,
 						event: fsEventFile,
+						count: 1,
+						size:  entry.size,
 					}
 					results <- &fileEvent
+
+					// update folder stat
+					count++
+					size += entry.size
 				}
 			}
+
+			dirEvent := filesystemItem{
+				dir:   d,
+				event: fsEventDir,
+				count: count,
+				size:  size,
+			}
+			results <- &dirEvent
+
 		}(currentDir)
 
 		// Pop
@@ -151,11 +181,11 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- *FilesystemIte
 	}
 }
 
-var sema = make(chan struct{}, 32)
+var concurrencyRestrictor = make(chan struct{}, 32)
 
-func dirents(path string, fs afero.Fs) []*FileInfo {
-	sema <- struct{}{}
-	defer func() { <-sema }()
+func dirents(path string, fs afero.Fs) []*filesysEntry {
+	concurrencyRestrictor <- struct{}{}
+	defer func() { <-concurrencyRestrictor }()
 	f, err := fs.Open(path)
 	if err != nil {
 		return nil
@@ -167,9 +197,9 @@ func dirents(path string, fs afero.Fs) []*FileInfo {
 		return nil
 	}
 
-	var result = []*FileInfo{}
+	var result = []*filesysEntry{}
 	for _, e := range entries {
-		fi := FileInfo{name: e.Name(), size: e.Size(), isDir: e.IsDir()}
+		fi := filesysEntry{name: e.Name(), size: e.Size(), isDir: e.IsDir()}
 		result = append(result, &fi)
 	}
 

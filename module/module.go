@@ -7,7 +7,6 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/spf13/afero"
 	"io"
-	"sync"
 	"text/tabwriter"
 	"time"
 )
@@ -23,19 +22,15 @@ type Module interface {
 // Context defines modules context
 type Context struct {
 	total          *totalInfo
-	foldersMu      *sync.RWMutex
 	folders        map[string]*container
 	rangeAggregate map[Range]fileStat
 }
 
 // Execute runs modules over path specified
 func Execute(path string, fs afero.Fs, w io.Writer, ctx *Context, modules []Module) {
-
-	foldersHandler := func(fsi *sys.FilesystemItem) {
-		ctx.foldersMu.Lock()
-		ctx.folders[fsi.Dir] = &container{name: fsi.Dir}
+	foldersHandler := func(fe *sys.FolderEntry) {
+		ctx.folders[fe.Name] = &container{name: fe.Name, count: fe.Count, size: fe.Size}
 		ctx.total.CountFolders++
-		ctx.foldersMu.Unlock()
 	}
 	executeModules(path, fs, w, foldersHandler, modules)
 }
@@ -44,12 +39,10 @@ func Execute(path string, fs afero.Fs, w io.Writer, ctx *Context, modules []Modu
 func NewContext() *Context {
 	total := totalInfo{}
 	folders := make(map[string]*container)
-	var foldersMu sync.RWMutex
 
 	ctx := Context{
 		total:          &total,
 		folders:        folders,
-		foldersMu:      &foldersMu,
 		rangeAggregate: make(map[Range]fileStat),
 	}
 	return &ctx
@@ -58,7 +51,6 @@ func NewContext() *Context {
 // NewFoldersModule creates new folders module
 func NewFoldersModule(ctx *Context) Module {
 	m := moduleFolders{
-		ctx.foldersMu,
 		ctx.total,
 		ctx.folders,
 		rbtree.NewRbTree(),
@@ -69,7 +61,6 @@ func NewFoldersModule(ctx *Context) Module {
 // NewFoldersHiddenModule creates new folders module that has disabled output
 func NewFoldersHiddenModule(ctx *Context) Module {
 	m := moduleFolders{
-		ctx.foldersMu,
 		ctx.total,
 		ctx.folders,
 		rbtree.NewRbTree(),
