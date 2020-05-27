@@ -73,6 +73,7 @@ func NewFoldersModule(ctx *Context) Module {
 		ctx.total,
 		rbtree.NewRbTree(),
 		rbtree.NewRbTree(),
+		rbtree.NewRbTree(),
 	}
 	return &m
 }
@@ -82,6 +83,7 @@ func NewFoldersModule(ctx *Context) Module {
 func NewFoldersHiddenModule(ctx *Context) Module {
 	m := moduleFolders{
 		ctx.total,
+		rbtree.NewRbTree(),
 		rbtree.NewRbTree(),
 		rbtree.NewRbTree(),
 	}

@@ -12,6 +12,10 @@ type folderNode struct {
 	container
 }
 
+type folderCount struct {
+	container
+}
+
 func (f *folderNode) LessThan(y interface{}) bool {
 	return f.name < y.(*folderNode).name
 }
@@ -20,10 +24,19 @@ func (f *folderNode) EqualTo(y interface{}) bool {
 	return f.name == y.(*folderNode).name
 }
 
+func (f *folderCount) LessThan(y interface{}) bool {
+	return f.count < y.(*folderCount).count
+}
+
+func (f *folderCount) EqualTo(y interface{}) bool {
+	return f.count == y.(*folderCount).count
+}
+
 type moduleFolders struct {
-	total   *totalInfo
-	folders *rbtree.RbTree
-	top     *rbtree.RbTree
+	total    *totalInfo
+	folders  *rbtree.RbTree
+	topSize  *rbtree.RbTree
+	topCount *rbtree.RbTree
 }
 
 type moduleFoldersNoOut struct {
@@ -35,12 +48,35 @@ func (m *moduleFolders) init() {
 
 func (m *moduleFolders) postScan() {
 	m.folders.WalkInorder(func(node *rbtree.Node) {
-		n := (*node.Key).(*folderNode)
-		cont := n
-		cont.insertTo(m.top)
+		fn := (*node.Key).(*folderNode)
+		fn.insertTo(m.topSize)
+
+		fcn := folderCount{
+			fn.container,
+		}
+
+		fcn.insertTo(m.topCount)
 	})
 
 	m.total.CountFolders = m.folders.Root.Size
+}
+
+func (f *folderCount) insertTo(topTree *rbtree.RbTree) {
+	min := topTree.Minimum()
+	if topTree.Len() < top || (*min.Key).LessThan(f) {
+		if topTree.Len() == top {
+			topTree.Delete(min)
+		}
+
+		node := rbtree.NewNode(f.toComparable())
+		topTree.Insert(node)
+	}
+}
+
+func (f *folderCount) toComparable() *rbtree.Comparable {
+	var r rbtree.Comparable
+	r = f
+	return &r
 }
 
 func (m *moduleFolders) folderHandler(fe *sys.FolderEntry) {
@@ -69,9 +105,32 @@ func (m *moduleFolders) output(tw *tabwriter.Writer, w io.Writer) {
 
 	i := 1
 
-	m.top.Descend(func(c *rbtree.Comparable) bool {
+	m.topSize.Descend(func(c *rbtree.Comparable) bool {
 
 		folder := (*c).(*container)
+		h := fmt.Sprintf("%d. %s", i, folder.name)
+
+		i++
+
+		count := folder.count
+		sz := uint64(folder.size)
+
+		outputTopStatLine(tw, count, m.total, sz, h)
+
+		return true
+	})
+
+	_ = tw.Flush()
+
+	_, _ = fmt.Fprintf(w, "\nTOP %d folders by count:\n\n", top)
+	_, _ = fmt.Fprintf(tw, format, "Folder", "Files", "%", "Size", "%")
+	_, _ = fmt.Fprintf(tw, format, "------", "-----", "------", "----", "------")
+
+	i = 1
+
+	m.topCount.Descend(func(c *rbtree.Comparable) bool {
+
+		folder := (*c).(*folderCount)
 		h := fmt.Sprintf("%d. %s", i, folder.name)
 
 		i++

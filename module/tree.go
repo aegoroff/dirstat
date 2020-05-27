@@ -35,7 +35,7 @@ func (c *container) EqualTo(y interface{}) bool {
 
 func (c *container) insertTo(topTree *rbtree.RbTree) {
 	min := topTree.Minimum()
-	if topTree.Len() < top || (*min.Key).(*container).size < c.size {
+	if topTree.Len() < top || (*min.Key).LessThan(c) {
 		if topTree.Len() == top {
 			topTree.Delete(min)
 		}
