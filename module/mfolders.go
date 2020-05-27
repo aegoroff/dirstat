@@ -9,16 +9,15 @@ import (
 )
 
 type folderNode struct {
-	path  string
-	value *container
+	container
 }
 
 func (f *folderNode) LessThan(y interface{}) bool {
-	return f.path < y.(*folderNode).path
+	return f.name < y.(*folderNode).name
 }
 
 func (f *folderNode) EqualTo(y interface{}) bool {
-	return f.path == y.(*folderNode).path
+	return f.name == y.(*folderNode).name
 }
 
 type moduleFolders struct {
@@ -37,7 +36,7 @@ func (m *moduleFolders) init() {
 func (m *moduleFolders) postScan() {
 	m.folders.WalkInorder(func(node *rbtree.Node) {
 		n := (*node.Key).(*folderNode)
-		cont := n.value
+		cont := n
 		cont.insertTo(m.top)
 	})
 
@@ -47,8 +46,7 @@ func (m *moduleFolders) postScan() {
 func (m *moduleFolders) folderHandler(fe *sys.FolderEntry) {
 	var cmp rbtree.Comparable
 	cmp = &folderNode{
-		path:  fe.Name,
-		value: &container{name: fe.Name, count: fe.Count, size: fe.Size},
+		container{name: fe.Name, count: fe.Count, size: fe.Size},
 	}
 	m.folders.Insert(rbtree.NewNode(&cmp))
 }
