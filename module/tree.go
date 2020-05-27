@@ -33,20 +33,14 @@ func (c *container) EqualTo(y interface{}) bool {
 	return c.size == (y.(*container)).size
 }
 
-func (c *container) insertTo(topTree *rbtree.RbTree) {
+func insertTo(topTree *rbtree.RbTree, c rbtree.Comparable) {
 	min := topTree.Minimum()
 	if topTree.Len() < top || (*min.Key).LessThan(c) {
 		if topTree.Len() == top {
 			topTree.Delete(min)
 		}
 
-		node := rbtree.NewNode(c.toComparable())
+		node := rbtree.NewNode(&c)
 		topTree.Insert(node)
 	}
-}
-
-func (c *container) toComparable() *rbtree.Comparable {
-	var r rbtree.Comparable
-	r = c
-	return &r
 }

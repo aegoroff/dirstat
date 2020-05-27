@@ -32,7 +32,7 @@ func (m *moduleTopFiles) folderHandler(_ *sys.FolderEntry) {
 func (m *moduleTopFiles) fileHandler(f *sys.FileEntry) {
 	fullPath := filepath.Join(f.Parent, f.Name)
 	fileContainer := container{size: f.Size, name: fullPath, count: 1}
-	fileContainer.insertTo(m.tree)
+	insertTo(m.tree, &fileContainer)
 }
 
 // Mute parent output

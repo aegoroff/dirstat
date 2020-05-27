@@ -49,34 +49,17 @@ func (m *moduleFolders) init() {
 func (m *moduleFolders) postScan() {
 	m.folders.WalkInorder(func(node *rbtree.Node) {
 		fn := (*node.Key).(*folderNode)
-		fn.insertTo(m.topSize)
+
+		insertTo(m.topSize, &fn.container)
 
 		fcn := folderCount{
 			fn.container,
 		}
 
-		fcn.insertTo(m.topCount)
+		insertTo(m.topCount, &fcn)
 	})
 
 	m.total.CountFolders = m.folders.Root.Size
-}
-
-func (f *folderCount) insertTo(topTree *rbtree.RbTree) {
-	min := topTree.Minimum()
-	if topTree.Len() < top || (*min.Key).LessThan(f) {
-		if topTree.Len() == top {
-			topTree.Delete(min)
-		}
-
-		node := rbtree.NewNode(f.toComparable())
-		topTree.Insert(node)
-	}
-}
-
-func (f *folderCount) toComparable() *rbtree.Comparable {
-	var r rbtree.Comparable
-	r = f
-	return &r
 }
 
 func (m *moduleFolders) folderHandler(fe *sys.FolderEntry) {
