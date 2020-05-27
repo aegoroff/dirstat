@@ -58,19 +58,6 @@ func NewFoldersModule(ctx *Context) Module {
 	return &m
 }
 
-// NewFoldersHiddenModule creates new folders module that has disabled output
-func NewFoldersHiddenModule(ctx *Context) Module {
-	m := moduleFolders{
-		ctx.total,
-		ctx.folders,
-		rbtree.NewRbTree(),
-	}
-	h := moduleFoldersNoOut{
-		m,
-	}
-	return &h
-}
-
 // NewTotalModule creates new total statistic module
 func NewTotalModule(ctx *Context) Module {
 	m := moduleTotal{

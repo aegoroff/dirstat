@@ -53,7 +53,6 @@ var fileCmd = &cobra.Command{
 		_, _ = fmt.Fprintf(appWriter, "Root: %s\n\n", opt.Path)
 
 		ctx := module.NewContext()
-		foldersmod := module.NewFoldersHiddenModule(ctx)
 		totalmod := module.NewTotalModule(ctx)
 		rangemod := module.NewRangeModule(ctx, opt.Verbosity, opt.Range)
 		totalfilemod := module.NewTotalFileModule(ctx)
@@ -68,7 +67,7 @@ var fileCmd = &cobra.Command{
 
 		topfilesmod := module.NewTopFilesModule(ctx)
 
-		modules := []module.Module{totalfilemod, extmod, topfilesmod, foldersmod, rangemod, totalmod}
+		modules := []module.Module{totalfilemod, extmod, topfilesmod, rangemod, totalmod}
 
 		module.Execute(opt.Path, appFileSystem, appWriter, ctx, modules)
 

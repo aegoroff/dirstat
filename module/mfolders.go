@@ -14,10 +14,6 @@ type moduleFolders struct {
 	tree    *rbtree.RbTree
 }
 
-type moduleFoldersNoOut struct {
-	moduleFolders
-}
-
 func (m *moduleFolders) init() {
 }
 
@@ -27,17 +23,9 @@ func (m *moduleFolders) postScan() {
 	}
 }
 
-func (m *moduleFoldersNoOut) postScan() {
-}
-
 func (m *moduleFolders) handler() sys.FileHandler {
 	return func(f *sys.FileEntry) {
 	}
-}
-
-// Mute parent output
-func (m *moduleFoldersNoOut) output(tw *tabwriter.Writer, w io.Writer) {
-
 }
 
 func (m *moduleFolders) output(tw *tabwriter.Writer, w io.Writer) {
