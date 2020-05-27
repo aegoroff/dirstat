@@ -39,7 +39,7 @@ var folderCmd = &cobra.Command{
 
 		modules := []module.Module{extmod, foldersmod, totalmod}
 
-		module.Execute(opt.Path, appFileSystem, appWriter, ctx, modules)
+		module.Execute(opt.Path, appFileSystem, appWriter, modules)
 
 		printMemUsage(appWriter)
 		return nil

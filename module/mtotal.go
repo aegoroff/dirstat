@@ -21,12 +21,14 @@ func (m *moduleTotal) postScan() {
 	m.total.ReadingTime = time.Since(m.start)
 }
 
-func (m *moduleTotal) handler() sys.FileHandler {
-	return func(f *sys.FileEntry) {
-		// Accumulate file statistic
-		m.total.FilesTotal.Count++
-		m.total.FilesTotal.Size += uint64(f.Size)
-	}
+func (m *moduleTotal) folderHandler(_ *sys.FolderEntry) {
+
+}
+
+func (m *moduleTotal) fileHandler(f *sys.FileEntry) {
+	// Accumulate file statistic
+	m.total.FilesTotal.Count++
+	m.total.FilesTotal.Size += uint64(f.Size)
 }
 
 func (m *moduleTotal) output(_ *tabwriter.Writer, w io.Writer) {

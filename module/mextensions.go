@@ -25,14 +25,16 @@ func (m *moduleExtensions) postScan() {
 	m.total.CountFileExts = len(m.aggregator)
 }
 
-func (m *moduleExtensions) handler() sys.FileHandler {
-	return func(f *sys.FileEntry) {
-		ext := filepath.Ext(f.Name)
-		a := m.aggregator[ext]
-		a.Size += uint64(f.Size)
-		a.Count++
-		m.aggregator[ext] = a
-	}
+func (m *moduleExtensions) folderHandler(_ *sys.FolderEntry) {
+
+}
+
+func (m *moduleExtensions) fileHandler(f *sys.FileEntry) {
+	ext := filepath.Ext(f.Name)
+	a := m.aggregator[ext]
+	a.Size += uint64(f.Size)
+	a.Count++
+	m.aggregator[ext] = a
 }
 
 func (m *moduleExtensions) output(tw *tabwriter.Writer, w io.Writer) {
@@ -75,7 +77,7 @@ func (m *moduleExtensions) output(tw *tabwriter.Writer, w io.Writer) {
 }
 
 // Mute parent output
-func (m *moduleExtensionsNoOut) output(tw *tabwriter.Writer, w io.Writer) {
+func (m *moduleExtensionsNoOut) output(*tabwriter.Writer, io.Writer) {
 }
 
 func outputTopTenExtensions(tw *tabwriter.Writer, data containers, total *totalInfo, selector func(data containers, item *container) (int64, uint64)) {

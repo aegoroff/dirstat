@@ -14,6 +14,10 @@ type moduleFolders struct {
 	tree    *rbtree.RbTree
 }
 
+type moduleFoldersNoOut struct {
+	moduleFolders
+}
+
 func (m *moduleFolders) init() {
 }
 
@@ -23,9 +27,18 @@ func (m *moduleFolders) postScan() {
 	}
 }
 
-func (m *moduleFolders) handler() sys.FileHandler {
-	return func(f *sys.FileEntry) {
-	}
+func (m *moduleFolders) folderHandler(fe *sys.FolderEntry) {
+	m.folders[fe.Name] = &container{name: fe.Name, count: fe.Count, size: fe.Size}
+	m.total.CountFolders++
+}
+
+func (m *moduleFolders) fileHandler(_ *sys.FileEntry) {
+
+}
+
+// Mute parent output
+func (m *moduleFoldersNoOut) output(_ *tabwriter.Writer, _ io.Writer) {
+
 }
 
 func (m *moduleFolders) output(tw *tabwriter.Writer, w io.Writer) {

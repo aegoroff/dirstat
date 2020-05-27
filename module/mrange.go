@@ -47,42 +47,44 @@ func (m *moduleRange) postScan() {
 
 }
 
-func (m *moduleRange) handler() sys.FileHandler {
-	return func(f *sys.FileEntry) {
-		unsignedSize := uint64(f.Size)
+func (m *moduleRange) folderHandler(_ *sys.FolderEntry) {
 
-		// Calculate files range statistic
-		for i, r := range fileSizeRanges {
-			if !r.Contains(f.Size) {
-				continue
-			}
+}
 
-			s := m.aggregate[r]
-			s.TotalFilesCount++
-			s.TotalFilesSize += unsignedSize
-			m.aggregate[r] = s
+func (m *moduleRange) fileHandler(f *sys.FileEntry) {
+	unsignedSize := uint64(f.Size)
 
-			// Store each file info within range only i verbose option set
-			if !m.verbose || !m.enabledRangesMap[i+1] {
-				continue
-			}
-
-			nodes, ok := m.distribution[r]
-			if !ok {
-				m.distribution[r] = make(containers, 0)
-			}
-			fileContainer := container{size: f.Size, name: filepath.Join(f.Parent, f.Name), count: 1}
-			m.distribution[r] = append(nodes, &fileContainer)
+	// Calculate files range statistic
+	for i, r := range fileSizeRanges {
+		if !r.Contains(f.Size) {
+			continue
 		}
+
+		s := m.aggregate[r]
+		s.TotalFilesCount++
+		s.TotalFilesSize += unsignedSize
+		m.aggregate[r] = s
+
+		// Store each file info within range only i verbose option set
+		if !m.verbose || !m.enabledRangesMap[i+1] {
+			continue
+		}
+
+		nodes, ok := m.distribution[r]
+		if !ok {
+			m.distribution[r] = make(containers, 0)
+		}
+		fileContainer := container{size: f.Size, name: filepath.Join(f.Parent, f.Name), count: 1}
+		m.distribution[r] = append(nodes, &fileContainer)
 	}
 }
 
 // Mute parent output
-func (m *moduleRangeNoOut) output(tw *tabwriter.Writer, w io.Writer) {
+func (m *moduleRangeNoOut) output(*tabwriter.Writer, io.Writer) {
 
 }
 
-func (m *moduleRange) output(tw *tabwriter.Writer, w io.Writer) {
+func (m *moduleRange) output(_ *tabwriter.Writer, w io.Writer) {
 	if m.verbose && len(m.enabledRanges) > 0 {
 		heads := createRangesHeads()
 		_, _ = fmt.Fprintf(w, "\nDetailed files stat:\n")

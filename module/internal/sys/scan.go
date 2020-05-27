@@ -6,6 +6,16 @@ import (
 	"sync"
 )
 
+// ScanEvent defines scanning event structure
+// that can contain file or folder event information
+type ScanEvent struct {
+	// File set not nil in case of file event occurred
+	File *FileEntry
+
+	// Folder set not nil in case of folder event occurred
+	Folder *FolderEntry
+}
+
 // FileEntry represent file description
 type FileEntry struct {
 	// File size in bytes
@@ -31,10 +41,7 @@ type FolderEntry struct {
 }
 
 // FileHandler defines function prototype that handles each file event received
-type FileHandler func(f *FileEntry)
-
-// FolderHandler defines function prototype that handles each folder event received
-type FolderHandler func(f *FolderEntry)
+type ScanHandler func(f *ScanEvent)
 
 type filesystemItem struct {
 	dir   string
@@ -59,38 +66,38 @@ const (
 
 // Scan do specified path scanning and executes folder handler on each folder
 // and all file handlers on each file
-func Scan(path string, fs afero.Fs, fh FolderHandler, handlers []FileHandler) {
+func Scan(path string, fs afero.Fs, handlers []ScanHandler) {
 	filesystemCh := make(chan *filesystemItem, 1024)
 	go func() {
 		walkDirBreadthFirst(path, fs, filesystemCh)
 	}()
 
-	filesChan := make(chan *FileEntry, 1024)
+	scanChan := make(chan *ScanEvent, 1024)
 
 	// Reading filesystem events
 	go func() {
-		defer close(filesChan)
+		defer close(scanChan)
 		for item := range filesystemCh {
+			se := ScanEvent{}
 			if item.event == fsEventDir {
-				foe := FolderEntry{
+				se.Folder = &FolderEntry{
 					Name:  item.dir,
 					Size:  item.size,
 					Count: item.count,
 				}
-				fh(&foe)
 			} else {
-				fie := FileEntry{
+				se.File = &FileEntry{
 					Size:   item.size,
 					Parent: item.dir,
 					Name:   item.name,
 				}
-				filesChan <- &fie
 			}
+			scanChan <- &se
 		}
 	}()
 
 	// Read all files from channel
-	for file := range filesChan {
+	for file := range scanChan {
 		for _, h := range handlers {
 			h(file)
 		}

@@ -25,16 +25,18 @@ func (m *moduleTopFiles) postScan() {
 
 }
 
-func (m *moduleTopFiles) handler() sys.FileHandler {
-	return func(f *sys.FileEntry) {
-		fullPath := filepath.Join(f.Parent, f.Name)
-		fileContainer := container{size: f.Size, name: fullPath, count: 1}
-		fileContainer.insertTo(m.tree)
-	}
+func (m *moduleTopFiles) folderHandler(_ *sys.FolderEntry) {
+
+}
+
+func (m *moduleTopFiles) fileHandler(f *sys.FileEntry) {
+	fullPath := filepath.Join(f.Parent, f.Name)
+	fileContainer := container{size: f.Size, name: fullPath, count: 1}
+	fileContainer.insertTo(m.tree)
 }
 
 // Mute parent output
-func (m *moduleTopFilesNoOut) output(tw *tabwriter.Writer, w io.Writer) {
+func (m *moduleTopFilesNoOut) output(_ *tabwriter.Writer, _ io.Writer) {
 
 }
 

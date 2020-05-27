@@ -19,9 +19,12 @@ func (m *moduleTotalFile) postScan() {
 
 }
 
-func (m *moduleTotalFile) handler() sys.FileHandler {
-	return func(f *sys.FileEntry) {
-	}
+func (m *moduleTotalFile) folderHandler(_ *sys.FolderEntry) {
+
+}
+
+func (m *moduleTotalFile) fileHandler(*sys.FileEntry) {
+
 }
 
 func (m *moduleTotalFile) output(tw *tabwriter.Writer, w io.Writer) {

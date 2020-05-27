@@ -56,6 +56,7 @@ var fileCmd = &cobra.Command{
 		totalmod := module.NewTotalModule(ctx)
 		rangemod := module.NewRangeModule(ctx, opt.Verbosity, opt.Range)
 		totalfilemod := module.NewTotalFileModule(ctx)
+		foldersmod := module.NewFoldersHiddenModule(ctx)
 
 		var extmod module.Module
 
@@ -67,9 +68,9 @@ var fileCmd = &cobra.Command{
 
 		topfilesmod := module.NewTopFilesModule(ctx)
 
-		modules := []module.Module{totalfilemod, extmod, topfilesmod, rangemod, totalmod}
+		modules := []module.Module{totalfilemod, extmod, topfilesmod, rangemod, foldersmod, totalmod}
 
-		module.Execute(opt.Path, appFileSystem, appWriter, ctx, modules)
+		module.Execute(opt.Path, appFileSystem, appWriter, modules)
 
 		printMemUsage(appWriter)
 		return nil

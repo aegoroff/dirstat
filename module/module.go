@@ -13,7 +13,8 @@ import (
 
 // Module defines working modules interface
 type Module interface {
-	handler() sys.FileHandler
+	fileHandler(f *sys.FileEntry)
+	folderHandler(f *sys.FolderEntry)
 	output(tw *tabwriter.Writer, w io.Writer)
 	postScan()
 	init()
@@ -27,12 +28,33 @@ type Context struct {
 }
 
 // Execute runs modules over path specified
-func Execute(path string, fs afero.Fs, w io.Writer, ctx *Context, modules []Module) {
-	foldersHandler := func(fe *sys.FolderEntry) {
-		ctx.folders[fe.Name] = &container{name: fe.Name, count: fe.Count, size: fe.Size}
-		ctx.total.CountFolders++
+func Execute(path string, fs afero.Fs, w io.Writer, modules []Module) {
+	var handlers []sys.ScanHandler
+	for _, m := range modules {
+		m.init()
+		handlers = append(handlers, scanEventHandler(m))
 	}
-	executeModules(path, fs, w, foldersHandler, modules)
+	sys.Scan(path, fs, handlers)
+
+	for _, m := range modules {
+		m.postScan()
+	}
+
+	tw := new(tabwriter.Writer).Init(w, 0, 8, 4, ' ', 0)
+
+	for _, m := range modules {
+		m.output(tw, w)
+	}
+}
+
+func scanEventHandler(m Module) sys.ScanHandler {
+	return func(evt *sys.ScanEvent) {
+		if evt.Folder != nil {
+			m.folderHandler(evt.Folder)
+		} else if evt.File != nil {
+			m.fileHandler(evt.File)
+		}
+	}
 }
 
 // NewContext create new module's context that needed to create new modules
@@ -56,6 +78,20 @@ func NewFoldersModule(ctx *Context) Module {
 		rbtree.NewRbTree(),
 	}
 	return &m
+}
+
+// NewFoldersHiddenModule creates new folders module
+// that has disabled output
+func NewFoldersHiddenModule(ctx *Context) Module {
+	m := moduleFolders{
+		ctx.total,
+		ctx.folders,
+		rbtree.NewRbTree(),
+	}
+	h := moduleFoldersNoOut{
+		m,
+	}
+	return &h
 }
 
 // NewTotalModule creates new total statistic module
@@ -142,25 +178,6 @@ func NewTopFilesHiddenModule(_ *Context) Module {
 		m,
 	}
 	return &h
-}
-
-func executeModules(path string, fs afero.Fs, w io.Writer, fh sys.FolderHandler, modules []Module) {
-	var handlers []sys.FileHandler
-	for _, m := range modules {
-		m.init()
-		handlers = append(handlers, m.handler())
-	}
-	sys.Scan(path, fs, fh, handlers)
-
-	for _, m := range modules {
-		m.postScan()
-	}
-
-	tw := new(tabwriter.Writer).Init(w, 0, 8, 4, ' ', 0)
-
-	for _, m := range modules {
-		m.output(tw, w)
-	}
 }
 
 func outputTopStatLine(tw *tabwriter.Writer, count int64, total *totalInfo, sz uint64, title string) {
