@@ -3,21 +3,27 @@ package module
 import (
 	"dirstat/module/internal/sys"
 	"fmt"
-	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/dustin/go-humanize"
 	"github.com/spf13/afero"
 	"io"
 	"text/tabwriter"
-	"time"
 )
 
 // Module defines working modules interface
 type Module interface {
+	worker
+	renderer
+}
+
+type worker interface {
 	fileHandler(f *sys.FileEntry)
 	folderHandler(f *sys.FolderEntry)
-	output(tw *tabwriter.Writer, w io.Writer)
 	postScan()
 	init()
+}
+
+type renderer interface {
+	output(tw *tabwriter.Writer, w io.Writer)
 }
 
 // Context defines modules context
@@ -65,118 +71,6 @@ func NewContext() *Context {
 		rangeAggregate: make(map[Range]fileStat),
 	}
 	return &ctx
-}
-
-// NewFoldersModule creates new folders module
-func NewFoldersModule(ctx *Context) Module {
-	m := moduleFolders{
-		ctx.total,
-		rbtree.NewRbTree(),
-		rbtree.NewRbTree(),
-		rbtree.NewRbTree(),
-	}
-	return &m
-}
-
-// NewFoldersHiddenModule creates new folders module
-// that has disabled output
-func NewFoldersHiddenModule(ctx *Context) Module {
-	m := moduleFolders{
-		ctx.total,
-		rbtree.NewRbTree(),
-		rbtree.NewRbTree(),
-		rbtree.NewRbTree(),
-	}
-	h := moduleFoldersNoOut{
-		m,
-	}
-	return &h
-}
-
-// NewTotalModule creates new total statistic module
-func NewTotalModule(ctx *Context) Module {
-	m := moduleTotal{
-		start: time.Now(),
-		total: ctx.total,
-	}
-	return &m
-}
-
-// NewTotalFileModule creates new total file statistic module
-func NewTotalFileModule(ctx *Context) Module {
-	m := moduleTotalFile{
-		total:     ctx.total,
-		aggregate: ctx.rangeAggregate,
-	}
-	return &m
-}
-
-// NewRangeModule creates new file statistic by file size range module
-func NewRangeModule(ctx *Context, verbose bool, enabledRanges []int) Module {
-	m := moduleRange{
-		verbose:       verbose,
-		enabledRanges: enabledRanges,
-		aggregate:     ctx.rangeAggregate,
-		distribution:  make(map[Range]containers),
-	}
-	return &m
-}
-
-// NewRangeHiddenModule creates new file statistic by file size range module
-// that has disabled output
-func NewRangeHiddenModule(ctx *Context) Module {
-	m := moduleRange{
-		verbose:       false,
-		enabledRanges: []int{},
-		aggregate:     ctx.rangeAggregate,
-		distribution:  make(map[Range]containers),
-	}
-	h := moduleRangeNoOut{
-		m,
-	}
-	return &h
-}
-
-// NewExtensionModule creates new file extensions statistic module
-func NewExtensionModule(ctx *Context) Module {
-	m := moduleExtensions{
-		total:      ctx.total,
-		aggregator: make(map[string]countSizeAggregate),
-	}
-	return &m
-}
-
-// NewExtensionHiddenModule creates new file extensions statistic module
-// that has disabled output
-func NewExtensionHiddenModule(ctx *Context) Module {
-	m := moduleExtensions{
-		total:      ctx.total,
-		aggregator: make(map[string]countSizeAggregate),
-	}
-	h := moduleExtensionsNoOut{
-		m,
-	}
-	return &h
-}
-
-// NewTopFilesModule creates new top files statistic module
-func NewTopFilesModule(_ *Context) Module {
-	m := moduleTopFiles{
-		tree: rbtree.NewRbTree(),
-	}
-	return &m
-}
-
-// NewTopFilesHiddenModule creates new top files statistic module
-// that has disabled output
-func NewTopFilesHiddenModule(_ *Context) Module {
-	m := moduleTopFiles{
-		tree: rbtree.NewRbTree(),
-	}
-	h := moduleTopFilesNoOut{
-		m,
-	}
-	return &h
 }
 
 func outputTopStatLine(tw *tabwriter.Writer, count int64, total *totalInfo, sz uint64, title string) {

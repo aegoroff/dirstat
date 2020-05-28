@@ -9,36 +9,67 @@ import (
 	"text/tabwriter"
 )
 
-type moduleTopFiles struct {
+// NewTopFilesModule creates new top files statistic module
+func NewTopFilesModule(*Context) Module {
+	work := newTopFilesWorker()
+	rend := topFilesRenderer{work}
+	m := moduleTopFiles{
+		work,
+		rend,
+	}
+	return &m
+}
+
+// NewTopFilesHiddenModule creates new top files statistic module
+// that has disabled output
+func NewTopFilesHiddenModule(*Context) Module {
+	work := newTopFilesWorker()
+	m := moduleTopFilesNoOut{
+		work,
+		emptyRenderer{},
+	}
+	return &m
+}
+
+type topFilesWorker struct {
 	tree *rbtree.RbTree
 }
 
+type topFilesRenderer struct {
+	topFilesWorker
+}
+
+type moduleTopFiles struct {
+	topFilesWorker
+	topFilesRenderer
+}
+
 type moduleTopFilesNoOut struct {
-	moduleTopFiles
+	topFilesWorker
+	emptyRenderer
 }
 
-func (m *moduleTopFiles) init() {
+func newTopFilesWorker() topFilesWorker {
+	return topFilesWorker{rbtree.NewRbTree()}
 }
 
-func (m *moduleTopFiles) postScan() {
+func (m *topFilesWorker) init() {
+}
+
+func (m *topFilesWorker) postScan() {
 
 }
 
-func (m *moduleTopFiles) folderHandler(_ *sys.FolderEntry) {
+func (m *topFilesWorker) folderHandler(_ *sys.FolderEntry) {
 
 }
 
-func (m *moduleTopFiles) fileHandler(f *sys.FileEntry) {
+func (m *topFilesWorker) fileHandler(f *sys.FileEntry) {
 	fileContainer := container{size: f.Size, name: f.Path, count: 1}
 	insertTo(m.tree, &fileContainer)
 }
 
-// Mute parent output
-func (m *moduleTopFilesNoOut) output(_ *tabwriter.Writer, _ io.Writer) {
-
-}
-
-func (m *moduleTopFiles) output(tw *tabwriter.Writer, w io.Writer) {
+func (m *topFilesRenderer) output(tw *tabwriter.Writer, w io.Writer) {
 	_, _ = fmt.Fprintf(w, "\nTOP %d files by size:\n\n", top)
 	_, _ = fmt.Fprintf(tw, "%v\t%v\n", "File", "Size")
 	_, _ = fmt.Fprintf(tw, "%v\t%v\n", "------", "----")

@@ -1,30 +1,24 @@
 package module
 
 import (
-	"dirstat/module/internal/sys"
 	"fmt"
 	"io"
 	"text/tabwriter"
 )
 
+// NewTotalFileModule creates new total file statistic module
+func NewTotalFileModule(ctx *Context) Module {
+	m := moduleTotalFile{
+		total:     ctx.total,
+		aggregate: ctx.rangeAggregate,
+	}
+	return &m
+}
+
 type moduleTotalFile struct {
+	emptyWorker
 	total     *totalInfo
 	aggregate map[Range]fileStat
-}
-
-func (m *moduleTotalFile) init() {
-}
-
-func (m *moduleTotalFile) postScan() {
-
-}
-
-func (m *moduleTotalFile) folderHandler(_ *sys.FolderEntry) {
-
-}
-
-func (m *moduleTotalFile) fileHandler(*sys.FileEntry) {
-
 }
 
 func (m *moduleTotalFile) output(tw *tabwriter.Writer, w io.Writer) {

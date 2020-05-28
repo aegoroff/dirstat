@@ -23,7 +23,30 @@ func (r Range) Contains(num int64) bool {
 	return num >= r.Min && num <= r.Max
 }
 
-type moduleRange struct {
+// NewRangeModule creates new file statistic by file size range module
+func NewRangeModule(ctx *Context, verbose bool, enabledRanges []int) Module {
+	work := newRangeWorker(ctx, verbose, enabledRanges)
+	rend := rangeRenderer{work}
+	m := moduleRange{
+		work,
+		rend,
+	}
+	return &m
+}
+
+// NewRangeHiddenModule creates new file statistic by file size range module
+// that has disabled output
+func NewRangeHiddenModule(ctx *Context) Module {
+	work := newRangeWorker(ctx, false, []int{})
+
+	m := moduleRangeNoOut{
+		work,
+		emptyRenderer{},
+	}
+	return &m
+}
+
+type rangeWorker struct {
 	distribution     map[Range]containers
 	aggregate        map[Range]fileStat
 	verbose          bool
@@ -31,26 +54,45 @@ type moduleRange struct {
 	enabledRangesMap map[int]bool
 }
 
-type moduleRangeNoOut struct {
-	moduleRange
+type rangeRenderer struct {
+	rangeWorker
 }
 
-func (m *moduleRange) init() {
+type moduleRange struct {
+	rangeWorker
+	rangeRenderer
+}
+
+type moduleRangeNoOut struct {
+	rangeWorker
+	emptyRenderer
+}
+
+func newRangeWorker(ctx *Context, verbose bool, enabledRanges []int) rangeWorker {
+	return rangeWorker{
+		verbose:       verbose,
+		enabledRanges: enabledRanges,
+		aggregate:     ctx.rangeAggregate,
+		distribution:  make(map[Range]containers),
+	}
+}
+
+func (m *rangeWorker) init() {
 	m.enabledRangesMap = make(map[int]bool)
 	for _, x := range m.enabledRanges {
 		m.enabledRangesMap[x] = true
 	}
 }
 
-func (m *moduleRange) postScan() {
+func (m *rangeWorker) postScan() {
 
 }
 
-func (m *moduleRange) folderHandler(_ *sys.FolderEntry) {
+func (m *rangeWorker) folderHandler(_ *sys.FolderEntry) {
 
 }
 
-func (m *moduleRange) fileHandler(f *sys.FileEntry) {
+func (m *rangeWorker) fileHandler(f *sys.FileEntry) {
 	unsignedSize := uint64(f.Size)
 
 	// Calculate files range statistic
@@ -78,12 +120,7 @@ func (m *moduleRange) fileHandler(f *sys.FileEntry) {
 	}
 }
 
-// Mute parent output
-func (m *moduleRangeNoOut) output(*tabwriter.Writer, io.Writer) {
-
-}
-
-func (m *moduleRange) output(_ *tabwriter.Writer, w io.Writer) {
+func (m *rangeRenderer) output(_ *tabwriter.Writer, w io.Writer) {
 	if m.verbose && len(m.enabledRanges) > 0 {
 		heads := createRangesHeads()
 		_, _ = fmt.Fprintf(w, "\nDetailed files stat:\n")

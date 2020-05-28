@@ -9,27 +9,66 @@ import (
 	"text/tabwriter"
 )
 
-type moduleExtensions struct {
+// NewExtensionModule creates new file extensions statistic module
+func NewExtensionModule(ctx *Context) Module {
+	work := newExtWorker(ctx)
+	rend := extRenderer{work}
+	m := moduleExtensions{
+		work,
+		rend,
+	}
+	return &m
+}
+
+// NewExtensionHiddenModule creates new file extensions statistic module
+// that has disabled output
+func NewExtensionHiddenModule(ctx *Context) Module {
+	work := newExtWorker(ctx)
+	m := moduleExtensionsNoOut{
+		work,
+		emptyRenderer{},
+	}
+	return &m
+}
+
+type extWorker struct {
 	total      *totalInfo
 	aggregator map[string]countSizeAggregate
 }
 
+type extRenderer struct {
+	extWorker
+}
+
+type moduleExtensions struct {
+	extWorker
+	extRenderer
+}
+
 type moduleExtensionsNoOut struct {
-	moduleExtensions
+	extWorker
+	emptyRenderer
 }
 
-func (m *moduleExtensions) init() {
+func newExtWorker(ctx *Context) extWorker {
+	return extWorker{
+		total:      ctx.total,
+		aggregator: make(map[string]countSizeAggregate),
+	}
 }
 
-func (m *moduleExtensions) postScan() {
+func (m *extWorker) init() {
+}
+
+func (m *extWorker) postScan() {
 	m.total.CountFileExts = len(m.aggregator)
 }
 
-func (m *moduleExtensions) folderHandler(_ *sys.FolderEntry) {
+func (m *extWorker) folderHandler(_ *sys.FolderEntry) {
 
 }
 
-func (m *moduleExtensions) fileHandler(f *sys.FileEntry) {
+func (m *extWorker) fileHandler(f *sys.FileEntry) {
 	ext := filepath.Ext(f.Path)
 	a := m.aggregator[ext]
 	a.Size += uint64(f.Size)
@@ -74,10 +113,6 @@ func (m *moduleExtensions) output(tw *tabwriter.Writer, w io.Writer) {
 	})
 
 	_ = tw.Flush()
-}
-
-// Mute parent output
-func (m *moduleExtensionsNoOut) output(*tabwriter.Writer, io.Writer) {
 }
 
 func outputTopTenExtensions(tw *tabwriter.Writer, data containers, total *totalInfo, selector func(data containers, item *container) (int64, uint64)) {

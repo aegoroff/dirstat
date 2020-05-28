@@ -32,21 +32,62 @@ func (f *folderCount) EqualTo(y interface{}) bool {
 	return f.count == y.(*folderCount).count
 }
 
-type moduleFolders struct {
+// NewFoldersModule creates new folders module
+func NewFoldersModule(ctx *Context) Module {
+	work := newFoldersWorker(ctx)
+	rend := foldersRenderer{work}
+	m := moduleFolders{
+		work,
+		rend,
+	}
+	return &m
+}
+
+// NewFoldersHiddenModule creates new folders module
+// that has disabled output
+func NewFoldersHiddenModule(ctx *Context) Module {
+	work := newFoldersWorker(ctx)
+	m := moduleFoldersNoOut{
+		work,
+		emptyRenderer{},
+	}
+	return &m
+}
+
+type foldersWorker struct {
 	total    *totalInfo
 	folders  *rbtree.RbTree
 	topSize  *rbtree.RbTree
 	topCount *rbtree.RbTree
 }
 
+type foldersRenderer struct {
+	foldersWorker
+}
+
+type moduleFolders struct {
+	foldersWorker
+	foldersRenderer
+}
+
 type moduleFoldersNoOut struct {
-	moduleFolders
+	foldersWorker
+	emptyRenderer
 }
 
-func (m *moduleFolders) init() {
+func newFoldersWorker(ctx *Context) foldersWorker {
+	return foldersWorker{
+		total:    ctx.total,
+		folders:  rbtree.NewRbTree(),
+		topSize:  rbtree.NewRbTree(),
+		topCount: rbtree.NewRbTree(),
+	}
 }
 
-func (m *moduleFolders) postScan() {
+func (m *foldersWorker) init() {
+}
+
+func (m *foldersWorker) postScan() {
 	m.folders.WalkInorder(func(node *rbtree.Node) {
 		fn := (*node.Key).(*folderNode)
 
@@ -62,7 +103,7 @@ func (m *moduleFolders) postScan() {
 	m.total.CountFolders = m.folders.Root.Size
 }
 
-func (m *moduleFolders) folderHandler(fe *sys.FolderEntry) {
+func (m *foldersWorker) folderHandler(fe *sys.FolderEntry) {
 	var cmp rbtree.Comparable
 	cmp = &folderNode{
 		container{name: fe.Path, count: fe.Count, size: fe.Size},
@@ -70,16 +111,11 @@ func (m *moduleFolders) folderHandler(fe *sys.FolderEntry) {
 	m.folders.Insert(rbtree.NewNode(&cmp))
 }
 
-func (m *moduleFolders) fileHandler(_ *sys.FileEntry) {
+func (m *foldersWorker) fileHandler(_ *sys.FileEntry) {
 
 }
 
-// Mute parent output
-func (m *moduleFoldersNoOut) output(_ *tabwriter.Writer, _ io.Writer) {
-
-}
-
-func (m *moduleFolders) output(tw *tabwriter.Writer, w io.Writer) {
+func (m *foldersRenderer) output(tw *tabwriter.Writer, w io.Writer) {
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
 	_, _ = fmt.Fprintf(w, "\nTOP %d folders by size:\n\n", top)

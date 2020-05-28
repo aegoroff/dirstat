@@ -9,6 +9,15 @@ import (
 	"time"
 )
 
+// NewTotalModule creates new total statistic module
+func NewTotalModule(ctx *Context) Module {
+	m := moduleTotal{
+		start: time.Now(),
+		total: ctx.total,
+	}
+	return &m
+}
+
 type moduleTotal struct {
 	total *totalInfo
 	start time.Time
