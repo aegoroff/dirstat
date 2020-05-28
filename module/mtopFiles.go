@@ -10,7 +10,7 @@ import (
 )
 
 // NewTopFilesModule creates new top files statistic module
-func NewTopFilesModule(*Context) Module {
+func NewTopFilesModule(_ *Context) Module {
 	work := newTopFilesWorker()
 	rend := topFilesRenderer{work}
 	m := moduleTopFiles{
@@ -22,7 +22,7 @@ func NewTopFilesModule(*Context) Module {
 
 // NewTopFilesHiddenModule creates new top files statistic module
 // that has disabled output
-func NewTopFilesHiddenModule(*Context) Module {
+func NewTopFilesHiddenModule(_ *Context) Module {
 	work := newTopFilesWorker()
 	m := moduleTopFilesNoOut{
 		work,
