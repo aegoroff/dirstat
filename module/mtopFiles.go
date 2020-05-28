@@ -6,7 +6,6 @@ import (
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/dustin/go-humanize"
 	"io"
-	"path/filepath"
 	"text/tabwriter"
 )
 
@@ -30,8 +29,7 @@ func (m *moduleTopFiles) folderHandler(_ *sys.FolderEntry) {
 }
 
 func (m *moduleTopFiles) fileHandler(f *sys.FileEntry) {
-	fullPath := filepath.Join(f.Parent, f.Name)
-	fileContainer := container{size: f.Size, name: fullPath, count: 1}
+	fileContainer := container{size: f.Size, name: f.Path, count: 1}
 	insertTo(m.tree, &fileContainer)
 }
 

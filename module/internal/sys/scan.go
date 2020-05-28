@@ -21,23 +21,16 @@ type FileEntry struct {
 	// File size in bytes
 	Size int64
 
-	// File's directory
-	Parent string
-
-	// File name
-	Name string
+	// Full path
+	Path string
 }
 
-// FileEntry represent file description
+// FolderEntry represent folder description
 type FolderEntry struct {
-	// All folder's files size in bytes
-	Size int64
+	FileEntry
 
 	// The number of files in a folder
 	Count int64
-
-	// Folder name
-	Name string
 }
 
 // FileHandler defines function prototype that handles each file event received
@@ -80,16 +73,18 @@ func Scan(path string, fs afero.Fs, handlers []ScanHandler) {
 		for item := range filesystemCh {
 			se := ScanEvent{}
 			if item.event == fsEventDir {
+				fe := FileEntry{
+					Size: item.size,
+					Path: item.dir,
+				}
 				se.Folder = &FolderEntry{
-					Name:  item.dir,
-					Size:  item.size,
-					Count: item.count,
+					FileEntry: fe,
+					Count:     item.count,
 				}
 			} else {
 				se.File = &FileEntry{
-					Size:   item.size,
-					Parent: item.dir,
-					Name:   item.name,
+					Size: item.size,
+					Path: filepath.Join(item.dir, item.name),
 				}
 			}
 			scanChan <- &se

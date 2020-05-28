@@ -30,7 +30,7 @@ func (m *moduleExtensions) folderHandler(_ *sys.FolderEntry) {
 }
 
 func (m *moduleExtensions) fileHandler(f *sys.FileEntry) {
-	ext := filepath.Ext(f.Name)
+	ext := filepath.Ext(f.Path)
 	a := m.aggregator[ext]
 	a.Size += uint64(f.Size)
 	a.Count++

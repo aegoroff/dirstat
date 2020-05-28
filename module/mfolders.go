@@ -65,7 +65,7 @@ func (m *moduleFolders) postScan() {
 func (m *moduleFolders) folderHandler(fe *sys.FolderEntry) {
 	var cmp rbtree.Comparable
 	cmp = &folderNode{
-		container{name: fe.Name, count: fe.Count, size: fe.Size},
+		container{name: fe.Path, count: fe.Count, size: fe.Size},
 	}
 	m.folders.Insert(rbtree.NewNode(&cmp))
 }

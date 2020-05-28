@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/dustin/go-humanize"
 	"io"
-	"path/filepath"
 	"sort"
 	"text/tabwriter"
 )
@@ -74,7 +73,7 @@ func (m *moduleRange) fileHandler(f *sys.FileEntry) {
 		if !ok {
 			m.distribution[r] = make(containers, 0)
 		}
-		fileContainer := container{size: f.Size, name: filepath.Join(f.Parent, f.Name), count: 1}
+		fileContainer := container{size: f.Size, name: f.Path, count: 1}
 		m.distribution[r] = append(nodes, &fileContainer)
 	}
 }
