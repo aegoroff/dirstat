@@ -10,6 +10,7 @@ const (
 	mbyte
 	gbyte
 	tbyte
+	pbyte
 )
 
 const top = 10
@@ -24,7 +25,7 @@ var fileSizeRanges = [...]Range{
 	{Min: 10 * gbyte, Max: 100 * gbyte},
 	{Min: 100 * gbyte, Max: tbyte},
 	{Min: tbyte, Max: 10 * tbyte},
-	{Min: 10 * tbyte, Max: 100 * tbyte},
+	{Min: 10 * tbyte, Max: pbyte},
 }
 
 type fileStat struct {
