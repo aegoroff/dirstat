@@ -35,6 +35,10 @@ func (r *rctx) writetab(format string, a ...interface{}) {
 	_, _ = fmt.Fprintf(r.tabw, format, a...)
 }
 
+func human(n int64) string {
+	return humanize.IBytes(uint64(n))
+}
+
 func render(w io.Writer, renderers []renderer) {
 	tw := new(tabwriter.Writer).Init(w, 0, 8, 4, ' ', 0)
 

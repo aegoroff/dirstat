@@ -4,7 +4,6 @@ import (
 	"dirstat/module/internal/sys"
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
-	"github.com/dustin/go-humanize"
 )
 
 // NewTopFilesModule creates new top files statistic module
@@ -81,9 +80,7 @@ func (m *topFilesRenderer) output(rc renderContext) {
 
 		i++
 
-		sz := uint64(file.size)
-
-		rc.writetab("%v\t%v\n", h, humanize.IBytes(sz))
+		rc.writetab("%v\t%v\n", h, human(file.size))
 
 		return true
 	})

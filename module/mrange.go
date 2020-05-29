@@ -3,7 +3,6 @@ package module
 import (
 	"dirstat/module/internal/sys"
 	"fmt"
-	"github.com/dustin/go-humanize"
 	"sort"
 )
 
@@ -133,7 +132,7 @@ func (m *rangeRenderer) output(rc renderContext) {
 			sort.Sort(sort.Reverse(items))
 
 			for _, item := range items {
-				size := humanize.IBytes(uint64(item.size))
+				size := human(item.size)
 				rc.write("   %s - %s\n", item.name, size)
 			}
 		}
@@ -143,7 +142,7 @@ func (m *rangeRenderer) output(rc renderContext) {
 func createRangesHeads() []string {
 	var heads []string
 	for i, r := range fileSizeRanges {
-		h := fmt.Sprintf("%d. Between %s and %s", i+1, humanize.IBytes(uint64(r.Min)), humanize.IBytes(uint64(r.Max)))
+		h := fmt.Sprintf("%d. Between %s and %s", i+1, human(r.Min), human(r.Max))
 		heads = append(heads, h)
 	}
 	return heads
