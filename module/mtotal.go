@@ -30,7 +30,7 @@ func (m *moduleTotal) postScan() {
 	m.total.ReadingTime = time.Since(m.start)
 }
 
-func (m *moduleTotal) folderHandler(_ *sys.FolderEntry) {
+func (m *moduleTotal) folderHandler(*sys.FolderEntry) {
 
 }
 

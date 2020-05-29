@@ -60,7 +60,7 @@ func (m *topFilesWorker) postScan() {
 
 }
 
-func (m *topFilesWorker) folderHandler(_ *sys.FolderEntry) {
+func (m *topFilesWorker) folderHandler(*sys.FolderEntry) {
 
 }
 

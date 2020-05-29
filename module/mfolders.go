@@ -110,7 +110,7 @@ func (m *foldersWorker) folderHandler(fe *sys.FolderEntry) {
 	m.folders.Insert(rbtree.NewNode(&fn))
 }
 
-func (m *foldersWorker) fileHandler(_ *sys.FileEntry) {
+func (m *foldersWorker) fileHandler(*sys.FileEntry) {
 
 }
 

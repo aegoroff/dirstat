@@ -64,7 +64,7 @@ func (m *extWorker) postScan() {
 	m.total.CountFileExts = len(m.aggregator)
 }
 
-func (m *extWorker) folderHandler(_ *sys.FolderEntry) {
+func (m *extWorker) folderHandler(*sys.FolderEntry) {
 
 }
 
