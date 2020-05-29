@@ -104,10 +104,10 @@ func (m *foldersWorker) postScan() {
 }
 
 func (m *foldersWorker) folderHandler(fe *sys.FolderEntry) {
-	fn := &folderNode{
+	fn := folderNode{
 		container{name: fe.Path, count: fe.Count, size: fe.Size},
 	}
-	m.folders.Insert(rbtree.NewNode(fn))
+	m.folders.Insert(rbtree.NewNode(&fn))
 }
 
 func (m *foldersWorker) fileHandler(_ *sys.FileEntry) {
