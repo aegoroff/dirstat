@@ -19,7 +19,7 @@ type Range struct {
 }
 
 // Contains defines whether the number specified within range
-func (r Range) Contains(num int64) bool {
+func (r *Range) Contains(num int64) bool {
 	return num >= r.Min && num <= r.Max
 }
 
