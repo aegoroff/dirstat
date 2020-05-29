@@ -19,8 +19,8 @@ func NewExtensionModule(ctx *Context) Module {
 
 // NewExtensionHiddenModule creates new file extensions statistic module
 // that has disabled output
-func NewExtensionHiddenModule(rc *Context) Module {
-	work := newExtWorker(rc)
+func NewExtensionHiddenModule(ctx *Context) Module {
+	work := newExtWorker(ctx)
 	m := moduleExtensionsNoOut{
 		work,
 		emptyRenderer{},
@@ -47,9 +47,9 @@ type moduleExtensionsNoOut struct {
 	emptyRenderer
 }
 
-func newExtWorker(rc *Context) extWorker {
+func newExtWorker(ctx *Context) extWorker {
 	return extWorker{
-		total:      rc.total,
+		total:      ctx.total,
 		aggregator: make(map[string]countSizeAggregate),
 	}
 }
@@ -74,12 +74,12 @@ func (m *extWorker) fileHandler(f *sys.FileEntry) {
 }
 
 func (e *extRenderer) output(rc renderContext) {
-	extBySize := e.evolventMap(func(aggregate countSizeAggregate) int64 {
-		return int64(aggregate.Size)
+	extBySize := e.evolventMap(func(agr countSizeAggregate) int64 {
+		return int64(agr.Size)
 	})
 
-	extByCount := e.evolventMap(func(aggregate countSizeAggregate) int64 {
-		return aggregate.Count
+	extByCount := e.evolventMap(func(agr countSizeAggregate) int64 {
+		return agr.Count
 	})
 
 	sort.Sort(sort.Reverse(extBySize))
