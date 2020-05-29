@@ -48,11 +48,11 @@ func render(w io.Writer, renderers []renderer) {
 	}
 }
 
-func (t *totalInfo) outputTopStatLine(ctx renderContext, count int64, sz uint64, title string) {
+func (t *totalInfo) outputTopStatLine(rc renderContext, count int64, sz uint64, title string) {
 	percentOfCount := t.countPercent(count)
 	percentOfSize := t.sizePercent(sz)
 
-	ctx.writetab("%v\t%v\t%.2f%%\t%v\t%.2f%%\n", title, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
+	rc.writetab("%v\t%v\t%.2f%%\t%v\t%.2f%%\n", title, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
 }
 
 func (t *totalInfo) countPercent(count int64) float64 {

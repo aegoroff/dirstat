@@ -38,7 +38,7 @@ func (m *moduleTotal) fileHandler(f *sys.FileEntry) {
 	m.total.FilesTotal.Size += uint64(f.Size)
 }
 
-func (m *moduleTotal) output(ctx renderContext) {
+func (m *moduleTotal) output(rc renderContext) {
 	const totalTemplate = `
 Total files:            {{.FilesTotal.Count}} ({{.FilesTotal.Size | toBytesString }})
 Total folders:          {{.CountFolders}}
@@ -48,5 +48,5 @@ Read taken:    {{.ReadingTime}}
 `
 
 	var report = template.Must(template.New("totalstat").Funcs(template.FuncMap{"toBytesString": humanize.IBytes}).Parse(totalTemplate))
-	_ = report.Execute(ctx.writer(), m.total)
+	_ = report.Execute(rc.writer(), m.total)
 }

@@ -19,8 +19,8 @@ func NewExtensionModule(ctx *Context) Module {
 
 // NewExtensionHiddenModule creates new file extensions statistic module
 // that has disabled output
-func NewExtensionHiddenModule(ctx *Context) Module {
-	work := newExtWorker(ctx)
+func NewExtensionHiddenModule(rc *Context) Module {
+	work := newExtWorker(rc)
 	m := moduleExtensionsNoOut{
 		work,
 		emptyRenderer{},
@@ -47,9 +47,9 @@ type moduleExtensionsNoOut struct {
 	emptyRenderer
 }
 
-func newExtWorker(ctx *Context) extWorker {
+func newExtWorker(rc *Context) extWorker {
 	return extWorker{
-		total:      ctx.total,
+		total:      rc.total,
 		aggregator: make(map[string]countSizeAggregate),
 	}
 }
@@ -73,7 +73,7 @@ func (m *extWorker) fileHandler(f *sys.FileEntry) {
 	m.aggregator[ext] = a
 }
 
-func (e *extRenderer) output(ctx renderContext) {
+func (e *extRenderer) output(rc renderContext) {
 	extBySize := createSliceFromMap(e.aggregator, func(aggregate countSizeAggregate) int64 {
 		return int64(aggregate.Size)
 	})
@@ -87,43 +87,43 @@ func (e *extRenderer) output(ctx renderContext) {
 
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
-	ctx.write("\nTOP %d file extensions by size:\n\n", top)
+	rc.write("\nTOP %d file extensions by size:\n\n", top)
 
-	e.outputTableHead(ctx, format)
+	e.outputTableHead(rc, format)
 
-	e.outputTopTen(ctx, extBySize, func(data containers, item *container) (int64, uint64) {
+	e.outputTopTen(rc, extBySize, func(data containers, item *container) (int64, uint64) {
 		count := e.aggregator[item.name].Count
 		sz := uint64(item.size)
 		return count, sz
 	})
 
-	ctx.flush()
+	rc.flush()
 
-	ctx.write("\nTOP %d file extensions by count:\n\n", top)
+	rc.write("\nTOP %d file extensions by count:\n\n", top)
 
-	e.outputTableHead(ctx, format)
+	e.outputTableHead(rc, format)
 
-	e.outputTopTen(ctx, extByCount, func(data containers, item *container) (int64, uint64) {
+	e.outputTopTen(rc, extByCount, func(data containers, item *container) (int64, uint64) {
 		count := item.size
 		sz := e.aggregator[item.name].Size
 		return count, sz
 	})
 
-	ctx.flush()
+	rc.flush()
 }
 
-func (e *extRenderer) outputTableHead(ctx renderContext, format string) {
-	ctx.writetab(format, "Extension", "Count", "%", "Size", "%")
-	ctx.writetab(format, "---------", "-----", "------", "----", "------")
+func (e *extRenderer) outputTableHead(rc renderContext, format string) {
+	rc.writetab(format, "Extension", "Count", "%", "Size", "%")
+	rc.writetab(format, "---------", "-----", "------", "----", "------")
 }
 
-func (e *extRenderer) outputTopTen(ctx renderContext, data containers, selector func(data containers, item *container) (int64, uint64)) {
+func (e *extRenderer) outputTopTen(rc renderContext, data containers, selector func(data containers, item *container) (int64, uint64)) {
 	for i := 0; i < top && i < len(data); i++ {
 		h := data[i].name
 
 		count, sz := selector(data, data[i])
 
-		e.total.outputTopStatLine(ctx, count, sz, h)
+		e.total.outputTopStatLine(rc, count, sz, h)
 	}
 }
 

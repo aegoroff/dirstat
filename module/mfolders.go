@@ -112,43 +112,43 @@ func (m *foldersWorker) fileHandler(*sys.FileEntry) {
 
 }
 
-func (f *foldersRenderer) output(ctx renderContext) {
+func (f *foldersRenderer) output(rc renderContext) {
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
-	ctx.write("\nTOP %d folders by size:\n\n", top)
+	rc.write("\nTOP %d folders by size:\n\n", top)
 
-	f.outputTableHead(ctx, format)
+	f.outputTableHead(rc, format)
 
 	i := 1
 
 	f.topSize.Descend(func(c rbtree.Comparable) bool {
 
 		folder := c.(*container)
-		f.outputTableRow(&i, folder, ctx)
+		f.outputTableRow(&i, folder, rc)
 
 		return true
 	})
 
-	ctx.flush()
+	rc.flush()
 
-	ctx.write("\nTOP %d folders by count:\n\n", top)
+	rc.write("\nTOP %d folders by count:\n\n", top)
 
-	f.outputTableHead(ctx, format)
+	f.outputTableHead(rc, format)
 
 	i = 1
 
 	f.topCount.Descend(func(c rbtree.Comparable) bool {
 
 		folder := c.(*folderCount)
-		f.outputTableRow(&i, &folder.container, ctx)
+		f.outputTableRow(&i, &folder.container, rc)
 
 		return true
 	})
 
-	ctx.flush()
+	rc.flush()
 }
 
-func (f *foldersRenderer) outputTableRow(i *int, folder *container, ctx renderContext) {
+func (f *foldersRenderer) outputTableRow(i *int, folder *container, rc renderContext) {
 	h := fmt.Sprintf("%d. %s", *i, folder.name)
 
 	*i++
@@ -156,10 +156,10 @@ func (f *foldersRenderer) outputTableRow(i *int, folder *container, ctx renderCo
 	count := folder.count
 	sz := uint64(folder.size)
 
-	f.total.outputTopStatLine(ctx, count, sz, h)
+	f.total.outputTopStatLine(rc, count, sz, h)
 }
 
-func (f *foldersRenderer) outputTableHead(ctx renderContext, format string) {
-	ctx.writetab(format, "Folder", "Files", "%", "Size", "%")
-	ctx.writetab(format, "------", "-----", "------", "----", "------")
+func (f *foldersRenderer) outputTableHead(rc renderContext, format string) {
+	rc.writetab(format, "Folder", "Files", "%", "Size", "%")
+	rc.writetab(format, "------", "-----", "------", "----", "------")
 }

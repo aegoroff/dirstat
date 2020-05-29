@@ -118,23 +118,23 @@ func (m *rangeWorker) fileHandler(f *sys.FileEntry) {
 	}
 }
 
-func (m *rangeRenderer) output(ctx renderContext) {
+func (m *rangeRenderer) output(rc renderContext) {
 	if m.verbose && len(m.enabledRanges) > 0 {
 		heads := createRangesHeads()
-		ctx.write("\nDetailed files stat:\n")
+		rc.write("\nDetailed files stat:\n")
 		for i, r := range fileSizeRanges {
 			if len(m.distribution[r]) == 0 {
 				continue
 			}
 
-			ctx.write("%s\n", heads[i])
+			rc.write("%s\n", heads[i])
 
 			items := m.distribution[r]
 			sort.Sort(sort.Reverse(items))
 
 			for _, item := range items {
 				size := humanize.IBytes(uint64(item.size))
-				ctx.write("   %s - %s\n", item.name, size)
+				rc.write("   %s - %s\n", item.name, size)
 			}
 		}
 	}
