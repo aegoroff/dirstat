@@ -15,17 +15,17 @@ func render(w io.Writer, renderers []renderer) {
 	}
 }
 
-func outputTopStatLine(tw *tabwriter.Writer, count int64, total *totalInfo, sz uint64, title string) {
-	percentOfCount := countPercent(count, total)
-	percentOfSize := sizePercent(sz, total)
+func (t *totalInfo) outputTopStatLine(tw *tabwriter.Writer, count int64, sz uint64, title string) {
+	percentOfCount := t.countPercent(count)
+	percentOfSize := t.sizePercent(sz)
 
 	_, _ = fmt.Fprintf(tw, "%v\t%v\t%.2f%%\t%v\t%.2f%%\n", title, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
 }
 
-func countPercent(count int64, total *totalInfo) float64 {
-	return (float64(count) / float64(total.FilesTotal.Count)) * 100
+func (t *totalInfo) countPercent(count int64) float64 {
+	return (float64(count) / float64(t.FilesTotal.Count)) * 100
 }
 
-func sizePercent(size uint64, total *totalInfo) float64 {
-	return (float64(size) / float64(total.FilesTotal.Size)) * 100
+func (t *totalInfo) sizePercent(size uint64) float64 {
+	return (float64(size) / float64(t.FilesTotal.Size)) * 100
 }

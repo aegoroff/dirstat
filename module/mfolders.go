@@ -115,26 +115,19 @@ func (m *foldersWorker) fileHandler(_ *sys.FileEntry) {
 
 }
 
-func (m *foldersRenderer) output(tw *tabwriter.Writer, w io.Writer) {
+func (f *foldersRenderer) output(tw *tabwriter.Writer, w io.Writer) {
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
 	_, _ = fmt.Fprintf(w, "\nTOP %d folders by size:\n\n", top)
-	_, _ = fmt.Fprintf(tw, format, "Folder", "Files", "%", "Size", "%")
-	_, _ = fmt.Fprintf(tw, format, "------", "-----", "------", "----", "------")
+
+	f.outputFoldersStatHeader(tw, format)
 
 	i := 1
 
-	m.topSize.Descend(func(c *rbtree.Comparable) bool {
+	f.topSize.Descend(func(c *rbtree.Comparable) bool {
 
 		folder := (*c).(*container)
-		h := fmt.Sprintf("%d. %s", i, folder.name)
-
-		i++
-
-		count := folder.count
-		sz := uint64(folder.size)
-
-		outputTopStatLine(tw, count, m.total, sz, h)
+		f.outputFoldersStatLine(&i, folder, tw)
 
 		return true
 	})
@@ -142,25 +135,34 @@ func (m *foldersRenderer) output(tw *tabwriter.Writer, w io.Writer) {
 	_ = tw.Flush()
 
 	_, _ = fmt.Fprintf(w, "\nTOP %d folders by count:\n\n", top)
-	_, _ = fmt.Fprintf(tw, format, "Folder", "Files", "%", "Size", "%")
-	_, _ = fmt.Fprintf(tw, format, "------", "-----", "------", "----", "------")
+
+	f.outputFoldersStatHeader(tw, format)
 
 	i = 1
 
-	m.topCount.Descend(func(c *rbtree.Comparable) bool {
+	f.topCount.Descend(func(c *rbtree.Comparable) bool {
 
 		folder := (*c).(*folderCount)
-		h := fmt.Sprintf("%d. %s", i, folder.name)
-
-		i++
-
-		count := folder.count
-		sz := uint64(folder.size)
-
-		outputTopStatLine(tw, count, m.total, sz, h)
+		f.outputFoldersStatLine(&i, &folder.container, tw)
 
 		return true
 	})
 
 	_ = tw.Flush()
+}
+
+func (f *foldersRenderer) outputFoldersStatLine(i *int, folder *container, tw *tabwriter.Writer) {
+	h := fmt.Sprintf("%d. %s", *i, folder.name)
+
+	*i++
+
+	count := folder.count
+	sz := uint64(folder.size)
+
+	f.total.outputTopStatLine(tw, count, sz, h)
+}
+
+func (f *foldersRenderer) outputFoldersStatHeader(tw *tabwriter.Writer, format string) {
+	_, _ = fmt.Fprintf(tw, format, "Folder", "Files", "%", "Size", "%")
+	_, _ = fmt.Fprintf(tw, format, "------", "-----", "------", "----", "------")
 }

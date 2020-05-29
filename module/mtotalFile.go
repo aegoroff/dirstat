@@ -34,7 +34,7 @@ func (m *moduleTotalFile) output(tw *tabwriter.Writer, w io.Writer) {
 		count := m.aggregate[r].TotalFilesCount
 		sz := m.aggregate[r].TotalFilesSize
 
-		outputTopStatLine(tw, count, m.total, sz, heads[i])
+		m.total.outputTopStatLine(tw, count, sz, heads[i])
 	}
 	_ = tw.Flush()
 }
