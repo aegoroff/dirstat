@@ -91,8 +91,8 @@ func (m *moduleExtensions) output(tw *tabwriter.Writer, w io.Writer) {
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
 	_, _ = fmt.Fprintf(w, "\nTOP %d file extensions by size:\n\n", top)
-	_, _ = fmt.Fprintf(tw, format, "Extension", "Count", "%", "Size", "%")
-	_, _ = fmt.Fprintf(tw, format, "---------", "-----", "------", "----", "------")
+
+	outputExtenstionsHead(tw, format)
 
 	outputTopTenExtensions(tw, extBySize, m.total, func(data containers, item *container) (int64, uint64) {
 		count := m.aggregator[item.name].Count
@@ -103,8 +103,8 @@ func (m *moduleExtensions) output(tw *tabwriter.Writer, w io.Writer) {
 	_ = tw.Flush()
 
 	_, _ = fmt.Fprintf(w, "\nTOP %d file extensions by count:\n\n", top)
-	_, _ = fmt.Fprintf(tw, format, "Extension", "Count", "%", "Size", "%")
-	_, _ = fmt.Fprintf(tw, format, "---------", "-----", "------", "----", "------")
+
+	outputExtenstionsHead(tw, format)
 
 	outputTopTenExtensions(tw, extByCount, m.total, func(data containers, item *container) (int64, uint64) {
 		count := item.size
@@ -113,6 +113,11 @@ func (m *moduleExtensions) output(tw *tabwriter.Writer, w io.Writer) {
 	})
 
 	_ = tw.Flush()
+}
+
+func outputExtenstionsHead(tw *tabwriter.Writer, format string) {
+	_, _ = fmt.Fprintf(tw, format, "Extension", "Count", "%", "Size", "%")
+	_, _ = fmt.Fprintf(tw, format, "---------", "-----", "------", "----", "------")
 }
 
 func outputTopTenExtensions(tw *tabwriter.Writer, data containers, total *totalInfo, selector func(data containers, item *container) (int64, uint64)) {
