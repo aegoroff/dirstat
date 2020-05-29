@@ -3,8 +3,6 @@ package module
 import (
 	"dirstat/module/internal/sys"
 	"github.com/dustin/go-humanize"
-	"io"
-	"text/tabwriter"
 	"text/template"
 	"time"
 )
@@ -40,7 +38,7 @@ func (m *moduleTotal) fileHandler(f *sys.FileEntry) {
 	m.total.FilesTotal.Size += uint64(f.Size)
 }
 
-func (m *moduleTotal) output(_ *tabwriter.Writer, w io.Writer) {
+func (m *moduleTotal) output(ctx renderContext) {
 	const totalTemplate = `
 Total files:            {{.FilesTotal.Count}} ({{.FilesTotal.Size | toBytesString }})
 Total folders:          {{.CountFolders}}
@@ -50,5 +48,5 @@ Read taken:    {{.ReadingTime}}
 `
 
 	var report = template.Must(template.New("totalstat").Funcs(template.FuncMap{"toBytesString": humanize.IBytes}).Parse(totalTemplate))
-	_ = report.Execute(w, m.total)
+	_ = report.Execute(ctx.writer(), m.total)
 }

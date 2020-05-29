@@ -4,9 +4,7 @@ import (
 	"dirstat/module/internal/sys"
 	"fmt"
 	"github.com/dustin/go-humanize"
-	"io"
 	"sort"
-	"text/tabwriter"
 )
 
 // Range defined integer value range
@@ -120,23 +118,23 @@ func (m *rangeWorker) fileHandler(f *sys.FileEntry) {
 	}
 }
 
-func (m *rangeRenderer) output(_ *tabwriter.Writer, w io.Writer) {
+func (m *rangeRenderer) output(ctx renderContext) {
 	if m.verbose && len(m.enabledRanges) > 0 {
 		heads := createRangesHeads()
-		_, _ = fmt.Fprintf(w, "\nDetailed files stat:\n")
+		ctx.write("\nDetailed files stat:\n")
 		for i, r := range fileSizeRanges {
 			if len(m.distribution[r]) == 0 {
 				continue
 			}
 
-			_, _ = fmt.Fprintf(w, "%s\n", heads[i])
+			ctx.write("%s\n", heads[i])
 
 			items := m.distribution[r]
 			sort.Sort(sort.Reverse(items))
 
 			for _, item := range items {
 				size := humanize.IBytes(uint64(item.size))
-				_, _ = fmt.Fprintf(w, "   %s - %s\n", item.name, size)
+				ctx.write("   %s - %s\n", item.name, size)
 			}
 		}
 	}

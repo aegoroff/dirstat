@@ -4,7 +4,6 @@ import (
 	"dirstat/module/internal/sys"
 	"github.com/spf13/afero"
 	"io"
-	"text/tabwriter"
 )
 
 // Module defines working modules interface
@@ -21,7 +20,7 @@ type worker interface {
 }
 
 type renderer interface {
-	output(tw *tabwriter.Writer, w io.Writer)
+	output(ctx renderContext)
 }
 
 // Context defines modules context

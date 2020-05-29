@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/dustin/go-humanize"
-	"io"
-	"text/tabwriter"
 )
 
 // NewTopFilesModule creates new top files statistic module
@@ -69,10 +67,11 @@ func (m *topFilesWorker) fileHandler(f *sys.FileEntry) {
 	insertTo(m.tree, &fileContainer)
 }
 
-func (m *topFilesRenderer) output(tw *tabwriter.Writer, w io.Writer) {
-	_, _ = fmt.Fprintf(w, "\nTOP %d files by size:\n\n", top)
-	_, _ = fmt.Fprintf(tw, "%v\t%v\n", "File", "Size")
-	_, _ = fmt.Fprintf(tw, "%v\t%v\n", "------", "----")
+func (m *topFilesRenderer) output(ctx renderContext) {
+	ctx.write("\nTOP %d files by size:\n\n", top)
+
+	ctx.writetab("%v\t%v\n", "File", "Size")
+	ctx.writetab("%v\t%v\n", "------", "----")
 
 	i := 1
 
@@ -84,10 +83,10 @@ func (m *topFilesRenderer) output(tw *tabwriter.Writer, w io.Writer) {
 
 		sz := uint64(file.size)
 
-		_, _ = fmt.Fprintf(tw, "%v\t%v\n", h, humanize.IBytes(sz))
+		ctx.writetab("%v\t%v\n", h, humanize.IBytes(sz))
 
 		return true
 	})
 
-	_ = tw.Flush()
+	ctx.flush()
 }

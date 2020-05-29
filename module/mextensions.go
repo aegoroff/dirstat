@@ -2,11 +2,8 @@ package module
 
 import (
 	"dirstat/module/internal/sys"
-	"fmt"
-	"io"
 	"path/filepath"
 	"sort"
-	"text/tabwriter"
 )
 
 // NewExtensionModule creates new file extensions statistic module
@@ -76,7 +73,7 @@ func (m *extWorker) fileHandler(f *sys.FileEntry) {
 	m.aggregator[ext] = a
 }
 
-func (e *extRenderer) output(tw *tabwriter.Writer, w io.Writer) {
+func (e *extRenderer) output(ctx renderContext) {
 	extBySize := createSliceFromMap(e.aggregator, func(aggregate countSizeAggregate) int64 {
 		return int64(aggregate.Size)
 	})
@@ -90,43 +87,43 @@ func (e *extRenderer) output(tw *tabwriter.Writer, w io.Writer) {
 
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
-	_, _ = fmt.Fprintf(w, "\nTOP %d file extensions by size:\n\n", top)
+	ctx.write("\nTOP %d file extensions by size:\n\n", top)
 
-	e.outputTableHead(tw, format)
+	e.outputTableHead(ctx, format)
 
-	e.outputTopTen(tw, extBySize, func(data containers, item *container) (int64, uint64) {
+	e.outputTopTen(ctx, extBySize, func(data containers, item *container) (int64, uint64) {
 		count := e.aggregator[item.name].Count
 		sz := uint64(item.size)
 		return count, sz
 	})
 
-	_ = tw.Flush()
+	ctx.flush()
 
-	_, _ = fmt.Fprintf(w, "\nTOP %d file extensions by count:\n\n", top)
+	ctx.write("\nTOP %d file extensions by count:\n\n", top)
 
-	e.outputTableHead(tw, format)
+	e.outputTableHead(ctx, format)
 
-	e.outputTopTen(tw, extByCount, func(data containers, item *container) (int64, uint64) {
+	e.outputTopTen(ctx, extByCount, func(data containers, item *container) (int64, uint64) {
 		count := item.size
 		sz := e.aggregator[item.name].Size
 		return count, sz
 	})
 
-	_ = tw.Flush()
+	ctx.flush()
 }
 
-func (e *extRenderer) outputTableHead(tw *tabwriter.Writer, format string) {
-	_, _ = fmt.Fprintf(tw, format, "Extension", "Count", "%", "Size", "%")
-	_, _ = fmt.Fprintf(tw, format, "---------", "-----", "------", "----", "------")
+func (e *extRenderer) outputTableHead(ctx renderContext, format string) {
+	ctx.writetab(format, "Extension", "Count", "%", "Size", "%")
+	ctx.writetab(format, "---------", "-----", "------", "----", "------")
 }
 
-func (e *extRenderer) outputTopTen(tw *tabwriter.Writer, data containers, selector func(data containers, item *container) (int64, uint64)) {
+func (e *extRenderer) outputTopTen(ctx renderContext, data containers, selector func(data containers, item *container) (int64, uint64)) {
 	for i := 0; i < top && i < len(data); i++ {
 		h := data[i].name
 
 		count, sz := selector(data, data[i])
 
-		e.total.outputTopStatLine(tw, count, sz, h)
+		e.total.outputTopStatLine(ctx, count, sz, h)
 	}
 }
 

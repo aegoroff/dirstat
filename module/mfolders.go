@@ -4,8 +4,6 @@ import (
 	"dirstat/module/internal/sys"
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
-	"io"
-	"text/tabwriter"
 )
 
 type folderNode struct {
@@ -114,43 +112,43 @@ func (m *foldersWorker) fileHandler(*sys.FileEntry) {
 
 }
 
-func (f *foldersRenderer) output(tw *tabwriter.Writer, w io.Writer) {
+func (f *foldersRenderer) output(ctx renderContext) {
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
-	_, _ = fmt.Fprintf(w, "\nTOP %d folders by size:\n\n", top)
+	ctx.write("\nTOP %d folders by size:\n\n", top)
 
-	f.outputTableHead(tw, format)
+	f.outputTableHead(ctx, format)
 
 	i := 1
 
 	f.topSize.Descend(func(c rbtree.Comparable) bool {
 
 		folder := c.(*container)
-		f.outputTableRow(&i, folder, tw)
+		f.outputTableRow(&i, folder, ctx)
 
 		return true
 	})
 
-	_ = tw.Flush()
+	ctx.flush()
 
-	_, _ = fmt.Fprintf(w, "\nTOP %d folders by count:\n\n", top)
+	ctx.write("\nTOP %d folders by count:\n\n", top)
 
-	f.outputTableHead(tw, format)
+	f.outputTableHead(ctx, format)
 
 	i = 1
 
 	f.topCount.Descend(func(c rbtree.Comparable) bool {
 
 		folder := c.(*folderCount)
-		f.outputTableRow(&i, &folder.container, tw)
+		f.outputTableRow(&i, &folder.container, ctx)
 
 		return true
 	})
 
-	_ = tw.Flush()
+	ctx.flush()
 }
 
-func (f *foldersRenderer) outputTableRow(i *int, folder *container, tw *tabwriter.Writer) {
+func (f *foldersRenderer) outputTableRow(i *int, folder *container, ctx renderContext) {
 	h := fmt.Sprintf("%d. %s", *i, folder.name)
 
 	*i++
@@ -158,10 +156,10 @@ func (f *foldersRenderer) outputTableRow(i *int, folder *container, tw *tabwrite
 	count := folder.count
 	sz := uint64(folder.size)
 
-	f.total.outputTopStatLine(tw, count, sz, h)
+	f.total.outputTopStatLine(ctx, count, sz, h)
 }
 
-func (f *foldersRenderer) outputTableHead(tw *tabwriter.Writer, format string) {
-	_, _ = fmt.Fprintf(tw, format, "Folder", "Files", "%", "Size", "%")
-	_, _ = fmt.Fprintf(tw, format, "------", "-----", "------", "----", "------")
+func (f *foldersRenderer) outputTableHead(ctx renderContext, format string) {
+	ctx.writetab(format, "Folder", "Files", "%", "Size", "%")
+	ctx.writetab(format, "------", "-----", "------", "----", "------")
 }

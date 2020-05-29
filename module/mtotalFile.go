@@ -1,11 +1,5 @@
 package module
 
-import (
-	"fmt"
-	"io"
-	"text/tabwriter"
-)
-
 // NewTotalFileModule creates new total file statistic module
 func NewTotalFileModule(ctx *Context) Module {
 	m := moduleTotalFile{
@@ -21,20 +15,20 @@ type moduleTotalFile struct {
 	aggregate map[Range]fileStat
 }
 
-func (m *moduleTotalFile) output(tw *tabwriter.Writer, w io.Writer) {
-	_, _ = fmt.Fprintf(w, "Total files stat:\n\n")
+func (m *moduleTotalFile) output(ctx renderContext) {
+	ctx.write("Total files stat:\n\n")
 
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
-	_, _ = fmt.Fprintf(tw, format, "File size", "Amount", "%", "Size", "%")
-	_, _ = fmt.Fprintf(tw, format, "---------", "------", "------", "----", "------")
+	ctx.writetab(format, "File size", "Amount", "%", "Size", "%")
+	ctx.writetab(format, "---------", "------", "------", "----", "------")
 
 	heads := createRangesHeads()
 	for i, r := range fileSizeRanges {
 		count := m.aggregate[r].TotalFilesCount
 		sz := m.aggregate[r].TotalFilesSize
 
-		m.total.outputTopStatLine(tw, count, sz, heads[i])
+		m.total.outputTopStatLine(ctx, count, sz, heads[i])
 	}
-	_ = tw.Flush()
+	ctx.flush()
 }
