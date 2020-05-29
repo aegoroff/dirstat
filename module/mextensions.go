@@ -74,11 +74,11 @@ func (m *extWorker) fileHandler(f *sys.FileEntry) {
 }
 
 func (e *extRenderer) output(rc renderContext) {
-	extBySize := createSliceFromMap(e.aggregator, func(aggregate countSizeAggregate) int64 {
+	extBySize := e.evolventMap(func(aggregate countSizeAggregate) int64 {
 		return int64(aggregate.Size)
 	})
 
-	extByCount := createSliceFromMap(e.aggregator, func(aggregate countSizeAggregate) int64 {
+	extByCount := e.evolventMap(func(aggregate countSizeAggregate) int64 {
 		return aggregate.Count
 	})
 
@@ -127,10 +127,10 @@ func (e *extRenderer) outputTopTen(rc renderContext, data containers, selector f
 	}
 }
 
-func createSliceFromMap(sizeByExt map[string]countSizeAggregate, mapper func(countSizeAggregate) int64) containers {
-	var result = make(containers, len(sizeByExt))
+func (e *extRenderer) evolventMap(mapper func(countSizeAggregate) int64) containers {
+	var result = make(containers, len(e.aggregator))
 	i := 0
-	for k, v := range sizeByExt {
+	for k, v := range e.aggregator {
 		result[i] = &container{size: mapper(v), name: k}
 		i++
 	}
