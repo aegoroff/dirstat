@@ -35,12 +35,12 @@ func (c *container) EqualTo(y interface{}) bool {
 
 func insertTo(topTree *rbtree.RbTree, c rbtree.Comparable) {
 	min := topTree.Minimum()
-	if topTree.Len() < top || (*min.Key).LessThan(c) {
+	if topTree.Len() < top || min.Key.LessThan(c) {
 		if topTree.Len() == top {
 			topTree.Delete(min)
 		}
 
-		node := rbtree.NewNode(&c)
+		node := rbtree.NewNode(c)
 		topTree.Insert(node)
 	}
 }

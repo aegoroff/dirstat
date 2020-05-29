@@ -89,7 +89,7 @@ func (m *foldersWorker) init() {
 
 func (m *foldersWorker) postScan() {
 	m.folders.WalkInorder(func(node *rbtree.Node) {
-		fn := (*node.Key).(*folderNode)
+		fn := node.Key.(*folderNode)
 
 		insertTo(m.topSize, &fn.container)
 
@@ -108,7 +108,7 @@ func (m *foldersWorker) folderHandler(fe *sys.FolderEntry) {
 	cmp = &folderNode{
 		container{name: fe.Path, count: fe.Count, size: fe.Size},
 	}
-	m.folders.Insert(rbtree.NewNode(&cmp))
+	m.folders.Insert(rbtree.NewNode(cmp))
 }
 
 func (m *foldersWorker) fileHandler(_ *sys.FileEntry) {
@@ -124,9 +124,9 @@ func (f *foldersRenderer) output(tw *tabwriter.Writer, w io.Writer) {
 
 	i := 1
 
-	f.topSize.Descend(func(c *rbtree.Comparable) bool {
+	f.topSize.Descend(func(c rbtree.Comparable) bool {
 
-		folder := (*c).(*container)
+		folder := c.(*container)
 		f.outputTableRow(&i, folder, tw)
 
 		return true
@@ -140,9 +140,9 @@ func (f *foldersRenderer) output(tw *tabwriter.Writer, w io.Writer) {
 
 	i = 1
 
-	f.topCount.Descend(func(c *rbtree.Comparable) bool {
+	f.topCount.Descend(func(c rbtree.Comparable) bool {
 
-		folder := (*c).(*folderCount)
+		folder := c.(*folderCount)
 		f.outputTableRow(&i, &folder.container, tw)
 
 		return true

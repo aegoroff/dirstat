@@ -76,8 +76,8 @@ func (m *topFilesRenderer) output(tw *tabwriter.Writer, w io.Writer) {
 
 	i := 1
 
-	m.tree.Descend(func(c *rbtree.Comparable) bool {
-		file := (*c).(*container)
+	m.tree.Descend(func(c rbtree.Comparable) bool {
+		file := c.(*container)
 		h := fmt.Sprintf("%d. %s", i, file.name)
 
 		i++
