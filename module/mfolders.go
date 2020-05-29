@@ -120,14 +120,14 @@ func (f *foldersRenderer) output(tw *tabwriter.Writer, w io.Writer) {
 
 	_, _ = fmt.Fprintf(w, "\nTOP %d folders by size:\n\n", top)
 
-	f.outputFoldersStatHeader(tw, format)
+	f.outputTableHead(tw, format)
 
 	i := 1
 
 	f.topSize.Descend(func(c *rbtree.Comparable) bool {
 
 		folder := (*c).(*container)
-		f.outputFoldersStatLine(&i, folder, tw)
+		f.outputTableRow(&i, folder, tw)
 
 		return true
 	})
@@ -136,14 +136,14 @@ func (f *foldersRenderer) output(tw *tabwriter.Writer, w io.Writer) {
 
 	_, _ = fmt.Fprintf(w, "\nTOP %d folders by count:\n\n", top)
 
-	f.outputFoldersStatHeader(tw, format)
+	f.outputTableHead(tw, format)
 
 	i = 1
 
 	f.topCount.Descend(func(c *rbtree.Comparable) bool {
 
 		folder := (*c).(*folderCount)
-		f.outputFoldersStatLine(&i, &folder.container, tw)
+		f.outputTableRow(&i, &folder.container, tw)
 
 		return true
 	})
@@ -151,7 +151,7 @@ func (f *foldersRenderer) output(tw *tabwriter.Writer, w io.Writer) {
 	_ = tw.Flush()
 }
 
-func (f *foldersRenderer) outputFoldersStatLine(i *int, folder *container, tw *tabwriter.Writer) {
+func (f *foldersRenderer) outputTableRow(i *int, folder *container, tw *tabwriter.Writer) {
 	h := fmt.Sprintf("%d. %s", *i, folder.name)
 
 	*i++
@@ -162,7 +162,7 @@ func (f *foldersRenderer) outputFoldersStatLine(i *int, folder *container, tw *t
 	f.total.outputTopStatLine(tw, count, sz, h)
 }
 
-func (f *foldersRenderer) outputFoldersStatHeader(tw *tabwriter.Writer, format string) {
+func (f *foldersRenderer) outputTableHead(tw *tabwriter.Writer, format string) {
 	_, _ = fmt.Fprintf(tw, format, "Folder", "Files", "%", "Size", "%")
 	_, _ = fmt.Fprintf(tw, format, "------", "-----", "------", "----", "------")
 }
