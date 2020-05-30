@@ -23,6 +23,7 @@ Available Commands:
 
 Flags:
   -h, --help      help for dirstat
+  -m, --memory    Show memory statistic after run
   -t, --top int   The number of lines in top statistics. (default 10)
 
 Use "dirstat [command] --help" for more information about a command.
