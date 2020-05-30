@@ -110,8 +110,8 @@ func NewFoldersHiddenModule(ctx *Context) Module {
 }
 
 // NewTopFilesModule creates new top files statistic module
-func NewTopFilesModule(c *Context) Module {
-	work := newTopFilesWorker(c.top)
+func NewTopFilesModule(ctx *Context) Module {
+	work := newTopFilesWorker(ctx.top)
 	rend := newTopFilesRenderer(work)
 	m := newModule()
 	m.addWorker(work)
