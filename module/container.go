@@ -35,14 +35,14 @@ func (c *container) EqualTo(y interface{}) bool {
 
 // insertTo inserts node into tree which size is limited by the size parameter.
 // Only <size> max nodes will be in the tree
-func insertTo(topTree *rbtree.RbTree, size int, c rbtree.Comparable) {
-	min := topTree.Minimum()
-	if topTree.Len() < int64(size) || min.Key.LessThan(c) {
-		if topTree.Len() == int64(size) {
-			topTree.Delete(min)
+func insertTo(tree *rbtree.RbTree, size int, c rbtree.Comparable) {
+	min := tree.Minimum()
+	if tree.Len() < int64(size) || min.Key.LessThan(c) {
+		if tree.Len() == int64(size) {
+			tree.Delete(min)
 		}
 
 		node := rbtree.NewNode(c)
-		topTree.Insert(node)
+		tree.Insert(node)
 	}
 }
