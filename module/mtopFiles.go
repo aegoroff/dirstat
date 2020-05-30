@@ -9,20 +9,15 @@ import (
 // NewTopFilesModule creates new top files statistic module
 func NewTopFilesModule(c *Context) Module {
 	work := newTopFilesWorker(c.top)
-	rend := &topFilesRenderer{*work}
+	rend := newTopFilesRenderer(work)
 	m := NewModule()
 	m.addWorker(work)
 	m.addRenderer(rend)
 	return m
 }
 
-// NewTopFilesHiddenModule creates new top files statistic module
-// that has disabled output
-func NewTopFilesHiddenModule(c *Context) Module {
-	work := newTopFilesWorker(c.top)
-	m := NewModule()
-	m.addWorker(work)
-	return m
+func newTopFilesRenderer(work *topFilesWorker) renderer {
+	return &topFilesRenderer{work}
 }
 
 type topFilesWorker struct {
@@ -31,7 +26,7 @@ type topFilesWorker struct {
 }
 
 type topFilesRenderer struct {
-	topFilesWorker
+	work *topFilesWorker
 }
 
 func newTopFilesWorker(top int) *topFilesWorker {
@@ -56,14 +51,14 @@ func (m *topFilesWorker) handler(evt *sys.ScanEvent) {
 }
 
 func (m *topFilesRenderer) print(p printer) {
-	p.print("\nTOP %d files by size:\n\n", m.top)
+	p.print("\nTOP %d files by size:\n\n", m.work.top)
 
 	p.printtab("%v\t%v\n", "File", "Size")
 	p.printtab("%v\t%v\n", "------", "----")
 
 	i := 1
 
-	m.tree.Descend(func(c rbtree.Comparable) bool {
+	m.work.tree.Descend(func(c rbtree.Comparable) bool {
 		file := c.(*container)
 		h := fmt.Sprintf("%d. %s", i, file.name)
 

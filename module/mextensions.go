@@ -9,11 +9,15 @@ import (
 // NewExtensionModule creates new file extensions statistic module
 func NewExtensionModule(ctx *Context) Module {
 	work := newExtWorker(ctx)
-	rend := &extRenderer{*work}
+	rend := newExtRenderer(work)
 	m := NewModule()
 	m.addWorker(work)
 	m.addRenderer(rend)
 	return m
+}
+
+func newExtRenderer(work *extWorker) renderer {
+	return &extRenderer{work}
 }
 
 // NewExtensionHiddenModule creates new file extensions statistic module
@@ -32,7 +36,7 @@ type extWorker struct {
 }
 
 type extRenderer struct {
-	extWorker
+	work *extWorker
 }
 
 func newExtWorker(ctx *Context) *extWorker {
@@ -77,25 +81,25 @@ func (e *extRenderer) print(p printer) {
 
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
-	p.print("\nTOP %d file extensions by size:\n\n", e.top)
+	p.print("\nTOP %d file extensions by size:\n\n", e.work.top)
 
 	e.printTableHead(p, format)
 
 	e.printTopTen(p, extBySize, func(data containers, item *container) (int64, uint64) {
-		count := e.aggregator[item.name].Count
+		count := e.work.aggregator[item.name].Count
 		sz := uint64(item.size)
 		return count, sz
 	})
 
 	p.flush()
 
-	p.print("\nTOP %d file extensions by count:\n\n", e.top)
+	p.print("\nTOP %d file extensions by count:\n\n", e.work.top)
 
 	e.printTableHead(p, format)
 
 	e.printTopTen(p, extByCount, func(data containers, item *container) (int64, uint64) {
 		count := item.size
-		sz := e.aggregator[item.name].Size
+		sz := e.work.aggregator[item.name].Size
 		return count, sz
 	})
 
@@ -108,19 +112,19 @@ func (e *extRenderer) printTableHead(p printer, format string) {
 }
 
 func (e *extRenderer) printTopTen(p printer, data containers, selector func(data containers, item *container) (int64, uint64)) {
-	for i := 0; i < e.top && i < len(data); i++ {
+	for i := 0; i < e.work.top && i < len(data); i++ {
 		h := data[i].name
 
 		count, sz := selector(data, data[i])
 
-		e.total.printCountAndSizeStatLine(p, count, sz, h)
+		e.work.total.printCountAndSizeStatLine(p, count, sz, h)
 	}
 }
 
 func (e *extRenderer) evolventMap(mapper func(countSizeAggregate) int64) containers {
-	var result = make(containers, len(e.aggregator))
+	var result = make(containers, len(e.work.aggregator))
 	i := 0
-	for k, v := range e.aggregator {
+	for k, v := range e.work.aggregator {
 		result[i] = &container{size: mapper(v), name: k}
 		i++
 	}

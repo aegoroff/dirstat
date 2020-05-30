@@ -9,17 +9,24 @@ import (
 
 // NewTotalModule creates new total statistic module
 func NewTotalModule(ctx *Context) Module {
-	work := totalWorker{
+	work := newTotalWorker(ctx)
+	rend := newTotalRenderer(work)
+
+	m := NewModule()
+	m.addWorker(work)
+	m.addRenderer(rend)
+	return m
+}
+
+func newTotalRenderer(work *totalWorker) renderer {
+	return &totalRenderer{work}
+}
+
+func newTotalWorker(ctx *Context) *totalWorker {
+	return &totalWorker{
 		start: time.Now(),
 		total: ctx.total,
 	}
-
-	rend := totalRenderer{work}
-
-	m := NewModule()
-	m.addWorker(&work)
-	m.addRenderer(&rend)
-	return m
 }
 
 type totalWorker struct {
@@ -28,7 +35,7 @@ type totalWorker struct {
 }
 
 type totalRenderer struct {
-	totalWorker
+	work *totalWorker
 }
 
 func (m *totalWorker) init() {
@@ -58,5 +65,5 @@ Read taken:    {{.ReadingTime}}
 `
 
 	var report = template.Must(template.New("totalstat").Funcs(template.FuncMap{"toBytesString": humanize.IBytes}).Parse(totalTemplate))
-	_ = report.Execute(p.writer(), m.total)
+	_ = report.Execute(p.writer(), m.work.total)
 }

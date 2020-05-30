@@ -2,14 +2,18 @@ package module
 
 // NewTotalFileModule creates new total file statistic module
 func NewTotalFileModule(ctx *Context) Module {
-	r := &totalFileRenderer{
-		total:     ctx.total,
-		aggregate: ctx.rangeAggregate,
-	}
+	r := newTotalFileRenderer(ctx)
 
 	m := NewModule()
 	m.addRenderer(r)
 	return m
+}
+
+func newTotalFileRenderer(ctx *Context) renderer {
+	return &totalFileRenderer{
+		total:     ctx.total,
+		aggregate: ctx.rangeAggregate,
+	}
 }
 
 type totalFileRenderer struct {

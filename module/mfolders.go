@@ -33,12 +33,16 @@ func (f *folderCount) EqualTo(y interface{}) bool {
 // NewFoldersModule creates new folders module
 func NewFoldersModule(ctx *Context) Module {
 	work := newFoldersWorker(ctx)
-	rend := &foldersRenderer{*work}
+	rend := newFoldersRenerer(work)
 
 	m := NewModule()
 	m.addWorker(work)
 	m.addRenderer(rend)
 	return m
+}
+
+func newFoldersRenerer(work *foldersWorker) renderer {
+	return &foldersRenderer{work}
 }
 
 // NewFoldersHiddenModule creates new folders module
@@ -59,7 +63,7 @@ type foldersWorker struct {
 }
 
 type foldersRenderer struct {
-	foldersWorker
+	work *foldersWorker
 }
 
 func newFoldersWorker(ctx *Context) *foldersWorker {
@@ -106,13 +110,13 @@ func (m *foldersWorker) handler(evt *sys.ScanEvent) {
 func (f *foldersRenderer) print(p printer) {
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
-	p.print("\nTOP %d folders by size:\n\n", f.top)
+	p.print("\nTOP %d folders by size:\n\n", f.work.top)
 
 	f.outputTableHead(p, format)
 
 	i := 1
 
-	f.topSize.Descend(func(c rbtree.Comparable) bool {
+	f.work.topSize.Descend(func(c rbtree.Comparable) bool {
 
 		folder := c.(*container)
 		f.outputTableRow(&i, folder, p)
@@ -122,13 +126,13 @@ func (f *foldersRenderer) print(p printer) {
 
 	p.flush()
 
-	p.print("\nTOP %d folders by count:\n\n", f.top)
+	p.print("\nTOP %d folders by count:\n\n", f.work.top)
 
 	f.outputTableHead(p, format)
 
 	i = 1
 
-	f.topCount.Descend(func(c rbtree.Comparable) bool {
+	f.work.topCount.Descend(func(c rbtree.Comparable) bool {
 
 		folder := c.(*folderCount)
 		f.outputTableRow(&i, &folder.container, p)
@@ -147,7 +151,7 @@ func (f *foldersRenderer) outputTableRow(i *int, folder *container, p printer) {
 	count := folder.count
 	sz := uint64(folder.size)
 
-	f.total.printCountAndSizeStatLine(p, count, sz, h)
+	f.work.total.printCountAndSizeStatLine(p, count, sz, h)
 }
 
 func (f *foldersRenderer) outputTableHead(rc printer, format string) {

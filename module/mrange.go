@@ -23,11 +23,15 @@ func (r *Range) Contains(num int64) bool {
 // NewRangeModule creates new file statistic by file size range module
 func NewRangeModule(ctx *Context, verbose bool, enabledRanges []int) Module {
 	work := newRangeWorker(ctx, verbose, enabledRanges)
-	rend := &rangeRenderer{*work}
+	rend := newRangeRenderer(work)
 	m := NewModule()
 	m.addWorker(work)
 	m.addRenderer(rend)
 	return m
+}
+
+func newRangeRenderer(work *rangeWorker) renderer {
+	return &rangeRenderer{work}
 }
 
 type rangeWorker struct {
@@ -39,7 +43,7 @@ type rangeWorker struct {
 }
 
 type rangeRenderer struct {
-	rangeWorker
+	work *rangeWorker
 }
 
 func newRangeWorker(ctx *Context, verbose bool, enabledRanges []int) *rangeWorker {
@@ -96,17 +100,17 @@ func (m *rangeWorker) handler(evt *sys.ScanEvent) {
 }
 
 func (m *rangeRenderer) print(p printer) {
-	if m.verbose && len(m.enabledRanges) > 0 {
+	if m.work.verbose && len(m.work.enabledRanges) > 0 {
 		heads := createRangesHeads()
 		p.print("\nDetailed files stat:\n")
 		for i, r := range fileSizeRanges {
-			if len(m.distribution[r]) == 0 {
+			if len(m.work.distribution[r]) == 0 {
 				continue
 			}
 
 			p.print("%s\n", heads[i])
 
-			items := m.distribution[r]
+			items := m.work.distribution[r]
 			sort.Sort(sort.Reverse(items))
 
 			for _, item := range items {
