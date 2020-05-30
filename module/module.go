@@ -82,8 +82,8 @@ func Execute(path string, fs afero.Fs, w io.Writer, modules ...Module) {
 
 	sys.Scan(path, fs, handlers)
 
-	for _, m := range workers {
-		m.finalize()
+	for _, wo := range workers {
+		wo.finalize()
 	}
 
 	render(w, renderers)
