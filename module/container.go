@@ -33,6 +33,8 @@ func (c *container) EqualTo(y interface{}) bool {
 	return c.size == (y.(*container)).size
 }
 
+// insertTo inserts node into tree which size is limited by the size parameter.
+// Only <size> max nodes will be in the tree
 func insertTo(topTree *rbtree.RbTree, size int, c rbtree.Comparable) {
 	min := topTree.Minimum()
 	if topTree.Len() < int64(size) || min.Key.LessThan(c) {

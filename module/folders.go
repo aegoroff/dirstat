@@ -31,11 +31,11 @@ func (f *folderCount) EqualTo(y interface{}) bool {
 }
 
 type foldersWorker struct {
-	total    *totalInfo
-	folders  *rbtree.RbTree
-	topSize  *rbtree.RbTree
-	topCount *rbtree.RbTree
-	top      int
+	total   *totalInfo
+	folders *rbtree.RbTree
+	bySize  *rbtree.RbTree
+	byCount *rbtree.RbTree
+	top     int
 }
 
 type foldersRenderer struct {
@@ -44,11 +44,11 @@ type foldersRenderer struct {
 
 func newFoldersWorker(ctx *Context) *foldersWorker {
 	return &foldersWorker{
-		total:    ctx.total,
-		folders:  rbtree.NewRbTree(),
-		topSize:  rbtree.NewRbTree(),
-		topCount: rbtree.NewRbTree(),
-		top:      ctx.top,
+		total:   ctx.total,
+		folders: rbtree.NewRbTree(),
+		bySize:  rbtree.NewRbTree(),
+		byCount: rbtree.NewRbTree(),
+		top:     ctx.top,
 	}
 }
 
@@ -65,13 +65,13 @@ func (m *foldersWorker) finalize() {
 	m.folders.WalkInorder(func(node *rbtree.Node) {
 		fn := node.Key.(*folderNode)
 
-		insertTo(m.topSize, m.top, &fn.container)
+		insertTo(m.bySize, m.top, &fn.container)
 
 		fcn := folderCount{
 			fn.container,
 		}
 
-		insertTo(m.topCount, m.top, &fcn)
+		insertTo(m.byCount, m.top, &fcn)
 	})
 
 	m.total.CountFolders = m.folders.Root.Size
@@ -100,7 +100,7 @@ func (f *foldersRenderer) print(p printer) {
 
 	i := 1
 
-	f.work.topSize.Descend(func(c rbtree.Comparable) bool {
+	f.work.bySize.Descend(func(c rbtree.Comparable) bool {
 
 		folder := c.(*container)
 		f.printTableRow(&i, folder, p)
@@ -116,7 +116,7 @@ func (f *foldersRenderer) print(p printer) {
 
 	i = 1
 
-	f.work.topCount.Descend(func(c rbtree.Comparable) bool {
+	f.work.byCount.Descend(func(c rbtree.Comparable) bool {
 
 		folder := c.(*folderCount)
 		f.printTableRow(&i, &folder.container, p)
