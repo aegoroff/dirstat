@@ -10,8 +10,6 @@ import (
 type Module interface {
 	workers() []worker
 	renderers() []renderer
-	addWorker(w worker)
-	addRenderer(r renderer)
 }
 
 type module struct {
@@ -25,14 +23,6 @@ func (m *module) workers() []worker {
 
 func (m *module) renderers() []renderer {
 	return m.rnd
-}
-
-func (m *module) addWorker(w worker) {
-	m.wks = append(m.wks, w)
-}
-
-func (m *module) addRenderer(r renderer) {
-	m.rnd = append(m.rnd, r)
 }
 
 type worker interface {
@@ -94,9 +84,7 @@ func NewFoldersModule(ctx *Context) Module {
 	work := newFoldersWorker(ctx)
 	rend := newFoldersRenderer(work)
 
-	m := newModule()
-	m.addWorker(work)
-	m.addRenderer(rend)
+	m := newModuleW(work, rend)
 	return m
 }
 
@@ -104,8 +92,7 @@ func NewFoldersModule(ctx *Context) Module {
 // that has disabled output
 func NewFoldersHiddenModule(ctx *Context) Module {
 	work := newFoldersWorker(ctx)
-	m := newModule()
-	m.addWorker(work)
+	m := newModuleW(work)
 	return m
 }
 
@@ -113,9 +100,7 @@ func NewFoldersHiddenModule(ctx *Context) Module {
 func NewTopFilesModule(ctx *Context) Module {
 	work := newTopFilesWorker(ctx.top)
 	rend := newTopFilesRenderer(work)
-	m := newModule()
-	m.addWorker(work)
-	m.addRenderer(rend)
+	m := newModuleW(work, rend)
 	return m
 }
 
@@ -123,9 +108,7 @@ func NewTopFilesModule(ctx *Context) Module {
 func NewRangeModule(ctx *Context, verbose bool, enabledRanges []int) Module {
 	work := newRangeWorker(ctx, verbose, enabledRanges)
 	rend := newRangeRenderer(work)
-	m := newModule()
-	m.addWorker(work)
-	m.addRenderer(rend)
+	m := newModuleW(work, rend)
 	return m
 }
 
@@ -133,9 +116,7 @@ func NewRangeModule(ctx *Context, verbose bool, enabledRanges []int) Module {
 func NewExtensionModule(ctx *Context) Module {
 	work := newExtWorker(ctx)
 	rend := newExtRenderer(work)
-	m := newModule()
-	m.addWorker(work)
-	m.addRenderer(rend)
+	m := newModuleW(work, rend)
 	return m
 }
 
@@ -143,8 +124,7 @@ func NewExtensionModule(ctx *Context) Module {
 // that has disabled output
 func NewExtensionHiddenModule(ctx *Context) Module {
 	work := newExtWorker(ctx)
-	m := newModule()
-	m.addWorker(work)
+	m := newModuleW(work)
 	return m
 }
 
@@ -152,8 +132,7 @@ func NewExtensionHiddenModule(ctx *Context) Module {
 func NewTotalFileModule(ctx *Context) Module {
 	r := newTotalFileRenderer(ctx)
 
-	m := newModule()
-	m.addRenderer(r)
+	m := newModuleR(r)
 	return m
 }
 
@@ -162,16 +141,24 @@ func NewTotalModule(ctx *Context) Module {
 	work := newTotalWorker(ctx)
 	rend := newTotalRenderer(work)
 
-	m := newModule()
-	m.addWorker(work)
-	m.addRenderer(rend)
+	m := newModuleW(work, rend)
 	return m
 }
 
-func newModule() Module {
+func newModuleW(w worker, r ...renderer) Module {
 	m := module{
-		[]worker{},
+		[]worker{w},
 		[]renderer{},
 	}
+	m.rnd = append(m.rnd, r...)
+	return &m
+}
+
+func newModuleR(r renderer, w ...worker) Module {
+	m := module{
+		[]worker{},
+		[]renderer{r},
+	}
+	m.wks = append(m.wks, w...)
 	return &m
 }
