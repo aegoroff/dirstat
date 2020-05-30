@@ -156,7 +156,7 @@ func (f *foldersRenderer) outputTableRow(i *int, folder *container, p printer) {
 	count := folder.count
 	sz := uint64(folder.size)
 
-	f.total.printTopStatLine(p, count, sz, h)
+	f.total.printCountAndSizeStatLine(p, count, sz, h)
 }
 
 func (f *foldersRenderer) outputTableHead(rc printer, format string) {

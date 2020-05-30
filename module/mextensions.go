@@ -89,9 +89,9 @@ func (e *extRenderer) output(p printer) {
 
 	p.print("\nTOP %d file extensions by size:\n\n", top)
 
-	e.outputTableHead(p, format)
+	e.printTableHead(p, format)
 
-	e.outputTopTen(p, extBySize, func(data containers, item *container) (int64, uint64) {
+	e.printTopTen(p, extBySize, func(data containers, item *container) (int64, uint64) {
 		count := e.aggregator[item.name].Count
 		sz := uint64(item.size)
 		return count, sz
@@ -101,9 +101,9 @@ func (e *extRenderer) output(p printer) {
 
 	p.print("\nTOP %d file extensions by count:\n\n", top)
 
-	e.outputTableHead(p, format)
+	e.printTableHead(p, format)
 
-	e.outputTopTen(p, extByCount, func(data containers, item *container) (int64, uint64) {
+	e.printTopTen(p, extByCount, func(data containers, item *container) (int64, uint64) {
 		count := item.size
 		sz := e.aggregator[item.name].Size
 		return count, sz
@@ -112,18 +112,18 @@ func (e *extRenderer) output(p printer) {
 	p.flush()
 }
 
-func (e *extRenderer) outputTableHead(p printer, format string) {
+func (e *extRenderer) printTableHead(p printer, format string) {
 	p.printtab(format, "Extension", "Count", "%", "Size", "%")
 	p.printtab(format, "---------", "-----", "------", "----", "------")
 }
 
-func (e *extRenderer) outputTopTen(p printer, data containers, selector func(data containers, item *container) (int64, uint64)) {
+func (e *extRenderer) printTopTen(p printer, data containers, selector func(data containers, item *container) (int64, uint64)) {
 	for i := 0; i < top && i < len(data); i++ {
 		h := data[i].name
 
 		count, sz := selector(data, data[i])
 
-		e.total.printTopStatLine(p, count, sz, h)
+		e.total.printCountAndSizeStatLine(p, count, sz, h)
 	}
 }
 

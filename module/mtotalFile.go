@@ -28,7 +28,7 @@ func (m *moduleTotalFile) output(p printer) {
 		count := m.aggregate[r].TotalFilesCount
 		sz := m.aggregate[r].TotalFilesSize
 
-		m.total.printTopStatLine(p, count, sz, heads[i])
+		m.total.printCountAndSizeStatLine(p, count, sz, heads[i])
 	}
 	p.flush()
 }
