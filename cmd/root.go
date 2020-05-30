@@ -19,7 +19,8 @@ type options struct {
 const pathParamName = "path"
 const verboseParamName = "verbose"
 const rangeParamName = "range"
-const top = 10
+
+var top int
 
 var appFileSystem = afero.NewOsFs()
 var appWriter io.Writer
@@ -37,6 +38,7 @@ var rootCmd = &cobra.Command{
 func init() {
 	cobra.MousetrapHelpText = ""
 	appWriter = os.Stdout
+	rootCmd.PersistentFlags().IntVarP(&top, "top", "t", 10, "The number of lines in top statistics.")
 }
 
 // Execute starts package running
