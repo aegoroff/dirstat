@@ -45,6 +45,8 @@ func newRangeRenderer(work *rangeWorker) renderer {
 	return &rangeRenderer{work}
 }
 
+// Worker methods
+
 func (m *rangeWorker) init() {
 	m.enabledRangesMap = make(map[int]bool)
 	for _, x := range m.enabledRanges {
@@ -88,6 +90,8 @@ func (m *rangeWorker) handler(evt *sys.ScanEvent) {
 		m.distribution[r] = append(nodes, &fileContainer)
 	}
 }
+
+// Renderer method
 
 func (m *rangeRenderer) print(p printer) {
 	if m.work.verbose && len(m.work.enabledRanges) > 0 {

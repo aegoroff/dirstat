@@ -28,6 +28,8 @@ func newExtRenderer(work *extWorker) renderer {
 	return &extRenderer{work}
 }
 
+// Worker methods
+
 func (m *extWorker) init() {
 }
 
@@ -47,6 +49,8 @@ func (m *extWorker) handler(evt *sys.ScanEvent) {
 	a.Count++
 	m.aggregator[ext] = a
 }
+
+// Renderer method
 
 func (e *extRenderer) print(p printer) {
 	extBySize := e.evolventMap(func(agr countSizeAggregate) int64 {

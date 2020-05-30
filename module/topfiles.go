@@ -23,6 +23,8 @@ func newTopFilesWorker(top int) *topFilesWorker {
 	return &topFilesWorker{rbtree.NewRbTree(), top}
 }
 
+// Worker methods
+
 func (m *topFilesWorker) init() {
 }
 
@@ -39,6 +41,8 @@ func (m *topFilesWorker) handler(evt *sys.ScanEvent) {
 	fileContainer := container{size: f.Size, name: f.Path, count: 1}
 	insertTo(m.tree, m.top, &fileContainer)
 }
+
+// Renderer method
 
 func (m *topFilesRenderer) print(p printer) {
 	p.print("\nTOP %d files by size:\n\n", m.work.top)

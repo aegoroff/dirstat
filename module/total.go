@@ -27,6 +27,8 @@ func newTotalWorker(ctx *Context) *totalWorker {
 	}
 }
 
+// Worker methods
+
 func (m *totalWorker) init() {
 }
 
@@ -43,6 +45,8 @@ func (m *totalWorker) handler(evt *sys.ScanEvent) {
 	m.total.FilesTotal.Count++
 	m.total.FilesTotal.Size += uint64(evt.File.Size)
 }
+
+// Renderer method
 
 func (m *totalRenderer) print(p printer) {
 	const totalTemplate = `

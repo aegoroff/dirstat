@@ -12,6 +12,8 @@ func newTotalFileRenderer(ctx *Context) renderer {
 	}
 }
 
+// Renderer method
+
 func (m *totalFileRenderer) print(p printer) {
 	p.print("Total files stat:\n\n")
 

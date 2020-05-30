@@ -56,6 +56,8 @@ func newFoldersRenderer(work *foldersWorker) renderer {
 	return &foldersRenderer{work}
 }
 
+// Worker methods
+
 func (m *foldersWorker) init() {
 }
 
@@ -87,19 +89,21 @@ func (m *foldersWorker) handler(evt *sys.ScanEvent) {
 	m.folders.Insert(rbtree.NewNode(&fn))
 }
 
+// Renderer method
+
 func (f *foldersRenderer) print(p printer) {
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
 	p.print("\nTOP %d folders by size:\n\n", f.work.top)
 
-	f.outputTableHead(p, format)
+	f.printTableHead(p, format)
 
 	i := 1
 
 	f.work.topSize.Descend(func(c rbtree.Comparable) bool {
 
 		folder := c.(*container)
-		f.outputTableRow(&i, folder, p)
+		f.printTableRow(&i, folder, p)
 
 		return true
 	})
@@ -108,14 +112,14 @@ func (f *foldersRenderer) print(p printer) {
 
 	p.print("\nTOP %d folders by count:\n\n", f.work.top)
 
-	f.outputTableHead(p, format)
+	f.printTableHead(p, format)
 
 	i = 1
 
 	f.work.topCount.Descend(func(c rbtree.Comparable) bool {
 
 		folder := c.(*folderCount)
-		f.outputTableRow(&i, &folder.container, p)
+		f.printTableRow(&i, &folder.container, p)
 
 		return true
 	})
@@ -123,7 +127,7 @@ func (f *foldersRenderer) print(p printer) {
 	p.flush()
 }
 
-func (f *foldersRenderer) outputTableRow(i *int, folder *container, p printer) {
+func (f *foldersRenderer) printTableRow(i *int, folder *container, p printer) {
 	h := fmt.Sprintf("%d. %s", *i, folder.name)
 
 	*i++
@@ -134,7 +138,7 @@ func (f *foldersRenderer) outputTableRow(i *int, folder *container, p printer) {
 	f.work.total.printCountAndSizeStatLine(p, count, sz, h)
 }
 
-func (f *foldersRenderer) outputTableHead(rc printer, format string) {
+func (f *foldersRenderer) printTableHead(rc printer, format string) {
 	rc.printtab(format, "Folder", "Files", "%", "Size", "%")
 	rc.printtab(format, "------", "-----", "------", "----", "------")
 }
