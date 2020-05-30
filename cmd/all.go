@@ -44,7 +44,7 @@ var allCmd = &cobra.Command{
 
 		_, _ = fmt.Fprintf(appWriter, "Root: %s\n\n", opt.Path)
 
-		ctx := module.NewContext()
+		ctx := module.NewContext(top)
 		foldersmod := module.NewFoldersModule(ctx)
 		totalmod := module.NewTotalModule(ctx)
 		rangemod := module.NewRangeModule(ctx, opt.Verbosity, opt.Range)

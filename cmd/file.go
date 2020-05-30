@@ -52,7 +52,7 @@ var fileCmd = &cobra.Command{
 
 		_, _ = fmt.Fprintf(appWriter, "Root: %s\n\n", opt.Path)
 
-		ctx := module.NewContext()
+		ctx := module.NewContext(top)
 		totalmod := module.NewTotalModule(ctx)
 		rangemod := module.NewRangeModule(ctx, opt.Verbosity, opt.Range)
 		totalfilemod := module.NewTotalFileModule(ctx)

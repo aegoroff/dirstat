@@ -31,6 +31,7 @@ func NewExtensionHiddenModule(ctx *Context) Module {
 type extWorker struct {
 	total      *totalInfo
 	aggregator map[string]countSizeAggregate
+	top        int
 }
 
 type extRenderer struct {
@@ -51,6 +52,7 @@ func newExtWorker(ctx *Context) extWorker {
 	return extWorker{
 		total:      ctx.total,
 		aggregator: make(map[string]countSizeAggregate),
+		top:        ctx.top,
 	}
 }
 
@@ -87,7 +89,7 @@ func (e *extRenderer) output(p printer) {
 
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
-	p.print("\nTOP %d file extensions by size:\n\n", top)
+	p.print("\nTOP %d file extensions by size:\n\n", e.top)
 
 	e.printTableHead(p, format)
 
@@ -99,7 +101,7 @@ func (e *extRenderer) output(p printer) {
 
 	p.flush()
 
-	p.print("\nTOP %d file extensions by count:\n\n", top)
+	p.print("\nTOP %d file extensions by count:\n\n", e.top)
 
 	e.printTableHead(p, format)
 
@@ -118,7 +120,7 @@ func (e *extRenderer) printTableHead(p printer, format string) {
 }
 
 func (e *extRenderer) printTopTen(p printer, data containers, selector func(data containers, item *container) (int64, uint64)) {
-	for i := 0; i < top && i < len(data); i++ {
+	for i := 0; i < e.top && i < len(data); i++ {
 		h := data[i].name
 
 		count, sz := selector(data, data[i])

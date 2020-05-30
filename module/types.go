@@ -14,8 +14,6 @@ const (
 	pbyte
 )
 
-const top = 10
-
 var fileSizeRanges = [...]Range{
 	{Min: 0, Max: 100 * kbyte},
 	{Min: 100 * kbyte, Max: mbyte},

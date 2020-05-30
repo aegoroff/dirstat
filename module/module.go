@@ -27,15 +27,17 @@ type renderer interface {
 type Context struct {
 	total          *totalInfo
 	rangeAggregate map[Range]fileStat
+	top            int
 }
 
 // NewContext create new module's context that needed to create new modules
-func NewContext() *Context {
+func NewContext(top int) *Context {
 	total := totalInfo{}
 
 	ctx := Context{
 		total:          &total,
 		rangeAggregate: make(map[Range]fileStat),
+		top:            top,
 	}
 	return &ctx
 }

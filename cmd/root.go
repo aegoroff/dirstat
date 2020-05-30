@@ -19,6 +19,7 @@ type options struct {
 const pathParamName = "path"
 const verboseParamName = "verbose"
 const rangeParamName = "range"
+const top = 10
 
 var appFileSystem = afero.NewOsFs()
 var appWriter io.Writer

@@ -7,8 +7,8 @@ import (
 )
 
 // NewTopFilesModule creates new top files statistic module
-func NewTopFilesModule(_ *Context) Module {
-	work := newTopFilesWorker()
+func NewTopFilesModule(c *Context) Module {
+	work := newTopFilesWorker(c.top)
 	rend := topFilesRenderer{work}
 	m := moduleTopFiles{
 		work,
@@ -19,8 +19,8 @@ func NewTopFilesModule(_ *Context) Module {
 
 // NewTopFilesHiddenModule creates new top files statistic module
 // that has disabled output
-func NewTopFilesHiddenModule(_ *Context) Module {
-	work := newTopFilesWorker()
+func NewTopFilesHiddenModule(c *Context) Module {
+	work := newTopFilesWorker(c.top)
 	m := moduleTopFilesNoOut{
 		work,
 		emptyRenderer{},
@@ -30,6 +30,7 @@ func NewTopFilesHiddenModule(_ *Context) Module {
 
 type topFilesWorker struct {
 	tree *rbtree.RbTree
+	top  int
 }
 
 type topFilesRenderer struct {
@@ -46,8 +47,8 @@ type moduleTopFilesNoOut struct {
 	emptyRenderer
 }
 
-func newTopFilesWorker() topFilesWorker {
-	return topFilesWorker{rbtree.NewRbTree()}
+func newTopFilesWorker(top int) topFilesWorker {
+	return topFilesWorker{rbtree.NewRbTree(), top}
 }
 
 func (m *topFilesWorker) init() {
@@ -63,11 +64,11 @@ func (m *topFilesWorker) folderHandler(*sys.FolderEntry) {
 
 func (m *topFilesWorker) fileHandler(f *sys.FileEntry) {
 	fileContainer := container{size: f.Size, name: f.Path, count: 1}
-	insertTo(m.tree, &fileContainer)
+	insertTo(m.tree, m.top, &fileContainer)
 }
 
 func (m *topFilesRenderer) output(p printer) {
-	p.print("\nTOP %d files by size:\n\n", top)
+	p.print("\nTOP %d files by size:\n\n", m.top)
 
 	p.printtab("%v\t%v\n", "File", "Size")
 	p.printtab("%v\t%v\n", "------", "----")

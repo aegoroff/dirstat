@@ -57,6 +57,7 @@ type foldersWorker struct {
 	folders  *rbtree.RbTree
 	topSize  *rbtree.RbTree
 	topCount *rbtree.RbTree
+	top      int
 }
 
 type foldersRenderer struct {
@@ -79,6 +80,7 @@ func newFoldersWorker(ctx *Context) foldersWorker {
 		folders:  rbtree.NewRbTree(),
 		topSize:  rbtree.NewRbTree(),
 		topCount: rbtree.NewRbTree(),
+		top:      ctx.top,
 	}
 }
 
@@ -89,13 +91,13 @@ func (m *foldersWorker) postScan() {
 	m.folders.WalkInorder(func(node *rbtree.Node) {
 		fn := node.Key.(*folderNode)
 
-		insertTo(m.topSize, &fn.container)
+		insertTo(m.topSize, m.top, &fn.container)
 
 		fcn := folderCount{
 			fn.container,
 		}
 
-		insertTo(m.topCount, &fcn)
+		insertTo(m.topCount, m.top, &fcn)
 	})
 
 	m.total.CountFolders = m.folders.Root.Size
@@ -115,7 +117,7 @@ func (m *foldersWorker) fileHandler(*sys.FileEntry) {
 func (f *foldersRenderer) output(p printer) {
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
-	p.print("\nTOP %d folders by size:\n\n", top)
+	p.print("\nTOP %d folders by size:\n\n", f.top)
 
 	f.outputTableHead(p, format)
 
@@ -131,7 +133,7 @@ func (f *foldersRenderer) output(p printer) {
 
 	p.flush()
 
-	p.print("\nTOP %d folders by count:\n\n", top)
+	p.print("\nTOP %d folders by count:\n\n", f.top)
 
 	f.outputTableHead(p, format)
 
