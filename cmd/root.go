@@ -21,6 +21,7 @@ const verboseParamName = "verbose"
 const rangeParamName = "range"
 
 var top int
+var showMemory bool
 
 var appFileSystem = afero.NewOsFs()
 var appWriter io.Writer
@@ -39,6 +40,7 @@ func init() {
 	cobra.MousetrapHelpText = ""
 	appWriter = os.Stdout
 	rootCmd.PersistentFlags().IntVarP(&top, "top", "t", 10, "The number of lines in top statistics.")
+	rootCmd.PersistentFlags().BoolVarP(&showMemory, "memory", "m", false, "Show memory statistic after run")
 }
 
 // Execute starts package running
@@ -51,6 +53,9 @@ func Execute() {
 // printMemUsage outputs the current, total and OS memory being used. As well as the number
 // of garage collection cycles completed.
 func printMemUsage(w io.Writer) {
+	if !showMemory {
+		return
+	}
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
 	// For info on each, see: https://golang.org/pkg/runtime/#MemStats
