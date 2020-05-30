@@ -52,15 +52,6 @@ type Context struct {
 	top            int
 }
 
-// NewModule creates new empty module
-func NewModule() Module {
-	m := module{
-		[]worker{},
-		[]renderer{},
-	}
-	return &m
-}
-
 // NewContext creates new module's context that needed to create new modules
 func NewContext(top int) *Context {
 	total := totalInfo{}
@@ -96,4 +87,91 @@ func Execute(path string, fs afero.Fs, w io.Writer, modules ...Module) {
 	}
 
 	render(w, renderers)
+}
+
+// NewFoldersModule creates new folders module
+func NewFoldersModule(ctx *Context) Module {
+	work := newFoldersWorker(ctx)
+	rend := newFoldersRenderer(work)
+
+	m := newModule()
+	m.addWorker(work)
+	m.addRenderer(rend)
+	return m
+}
+
+// NewFoldersHiddenModule creates new folders module
+// that has disabled output
+func NewFoldersHiddenModule(ctx *Context) Module {
+	work := newFoldersWorker(ctx)
+	m := newModule()
+	m.addWorker(work)
+	return m
+}
+
+// NewTopFilesModule creates new top files statistic module
+func NewTopFilesModule(c *Context) Module {
+	work := newTopFilesWorker(c.top)
+	rend := newTopFilesRenderer(work)
+	m := newModule()
+	m.addWorker(work)
+	m.addRenderer(rend)
+	return m
+}
+
+// NewRangeModule creates new file statistic by file size range module
+func NewRangeModule(ctx *Context, verbose bool, enabledRanges []int) Module {
+	work := newRangeWorker(ctx, verbose, enabledRanges)
+	rend := newRangeRenderer(work)
+	m := newModule()
+	m.addWorker(work)
+	m.addRenderer(rend)
+	return m
+}
+
+// NewExtensionModule creates new file extensions statistic module
+func NewExtensionModule(ctx *Context) Module {
+	work := newExtWorker(ctx)
+	rend := newExtRenderer(work)
+	m := newModule()
+	m.addWorker(work)
+	m.addRenderer(rend)
+	return m
+}
+
+// NewExtensionHiddenModule creates new file extensions statistic module
+// that has disabled output
+func NewExtensionHiddenModule(ctx *Context) Module {
+	work := newExtWorker(ctx)
+	m := newModule()
+	m.addWorker(work)
+	return m
+}
+
+// NewTotalFileModule creates new total file statistic module
+func NewTotalFileModule(ctx *Context) Module {
+	r := newTotalFileRenderer(ctx)
+
+	m := newModule()
+	m.addRenderer(r)
+	return m
+}
+
+// NewTotalModule creates new total statistic module
+func NewTotalModule(ctx *Context) Module {
+	work := newTotalWorker(ctx)
+	rend := newTotalRenderer(work)
+
+	m := newModule()
+	m.addWorker(work)
+	m.addRenderer(rend)
+	return m
+}
+
+func newModule() Module {
+	m := module{
+		[]worker{},
+		[]renderer{},
+	}
+	return &m
 }

@@ -6,16 +6,6 @@ import (
 	"github.com/aegoroff/godatastruct/rbtree"
 )
 
-// NewTopFilesModule creates new top files statistic module
-func NewTopFilesModule(c *Context) Module {
-	work := newTopFilesWorker(c.top)
-	rend := newTopFilesRenderer(work)
-	m := NewModule()
-	m.addWorker(work)
-	m.addRenderer(rend)
-	return m
-}
-
 func newTopFilesRenderer(work *topFilesWorker) renderer {
 	return &topFilesRenderer{work}
 }

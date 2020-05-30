@@ -30,30 +30,6 @@ func (f *folderCount) EqualTo(y interface{}) bool {
 	return f.count == y.(*folderCount).count
 }
 
-// NewFoldersModule creates new folders module
-func NewFoldersModule(ctx *Context) Module {
-	work := newFoldersWorker(ctx)
-	rend := newFoldersRenerer(work)
-
-	m := NewModule()
-	m.addWorker(work)
-	m.addRenderer(rend)
-	return m
-}
-
-// NewFoldersHiddenModule creates new folders module
-// that has disabled output
-func NewFoldersHiddenModule(ctx *Context) Module {
-	work := newFoldersWorker(ctx)
-	m := NewModule()
-	m.addWorker(work)
-	return m
-}
-
-func newFoldersRenerer(work *foldersWorker) renderer {
-	return &foldersRenderer{work}
-}
-
 type foldersWorker struct {
 	total    *totalInfo
 	folders  *rbtree.RbTree
@@ -74,6 +50,10 @@ func newFoldersWorker(ctx *Context) *foldersWorker {
 		topCount: rbtree.NewRbTree(),
 		top:      ctx.top,
 	}
+}
+
+func newFoldersRenderer(work *foldersWorker) renderer {
+	return &foldersRenderer{work}
 }
 
 func (m *foldersWorker) init() {

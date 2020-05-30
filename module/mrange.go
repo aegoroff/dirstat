@@ -20,20 +20,6 @@ func (r *Range) Contains(num int64) bool {
 	return num >= r.Min && num <= r.Max
 }
 
-// NewRangeModule creates new file statistic by file size range module
-func NewRangeModule(ctx *Context, verbose bool, enabledRanges []int) Module {
-	work := newRangeWorker(ctx, verbose, enabledRanges)
-	rend := newRangeRenderer(work)
-	m := NewModule()
-	m.addWorker(work)
-	m.addRenderer(rend)
-	return m
-}
-
-func newRangeRenderer(work *rangeWorker) renderer {
-	return &rangeRenderer{work}
-}
-
 type rangeWorker struct {
 	distribution     map[Range]containers
 	aggregate        map[Range]fileStat
@@ -53,6 +39,10 @@ func newRangeWorker(ctx *Context, verbose bool, enabledRanges []int) *rangeWorke
 		aggregate:     ctx.rangeAggregate,
 		distribution:  make(map[Range]containers),
 	}
+}
+
+func newRangeRenderer(work *rangeWorker) renderer {
+	return &rangeRenderer{work}
 }
 
 func (m *rangeWorker) init() {

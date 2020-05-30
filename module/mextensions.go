@@ -6,29 +6,6 @@ import (
 	"sort"
 )
 
-// NewExtensionModule creates new file extensions statistic module
-func NewExtensionModule(ctx *Context) Module {
-	work := newExtWorker(ctx)
-	rend := newExtRenderer(work)
-	m := NewModule()
-	m.addWorker(work)
-	m.addRenderer(rend)
-	return m
-}
-
-// NewExtensionHiddenModule creates new file extensions statistic module
-// that has disabled output
-func NewExtensionHiddenModule(ctx *Context) Module {
-	work := newExtWorker(ctx)
-	m := NewModule()
-	m.addWorker(work)
-	return m
-}
-
-func newExtRenderer(work *extWorker) renderer {
-	return &extRenderer{work}
-}
-
 type extWorker struct {
 	total      *totalInfo
 	aggregator map[string]countSizeAggregate
@@ -45,6 +22,10 @@ func newExtWorker(ctx *Context) *extWorker {
 		aggregator: make(map[string]countSizeAggregate),
 		top:        ctx.top,
 	}
+}
+
+func newExtRenderer(work *extWorker) renderer {
+	return &extRenderer{work}
 }
 
 func (m *extWorker) init() {

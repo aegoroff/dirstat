@@ -7,15 +7,13 @@ import (
 	"time"
 )
 
-// NewTotalModule creates new total statistic module
-func NewTotalModule(ctx *Context) Module {
-	work := newTotalWorker(ctx)
-	rend := newTotalRenderer(work)
+type totalWorker struct {
+	total *totalInfo
+	start time.Time
+}
 
-	m := NewModule()
-	m.addWorker(work)
-	m.addRenderer(rend)
-	return m
+type totalRenderer struct {
+	work *totalWorker
 }
 
 func newTotalRenderer(work *totalWorker) renderer {
@@ -27,15 +25,6 @@ func newTotalWorker(ctx *Context) *totalWorker {
 		start: time.Now(),
 		total: ctx.total,
 	}
-}
-
-type totalWorker struct {
-	total *totalInfo
-	start time.Time
-}
-
-type totalRenderer struct {
-	work *totalWorker
 }
 
 func (m *totalWorker) init() {
