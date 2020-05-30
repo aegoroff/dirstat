@@ -73,7 +73,7 @@ func (m *extWorker) fileHandler(f *sys.FileEntry) {
 	m.aggregator[ext] = a
 }
 
-func (e *extRenderer) output(rc renderContext) {
+func (e *extRenderer) output(p printer) {
 	extBySize := e.evolventMap(func(agr countSizeAggregate) int64 {
 		return int64(agr.Size)
 	})
@@ -87,43 +87,43 @@ func (e *extRenderer) output(rc renderContext) {
 
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
-	rc.write("\nTOP %d file extensions by size:\n\n", top)
+	p.print("\nTOP %d file extensions by size:\n\n", top)
 
-	e.outputTableHead(rc, format)
+	e.outputTableHead(p, format)
 
-	e.outputTopTen(rc, extBySize, func(data containers, item *container) (int64, uint64) {
+	e.outputTopTen(p, extBySize, func(data containers, item *container) (int64, uint64) {
 		count := e.aggregator[item.name].Count
 		sz := uint64(item.size)
 		return count, sz
 	})
 
-	rc.flush()
+	p.flush()
 
-	rc.write("\nTOP %d file extensions by count:\n\n", top)
+	p.print("\nTOP %d file extensions by count:\n\n", top)
 
-	e.outputTableHead(rc, format)
+	e.outputTableHead(p, format)
 
-	e.outputTopTen(rc, extByCount, func(data containers, item *container) (int64, uint64) {
+	e.outputTopTen(p, extByCount, func(data containers, item *container) (int64, uint64) {
 		count := item.size
 		sz := e.aggregator[item.name].Size
 		return count, sz
 	})
 
-	rc.flush()
+	p.flush()
 }
 
-func (e *extRenderer) outputTableHead(rc renderContext, format string) {
-	rc.writetab(format, "Extension", "Count", "%", "Size", "%")
-	rc.writetab(format, "---------", "-----", "------", "----", "------")
+func (e *extRenderer) outputTableHead(p printer, format string) {
+	p.printtab(format, "Extension", "Count", "%", "Size", "%")
+	p.printtab(format, "---------", "-----", "------", "----", "------")
 }
 
-func (e *extRenderer) outputTopTen(rc renderContext, data containers, selector func(data containers, item *container) (int64, uint64)) {
+func (e *extRenderer) outputTopTen(p printer, data containers, selector func(data containers, item *container) (int64, uint64)) {
 	for i := 0; i < top && i < len(data); i++ {
 		h := data[i].name
 
 		count, sz := selector(data, data[i])
 
-		e.total.outputTopStatLine(rc, count, sz, h)
+		e.total.printTopStatLine(p, count, sz, h)
 	}
 }
 

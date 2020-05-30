@@ -66,11 +66,11 @@ func (m *topFilesWorker) fileHandler(f *sys.FileEntry) {
 	insertTo(m.tree, &fileContainer)
 }
 
-func (m *topFilesRenderer) output(rc renderContext) {
-	rc.write("\nTOP %d files by size:\n\n", top)
+func (m *topFilesRenderer) output(p printer) {
+	p.print("\nTOP %d files by size:\n\n", top)
 
-	rc.writetab("%v\t%v\n", "File", "Size")
-	rc.writetab("%v\t%v\n", "------", "----")
+	p.printtab("%v\t%v\n", "File", "Size")
+	p.printtab("%v\t%v\n", "------", "----")
 
 	i := 1
 
@@ -80,10 +80,10 @@ func (m *topFilesRenderer) output(rc renderContext) {
 
 		i++
 
-		rc.writetab("%v\t%v\n", h, human(file.size))
+		p.printtab("%v\t%v\n", h, human(file.size))
 
 		return true
 	})
 
-	rc.flush()
+	p.flush()
 }

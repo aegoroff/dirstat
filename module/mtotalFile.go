@@ -15,20 +15,20 @@ type moduleTotalFile struct {
 	aggregate map[Range]fileStat
 }
 
-func (m *moduleTotalFile) output(rc renderContext) {
-	rc.write("Total files stat:\n\n")
+func (m *moduleTotalFile) output(p printer) {
+	p.print("Total files stat:\n\n")
 
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
-	rc.writetab(format, "File size", "Amount", "%", "Size", "%")
-	rc.writetab(format, "---------", "------", "------", "----", "------")
+	p.printtab(format, "File size", "Amount", "%", "Size", "%")
+	p.printtab(format, "---------", "------", "------", "----", "------")
 
 	heads := createRangesHeads()
 	for i, r := range fileSizeRanges {
 		count := m.aggregate[r].TotalFilesCount
 		sz := m.aggregate[r].TotalFilesSize
 
-		m.total.outputTopStatLine(rc, count, sz, heads[i])
+		m.total.printTopStatLine(p, count, sz, heads[i])
 	}
-	rc.flush()
+	p.flush()
 }
