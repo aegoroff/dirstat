@@ -11,7 +11,7 @@ func newTopFilesRenderer(work *topFilesWorker) renderer {
 }
 
 type topFilesWorker struct {
-	tree *rbtree.RbTree
+	tree rbtree.RbTree
 	top  int
 }
 
