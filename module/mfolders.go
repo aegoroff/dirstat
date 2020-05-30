@@ -34,22 +34,20 @@ func (f *folderCount) EqualTo(y interface{}) bool {
 func NewFoldersModule(ctx *Context) Module {
 	work := newFoldersWorker(ctx)
 	rend := &foldersRenderer{*work}
-	m := module{
-		[]worker{work},
-		[]renderer{rend},
-	}
-	return &m
+
+	m := NewModule()
+	m.addWorker(work)
+	m.addRenderer(rend)
+	return m
 }
 
 // NewFoldersHiddenModule creates new folders module
 // that has disabled output
 func NewFoldersHiddenModule(ctx *Context) Module {
 	work := newFoldersWorker(ctx)
-	m := module{
-		[]worker{work},
-		[]renderer{},
-	}
-	return &m
+	m := NewModule()
+	m.addWorker(work)
+	return m
 }
 
 type foldersWorker struct {

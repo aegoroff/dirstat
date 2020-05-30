@@ -10,22 +10,19 @@ import (
 func NewExtensionModule(ctx *Context) Module {
 	work := newExtWorker(ctx)
 	rend := &extRenderer{*work}
-	m := module{
-		[]worker{work},
-		[]renderer{rend},
-	}
-	return &m
+	m := NewModule()
+	m.addWorker(work)
+	m.addRenderer(rend)
+	return m
 }
 
 // NewExtensionHiddenModule creates new file extensions statistic module
 // that has disabled output
 func NewExtensionHiddenModule(ctx *Context) Module {
 	work := newExtWorker(ctx)
-	m := module{
-		[]worker{work},
-		[]renderer{},
-	}
-	return &m
+	m := NewModule()
+	m.addWorker(work)
+	return m
 }
 
 type extWorker struct {

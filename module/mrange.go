@@ -24,22 +24,10 @@ func (r *Range) Contains(num int64) bool {
 func NewRangeModule(ctx *Context, verbose bool, enabledRanges []int) Module {
 	work := newRangeWorker(ctx, verbose, enabledRanges)
 	rend := &rangeRenderer{*work}
-	m := module{
-		[]worker{work},
-		[]renderer{rend},
-	}
-	return &m
-}
-
-// NewRangeHiddenModule creates new file statistic by file size range module
-// that has disabled output
-func NewRangeHiddenModule(ctx *Context) Module {
-	work := newRangeWorker(ctx, false, []int{})
-	m := module{
-		[]worker{work},
-		[]renderer{},
-	}
-	return &m
+	m := NewModule()
+	m.addWorker(work)
+	m.addRenderer(rend)
+	return m
 }
 
 type rangeWorker struct {

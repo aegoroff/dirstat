@@ -10,6 +10,8 @@ import (
 type Module interface {
 	workers() []worker
 	renderers() []renderer
+	addWorker(w worker)
+	addRenderer(r renderer)
 }
 
 type module struct {
@@ -23,6 +25,14 @@ func (m *module) workers() []worker {
 
 func (m *module) renderers() []renderer {
 	return m.rnd
+}
+
+func (m *module) addWorker(w worker) {
+	m.wks = append(m.wks, w)
+}
+
+func (m *module) addRenderer(r renderer) {
+	m.rnd = append(m.rnd, r)
 }
 
 type worker interface {
@@ -42,7 +52,16 @@ type Context struct {
 	top            int
 }
 
-// NewContext create new module's context that needed to create new modules
+// NewModule creates new empty module
+func NewModule() Module {
+	m := module{
+		[]worker{},
+		[]renderer{},
+	}
+	return &m
+}
+
+// NewContext creates new module's context that needed to create new modules
 func NewContext(top int) *Context {
 	total := totalInfo{}
 
@@ -55,7 +74,7 @@ func NewContext(top int) *Context {
 }
 
 // Execute runs modules over path specified
-func Execute(path string, fs afero.Fs, w io.Writer, modules []Module) {
+func Execute(path string, fs afero.Fs, w io.Writer, modules ...Module) {
 	var renderers []renderer
 	var workers []worker
 

@@ -10,22 +10,19 @@ import (
 func NewTopFilesModule(c *Context) Module {
 	work := newTopFilesWorker(c.top)
 	rend := &topFilesRenderer{*work}
-	m := module{
-		[]worker{work},
-		[]renderer{rend},
-	}
-	return &m
+	m := NewModule()
+	m.addWorker(work)
+	m.addRenderer(rend)
+	return m
 }
 
 // NewTopFilesHiddenModule creates new top files statistic module
 // that has disabled output
 func NewTopFilesHiddenModule(c *Context) Module {
 	work := newTopFilesWorker(c.top)
-	m := module{
-		[]worker{work},
-		[]renderer{},
-	}
-	return &m
+	m := NewModule()
+	m.addWorker(work)
+	return m
 }
 
 type topFilesWorker struct {

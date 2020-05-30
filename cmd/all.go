@@ -52,9 +52,7 @@ var allCmd = &cobra.Command{
 		extmod := module.NewExtensionModule(ctx)
 		topfilesmod := module.NewTopFilesModule(ctx)
 
-		modules := []module.Module{totalfilemod, extmod, topfilesmod, foldersmod, rangemod, totalmod}
-
-		module.Execute(opt.Path, appFileSystem, appWriter, modules)
+		module.Execute(opt.Path, appFileSystem, appWriter, totalfilemod, extmod, topfilesmod, foldersmod, rangemod, totalmod)
 
 		printMemUsage(appWriter)
 		return nil

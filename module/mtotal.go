@@ -14,14 +14,12 @@ func NewTotalModule(ctx *Context) Module {
 		total: ctx.total,
 	}
 
-	rend := &totalRenderer{work}
+	rend := totalRenderer{work}
 
-	m := module{
-		[]worker{&work},
-		[]renderer{rend},
-	}
-
-	return &m
+	m := NewModule()
+	m.addWorker(&work)
+	m.addRenderer(&rend)
+	return m
 }
 
 type totalWorker struct {

@@ -7,12 +7,9 @@ func NewTotalFileModule(ctx *Context) Module {
 		aggregate: ctx.rangeAggregate,
 	}
 
-	m := module{
-		[]worker{},
-		[]renderer{r},
-	}
-
-	return &m
+	m := NewModule()
+	m.addRenderer(r)
+	return m
 }
 
 type totalFileRenderer struct {
