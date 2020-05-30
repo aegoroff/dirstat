@@ -41,10 +41,6 @@ func NewFoldersModule(ctx *Context) Module {
 	return m
 }
 
-func newFoldersRenerer(work *foldersWorker) renderer {
-	return &foldersRenderer{work}
-}
-
 // NewFoldersHiddenModule creates new folders module
 // that has disabled output
 func NewFoldersHiddenModule(ctx *Context) Module {
@@ -52,6 +48,10 @@ func NewFoldersHiddenModule(ctx *Context) Module {
 	m := NewModule()
 	m.addWorker(work)
 	return m
+}
+
+func newFoldersRenerer(work *foldersWorker) renderer {
+	return &foldersRenderer{work}
 }
 
 type foldersWorker struct {

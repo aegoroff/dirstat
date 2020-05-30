@@ -16,10 +16,6 @@ func NewExtensionModule(ctx *Context) Module {
 	return m
 }
 
-func newExtRenderer(work *extWorker) renderer {
-	return &extRenderer{work}
-}
-
 // NewExtensionHiddenModule creates new file extensions statistic module
 // that has disabled output
 func NewExtensionHiddenModule(ctx *Context) Module {
@@ -27,6 +23,10 @@ func NewExtensionHiddenModule(ctx *Context) Module {
 	m := NewModule()
 	m.addWorker(work)
 	return m
+}
+
+func newExtRenderer(work *extWorker) renderer {
+	return &extRenderer{work}
 }
 
 type extWorker struct {
