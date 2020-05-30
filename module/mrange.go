@@ -117,7 +117,7 @@ func (m *rangeWorker) fileHandler(f *sys.FileEntry) {
 	}
 }
 
-func (m *rangeRenderer) output(p printer) {
+func (m *rangeRenderer) print(p printer) {
 	if m.verbose && len(m.enabledRanges) > 0 {
 		heads := createRangesHeads()
 		p.print("\nDetailed files stat:\n")

@@ -15,4 +15,4 @@ func (m *emptyWorker) folderHandler(*sys.FolderEntry) {}
 
 func (m *emptyWorker) fileHandler(*sys.FileEntry) {}
 
-func (m *emptyRenderer) output(printer) {}
+func (m *emptyRenderer) print(printer) {}

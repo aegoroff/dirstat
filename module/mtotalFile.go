@@ -15,7 +15,7 @@ type moduleTotalFile struct {
 	aggregate map[Range]fileStat
 }
 
-func (m *moduleTotalFile) output(p printer) {
+func (m *moduleTotalFile) print(p printer) {
 	p.print("Total files stat:\n\n")
 
 	const format = "%v\t%v\t%v\t%v\t%v\n"

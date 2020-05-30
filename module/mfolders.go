@@ -114,7 +114,7 @@ func (m *foldersWorker) fileHandler(*sys.FileEntry) {
 
 }
 
-func (f *foldersRenderer) output(p printer) {
+func (f *foldersRenderer) print(p printer) {
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
 	p.print("\nTOP %d folders by size:\n\n", f.top)

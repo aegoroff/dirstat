@@ -20,7 +20,7 @@ type worker interface {
 }
 
 type renderer interface {
-	output(p printer)
+	print(p printer)
 }
 
 // Context defines modules context

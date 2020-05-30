@@ -38,7 +38,7 @@ func (m *moduleTotal) fileHandler(f *sys.FileEntry) {
 	m.total.FilesTotal.Size += uint64(f.Size)
 }
 
-func (m *moduleTotal) output(p printer) {
+func (m *moduleTotal) print(p printer) {
 	const totalTemplate = `
 Total files:            {{.FilesTotal.Count}} ({{.FilesTotal.Size | toBytesString }})
 Total folders:          {{.CountFolders}}

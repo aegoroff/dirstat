@@ -67,7 +67,7 @@ func (m *topFilesWorker) fileHandler(f *sys.FileEntry) {
 	insertTo(m.tree, m.top, &fileContainer)
 }
 
-func (m *topFilesRenderer) output(p printer) {
+func (m *topFilesRenderer) print(p printer) {
 	p.print("\nTOP %d files by size:\n\n", m.top)
 
 	p.printtab("%v\t%v\n", "File", "Size")

@@ -75,7 +75,7 @@ func (m *extWorker) fileHandler(f *sys.FileEntry) {
 	m.aggregator[ext] = a
 }
 
-func (e *extRenderer) output(p printer) {
+func (e *extRenderer) print(p printer) {
 	extBySize := e.evolventMap(func(agr countSizeAggregate) int64 {
 		return int64(agr.Size)
 	})

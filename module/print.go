@@ -42,12 +42,12 @@ func human(n int64) string {
 func render(w io.Writer, renderers []renderer) {
 	tw := new(tabwriter.Writer).Init(w, 0, 8, 4, ' ', 0)
 
-	c := prn{
+	p := prn{
 		tw: tw,
 		w:  w,
 	}
 
 	for _, r := range renderers {
-		r.output(&c)
+		r.print(&p)
 	}
 }
