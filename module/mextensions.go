@@ -9,10 +9,10 @@ import (
 // NewExtensionModule creates new file extensions statistic module
 func NewExtensionModule(ctx *Context) Module {
 	work := newExtWorker(ctx)
-	rend := extRenderer{work}
-	m := moduleExtensions{
-		work,
-		rend,
+	rend := &extRenderer{*work}
+	m := module{
+		[]worker{work},
+		[]renderer{rend},
 	}
 	return &m
 }
@@ -21,9 +21,9 @@ func NewExtensionModule(ctx *Context) Module {
 // that has disabled output
 func NewExtensionHiddenModule(ctx *Context) Module {
 	work := newExtWorker(ctx)
-	m := moduleExtensionsNoOut{
-		work,
-		emptyRenderer{},
+	m := module{
+		[]worker{work},
+		[]renderer{},
 	}
 	return &m
 }
@@ -38,18 +38,8 @@ type extRenderer struct {
 	extWorker
 }
 
-type moduleExtensions struct {
-	extWorker
-	extRenderer
-}
-
-type moduleExtensionsNoOut struct {
-	extWorker
-	emptyRenderer
-}
-
-func newExtWorker(ctx *Context) extWorker {
-	return extWorker{
+func newExtWorker(ctx *Context) *extWorker {
+	return &extWorker{
 		total:      ctx.total,
 		aggregator: make(map[string]countSizeAggregate),
 		top:        ctx.top,
@@ -59,15 +49,16 @@ func newExtWorker(ctx *Context) extWorker {
 func (m *extWorker) init() {
 }
 
-func (m *extWorker) postScan() {
+func (m *extWorker) finalize() {
 	m.total.CountFileExts = len(m.aggregator)
 }
 
-func (m *extWorker) folderHandler(*sys.FolderEntry) {
+func (m *extWorker) handler(evt *sys.ScanEvent) {
+	if evt.File == nil {
+		return
+	}
+	f := evt.File
 
-}
-
-func (m *extWorker) fileHandler(f *sys.FileEntry) {
 	ext := filepath.Ext(f.Path)
 	a := m.aggregator[ext]
 	a.Size += uint64(f.Size)

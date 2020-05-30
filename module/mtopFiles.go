@@ -9,10 +9,10 @@ import (
 // NewTopFilesModule creates new top files statistic module
 func NewTopFilesModule(c *Context) Module {
 	work := newTopFilesWorker(c.top)
-	rend := topFilesRenderer{work}
-	m := moduleTopFiles{
-		work,
-		rend,
+	rend := &topFilesRenderer{*work}
+	m := module{
+		[]worker{work},
+		[]renderer{rend},
 	}
 	return &m
 }
@@ -21,9 +21,9 @@ func NewTopFilesModule(c *Context) Module {
 // that has disabled output
 func NewTopFilesHiddenModule(c *Context) Module {
 	work := newTopFilesWorker(c.top)
-	m := moduleTopFilesNoOut{
-		work,
-		emptyRenderer{},
+	m := module{
+		[]worker{work},
+		[]renderer{},
 	}
 	return &m
 }
@@ -37,32 +37,23 @@ type topFilesRenderer struct {
 	topFilesWorker
 }
 
-type moduleTopFiles struct {
-	topFilesWorker
-	topFilesRenderer
-}
-
-type moduleTopFilesNoOut struct {
-	topFilesWorker
-	emptyRenderer
-}
-
-func newTopFilesWorker(top int) topFilesWorker {
-	return topFilesWorker{rbtree.NewRbTree(), top}
+func newTopFilesWorker(top int) *topFilesWorker {
+	return &topFilesWorker{rbtree.NewRbTree(), top}
 }
 
 func (m *topFilesWorker) init() {
 }
 
-func (m *topFilesWorker) postScan() {
+func (m *topFilesWorker) finalize() {
 
 }
 
-func (m *topFilesWorker) folderHandler(*sys.FolderEntry) {
+func (m *topFilesWorker) handler(evt *sys.ScanEvent) {
+	if evt.File == nil {
+		return
+	}
+	f := evt.File
 
-}
-
-func (m *topFilesWorker) fileHandler(f *sys.FileEntry) {
 	fileContainer := container{size: f.Size, name: f.Path, count: 1}
 	insertTo(m.tree, m.top, &fileContainer)
 }

@@ -8,15 +8,27 @@ import (
 
 // Module defines working modules interface
 type Module interface {
-	worker
-	renderer
+	workers() []worker
+	renderers() []renderer
+}
+
+type module struct {
+	wks []worker
+	rnd []renderer
+}
+
+func (m *module) workers() []worker {
+	return m.wks
+}
+
+func (m *module) renderers() []renderer {
+	return m.rnd
 }
 
 type worker interface {
-	fileHandler(f *sys.FileEntry)
-	folderHandler(f *sys.FolderEntry)
-	postScan()
 	init()
+	handler(evt *sys.ScanEvent)
+	finalize()
 }
 
 type renderer interface {
@@ -44,30 +56,25 @@ func NewContext(top int) *Context {
 
 // Execute runs modules over path specified
 func Execute(path string, fs afero.Fs, w io.Writer, modules []Module) {
-	var handlers []sys.ScanHandler
 	var renderers []renderer
+	var workers []worker
 
 	for _, m := range modules {
-		renderers = append(renderers, m)
-		m.init()
-		handlers = append(handlers, scanEventHandler(m))
+		renderers = append(renderers, m.renderers()...)
+		workers = append(workers, m.workers()...)
+	}
+
+	var handlers []sys.ScanHandler
+	for _, wo := range workers {
+		wo.init()
+		handlers = append(handlers, wo.handler)
 	}
 
 	sys.Scan(path, fs, handlers)
 
-	for _, m := range modules {
-		m.postScan()
+	for _, m := range workers {
+		m.finalize()
 	}
 
 	render(w, renderers)
-}
-
-func scanEventHandler(m Module) sys.ScanHandler {
-	return func(evt *sys.ScanEvent) {
-		if evt.Folder != nil {
-			m.folderHandler(evt.Folder)
-		} else if evt.File != nil {
-			m.fileHandler(evt.File)
-		}
-	}
 }

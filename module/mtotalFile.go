@@ -2,20 +2,25 @@ package module
 
 // NewTotalFileModule creates new total file statistic module
 func NewTotalFileModule(ctx *Context) Module {
-	m := moduleTotalFile{
+	r := &totalFileRenderer{
 		total:     ctx.total,
 		aggregate: ctx.rangeAggregate,
 	}
+
+	m := module{
+		[]worker{},
+		[]renderer{r},
+	}
+
 	return &m
 }
 
-type moduleTotalFile struct {
-	emptyWorker
+type totalFileRenderer struct {
 	total     *totalInfo
 	aggregate map[Range]fileStat
 }
 
-func (m *moduleTotalFile) print(p printer) {
+func (m *totalFileRenderer) print(p printer) {
 	p.print("Total files stat:\n\n")
 
 	const format = "%v\t%v\t%v\t%v\t%v\n"

@@ -9,36 +9,48 @@ import (
 
 // NewTotalModule creates new total statistic module
 func NewTotalModule(ctx *Context) Module {
-	m := moduleTotal{
+	work := totalWorker{
 		start: time.Now(),
 		total: ctx.total,
 	}
+
+	rend := &totalRenderer{work}
+
+	m := module{
+		[]worker{&work},
+		[]renderer{rend},
+	}
+
 	return &m
 }
 
-type moduleTotal struct {
+type totalWorker struct {
 	total *totalInfo
 	start time.Time
 }
 
-func (m *moduleTotal) init() {
+type totalRenderer struct {
+	totalWorker
 }
 
-func (m *moduleTotal) postScan() {
+func (m *totalWorker) init() {
+}
+
+func (m *totalWorker) finalize() {
 	m.total.ReadingTime = time.Since(m.start)
 }
 
-func (m *moduleTotal) folderHandler(*sys.FolderEntry) {
+func (m *totalWorker) handler(evt *sys.ScanEvent) {
+	if evt.File == nil {
+		return
+	}
 
-}
-
-func (m *moduleTotal) fileHandler(f *sys.FileEntry) {
 	// Accumulate file statistic
 	m.total.FilesTotal.Count++
-	m.total.FilesTotal.Size += uint64(f.Size)
+	m.total.FilesTotal.Size += uint64(evt.File.Size)
 }
 
-func (m *moduleTotal) print(p printer) {
+func (m *totalRenderer) print(p printer) {
 	const totalTemplate = `
 Total files:            {{.FilesTotal.Count}} ({{.FilesTotal.Size | toBytesString }})
 Total folders:          {{.CountFolders}}

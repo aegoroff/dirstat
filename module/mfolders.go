@@ -33,10 +33,10 @@ func (f *folderCount) EqualTo(y interface{}) bool {
 // NewFoldersModule creates new folders module
 func NewFoldersModule(ctx *Context) Module {
 	work := newFoldersWorker(ctx)
-	rend := foldersRenderer{work}
-	m := moduleFolders{
-		work,
-		rend,
+	rend := &foldersRenderer{*work}
+	m := module{
+		[]worker{work},
+		[]renderer{rend},
 	}
 	return &m
 }
@@ -45,9 +45,9 @@ func NewFoldersModule(ctx *Context) Module {
 // that has disabled output
 func NewFoldersHiddenModule(ctx *Context) Module {
 	work := newFoldersWorker(ctx)
-	m := moduleFoldersNoOut{
-		work,
-		emptyRenderer{},
+	m := module{
+		[]worker{work},
+		[]renderer{},
 	}
 	return &m
 }
@@ -64,18 +64,8 @@ type foldersRenderer struct {
 	foldersWorker
 }
 
-type moduleFolders struct {
-	foldersWorker
-	foldersRenderer
-}
-
-type moduleFoldersNoOut struct {
-	foldersWorker
-	emptyRenderer
-}
-
-func newFoldersWorker(ctx *Context) foldersWorker {
-	return foldersWorker{
+func newFoldersWorker(ctx *Context) *foldersWorker {
+	return &foldersWorker{
 		total:    ctx.total,
 		folders:  rbtree.NewRbTree(),
 		topSize:  rbtree.NewRbTree(),
@@ -87,7 +77,7 @@ func newFoldersWorker(ctx *Context) foldersWorker {
 func (m *foldersWorker) init() {
 }
 
-func (m *foldersWorker) postScan() {
+func (m *foldersWorker) finalize() {
 	m.folders.WalkInorder(func(node *rbtree.Node) {
 		fn := node.Key.(*folderNode)
 
@@ -103,15 +93,16 @@ func (m *foldersWorker) postScan() {
 	m.total.CountFolders = m.folders.Root.Size
 }
 
-func (m *foldersWorker) folderHandler(fe *sys.FolderEntry) {
+func (m *foldersWorker) handler(evt *sys.ScanEvent) {
+	if evt.Folder == nil {
+		return
+	}
+	fe := evt.Folder
+
 	fn := folderNode{
 		container{name: fe.Path, count: fe.Count, size: fe.Size},
 	}
 	m.folders.Insert(rbtree.NewNode(&fn))
-}
-
-func (m *foldersWorker) fileHandler(*sys.FileEntry) {
-
 }
 
 func (f *foldersRenderer) print(p printer) {

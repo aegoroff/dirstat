@@ -23,10 +23,10 @@ func (r *Range) Contains(num int64) bool {
 // NewRangeModule creates new file statistic by file size range module
 func NewRangeModule(ctx *Context, verbose bool, enabledRanges []int) Module {
 	work := newRangeWorker(ctx, verbose, enabledRanges)
-	rend := rangeRenderer{work}
-	m := moduleRange{
-		work,
-		rend,
+	rend := &rangeRenderer{*work}
+	m := module{
+		[]worker{work},
+		[]renderer{rend},
 	}
 	return &m
 }
@@ -35,10 +35,9 @@ func NewRangeModule(ctx *Context, verbose bool, enabledRanges []int) Module {
 // that has disabled output
 func NewRangeHiddenModule(ctx *Context) Module {
 	work := newRangeWorker(ctx, false, []int{})
-
-	m := moduleRangeNoOut{
-		work,
-		emptyRenderer{},
+	m := module{
+		[]worker{work},
+		[]renderer{},
 	}
 	return &m
 }
@@ -55,18 +54,8 @@ type rangeRenderer struct {
 	rangeWorker
 }
 
-type moduleRange struct {
-	rangeWorker
-	rangeRenderer
-}
-
-type moduleRangeNoOut struct {
-	rangeWorker
-	emptyRenderer
-}
-
-func newRangeWorker(ctx *Context, verbose bool, enabledRanges []int) rangeWorker {
-	return rangeWorker{
+func newRangeWorker(ctx *Context, verbose bool, enabledRanges []int) *rangeWorker {
+	return &rangeWorker{
 		verbose:       verbose,
 		enabledRanges: enabledRanges,
 		aggregate:     ctx.rangeAggregate,
@@ -81,15 +70,16 @@ func (m *rangeWorker) init() {
 	}
 }
 
-func (m *rangeWorker) postScan() {
+func (m *rangeWorker) finalize() {
 
 }
 
-func (m *rangeWorker) folderHandler(_ *sys.FolderEntry) {
+func (m *rangeWorker) handler(evt *sys.ScanEvent) {
+	if evt.File == nil {
+		return
+	}
+	f := evt.File
 
-}
-
-func (m *rangeWorker) fileHandler(f *sys.FileEntry) {
 	unsignedSize := uint64(f.Size)
 
 	// Calculate files range statistic
