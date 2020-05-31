@@ -23,16 +23,12 @@ type folder struct {
 
 // Count sortable folder
 type folderC struct {
-	path  string
-	size  int64
-	count int64
+	folder
 }
 
 // Size sortable folder
 type folderS struct {
-	path  string
-	size  int64
-	count int64
+	folder
 }
 
 // Path sortable folder methods
@@ -71,22 +67,6 @@ func (fc *folderC) EqualTo(y interface{}) bool {
 	return fc.count == y.(*folderC).count
 }
 
-func (fc *folderC) String() string {
-	return fc.path
-}
-
-func (fc *folderC) Path() string {
-	return fc.path
-}
-
-func (fc *folderC) Size() int64 {
-	return fc.size
-}
-
-func (fc *folderC) Count() int64 {
-	return fc.count
-}
-
 // Size sortable folder methods
 
 func (fs *folderS) LessThan(y interface{}) bool {
@@ -95,22 +75,6 @@ func (fs *folderS) LessThan(y interface{}) bool {
 
 func (fs *folderS) EqualTo(y interface{}) bool {
 	return fs.size == y.(*folderS).size
-}
-
-func (fs *folderS) String() string {
-	return fs.path
-}
-
-func (fs *folderS) Path() string {
-	return fs.path
-}
-
-func (fs *folderS) Size() int64 {
-	return fs.size
-}
-
-func (fs *folderS) Count() int64 {
-	return fs.count
 }
 
 type foldersWorker struct {
@@ -148,19 +112,10 @@ func (m *foldersWorker) finalize() {
 	m.folders.WalkInorder(func(node rbtree.Node) {
 		fn := node.Key().(*folder)
 
-		fs := folderS{
-			path:  fn.path,
-			count: fn.count,
-			size:  fn.size,
-		}
+		fs := folderS{*fn}
 		insertTo(m.bySize, m.top, &fs)
 
-		fc := folderC{
-			path:  fn.path,
-			count: fn.count,
-			size:  fn.size,
-		}
-
+		fc := folderC{*fn}
 		insertTo(m.byCount, m.top, &fc)
 	})
 
