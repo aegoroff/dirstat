@@ -63,16 +63,15 @@ func (m *foldersWorker) init() {
 
 func (m *foldersWorker) finalize() {
 	m.folders.WalkInorder(func(node rbtree.Node) {
-		//fn := node.(rbtree.Comparable).(*folderNode)
-		fn := node.(rbtree.Comparable)
+		fn := node.Key().(*folderNode)
 
 		insertTo(m.bySize, m.top, fn)
 
-		//fcn := folderCount{
-		//	fn.container,
-		//}
-		//
-		//insertTo(m.byCount, m.top, &fcn)
+		fcn := folderCount{
+			fn.container,
+		}
+
+		insertTo(m.byCount, m.top, &fcn)
 	})
 
 	m.total.CountFolders = m.folders.Len()
@@ -101,10 +100,10 @@ func (f *foldersRenderer) print(p printer) {
 
 	i := 1
 
-	f.work.bySize.Descend(func(c rbtree.Node) bool {
+	f.work.bySize.Descend(func(n rbtree.Node) bool {
 
-		folder := c.(rbtree.Comparable).(*container)
-		f.printTableRow(&i, folder, p)
+		folder := n.Key().(*folderNode)
+		f.printTableRow(&i, &folder.container, p)
 
 		return true
 	})
@@ -117,9 +116,9 @@ func (f *foldersRenderer) print(p printer) {
 
 	i = 1
 
-	f.work.byCount.Descend(func(c rbtree.Node) bool {
+	f.work.byCount.Descend(func(n rbtree.Node) bool {
 
-		folder := c.(rbtree.Comparable).(*folderCount)
+		folder := n.Key().(*folderCount)
 		f.printTableRow(&i, &folder.container, p)
 
 		return true
@@ -129,7 +128,7 @@ func (f *foldersRenderer) print(p printer) {
 }
 
 func (f *foldersRenderer) printTableRow(i *int, folder *container, p printer) {
-	h := fmt.Sprintf("%d. %s", *i, folder.name)
+	h := fmt.Sprintf("%d. %s", *i, folder)
 
 	*i++
 

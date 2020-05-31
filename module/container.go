@@ -33,6 +33,10 @@ func (c *container) EqualTo(y interface{}) bool {
 	return c.size == (y.(*container)).size
 }
 
+func (c *container) String() string {
+	return c.name
+}
+
 // insertTo inserts node into tree which size is limited by the size parameter.
 // Only <size> max nodes will be in the tree
 func insertTo(tree rbtree.RbTree, size int, c rbtree.Comparable) {
