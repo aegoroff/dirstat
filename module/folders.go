@@ -197,7 +197,8 @@ func (f *foldersRenderer) print(p printer) {
 		folder := n.Key().(*folderS)
 		f.printTableRow(&i, folder, p)
 
-		return true
+		// TODO: hack to prevent too much output because of rbtree bug
+		return i <= f.work.top
 	})
 
 	p.flush()
@@ -213,7 +214,8 @@ func (f *foldersRenderer) print(p printer) {
 		folder := n.Key().(*folderC)
 		f.printTableRow(&i, folder, p)
 
-		return true
+		// TODO: hack to prevent too much output because of rbtree bug
+		return i <= f.work.top
 	})
 
 	p.flush()

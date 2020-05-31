@@ -60,7 +60,8 @@ func (m *topFilesRenderer) print(p printer) {
 
 		p.printtab("%v\t%v\n", h, human(file.size))
 
-		return true
+		// TODO: hack to prevent too much output because of rbtree bug
+		return i <= m.work.top
 	})
 
 	p.flush()
