@@ -52,8 +52,8 @@ func (m *topFilesRenderer) print(p printer) {
 
 	i := 1
 
-	m.work.tree.Descend(func(c rbtree.Comparable) bool {
-		file := c.(*container)
+	m.work.tree.Descend(func(c rbtree.Node) bool {
+		file := c.(rbtree.Comparable).(*container)
 		h := fmt.Sprintf("%d. %s", i, file.name)
 
 		i++
