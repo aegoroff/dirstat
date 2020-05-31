@@ -38,7 +38,7 @@ func (m *topFilesWorker) handler(evt *sys.ScanEvent) {
 	}
 	f := evt.File
 
-	fileContainer := container{size: f.Size, name: f.Path, count: 1}
+	fileContainer := file{size: f.Size, path: f.Path}
 	insertTo(m.tree, m.top, &fileContainer)
 }
 
@@ -53,7 +53,7 @@ func (m *topFilesRenderer) print(p printer) {
 	i := 1
 
 	m.work.tree.Descend(func(n rbtree.Node) bool {
-		file := n.Key().(*container)
+		file := n.Key().(*file)
 		h := fmt.Sprintf("%d. %s", i, file)
 
 		i++

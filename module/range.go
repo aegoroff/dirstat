@@ -21,7 +21,7 @@ func (r *Range) Contains(num int64) bool {
 }
 
 type rangeWorker struct {
-	distribution     map[Range]containers
+	distribution     map[Range]files
 	aggregate        map[Range]fileStat
 	verbose          bool
 	enabledRanges    []int
@@ -37,7 +37,7 @@ func newRangeWorker(ctx *Context, verbose bool, enabledRanges []int) *rangeWorke
 		verbose:       verbose,
 		enabledRanges: enabledRanges,
 		aggregate:     ctx.rangeAggregate,
-		distribution:  make(map[Range]containers),
+		distribution:  make(map[Range]files),
 	}
 }
 
@@ -84,9 +84,9 @@ func (m *rangeWorker) handler(evt *sys.ScanEvent) {
 
 		nodes, ok := m.distribution[r]
 		if !ok {
-			m.distribution[r] = make(containers, 0)
+			m.distribution[r] = make(files, 0)
 		}
-		fileContainer := container{size: f.Size, name: f.Path, count: 1}
+		fileContainer := file{size: f.Size, path: f.Path}
 		m.distribution[r] = append(nodes, &fileContainer)
 	}
 }
@@ -104,12 +104,12 @@ func (m *rangeRenderer) print(p printer) {
 
 			p.print("%s\n", heads[i])
 
-			items := m.work.distribution[r]
-			sort.Sort(sort.Reverse(items))
+			files := m.work.distribution[r]
+			sort.Sort(sort.Reverse(files))
 
-			for _, item := range items {
-				size := human(item.size)
-				p.print("   %s - %s\n", item.name, size)
+			for _, f := range files {
+				size := human(f.size)
+				p.print("   %s - %s\n", f, size)
 			}
 		}
 	}

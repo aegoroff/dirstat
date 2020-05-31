@@ -70,8 +70,8 @@ func (e *extRenderer) print(p printer) {
 
 	e.printTableHead(p, format)
 
-	e.printTopTen(p, extBySize, func(data containers, item *container) (int64, uint64) {
-		count := e.work.aggregator[item.name].Count
+	e.printTopTen(p, extBySize, func(data files, item *file) (int64, uint64) {
+		count := e.work.aggregator[item.path].Count
 		sz := uint64(item.size)
 		return count, sz
 	})
@@ -82,9 +82,9 @@ func (e *extRenderer) print(p printer) {
 
 	e.printTableHead(p, format)
 
-	e.printTopTen(p, extByCount, func(data containers, item *container) (int64, uint64) {
+	e.printTopTen(p, extByCount, func(data files, item *file) (int64, uint64) {
 		count := item.size
-		sz := e.work.aggregator[item.name].Size
+		sz := e.work.aggregator[item.path].Size
 		return count, sz
 	})
 
@@ -96,9 +96,9 @@ func (e *extRenderer) printTableHead(p printer, format string) {
 	p.printtab(format, "---------", "-----", "------", "----", "------")
 }
 
-func (e *extRenderer) printTopTen(p printer, data containers, selector func(data containers, item *container) (int64, uint64)) {
+func (e *extRenderer) printTopTen(p printer, data files, selector func(data files, item *file) (int64, uint64)) {
 	for i := 0; i < e.work.top && i < len(data); i++ {
-		h := data[i].name
+		h := data[i].path
 
 		count, sz := selector(data, data[i])
 
@@ -106,11 +106,11 @@ func (e *extRenderer) printTopTen(p printer, data containers, selector func(data
 	}
 }
 
-func (e *extRenderer) evolventMap(mapper func(countSizeAggregate) int64) containers {
-	var result = make(containers, len(e.work.aggregator))
+func (e *extRenderer) evolventMap(mapper func(countSizeAggregate) int64) files {
+	var result = make(files, len(e.work.aggregator))
 	i := 0
 	for k, v := range e.work.aggregator {
-		result[i] = &container{size: mapper(v), name: k}
+		result[i] = &file{size: mapper(v), path: k}
 		i++
 	}
 	return result
