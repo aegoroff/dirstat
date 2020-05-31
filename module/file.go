@@ -36,12 +36,15 @@ func (f *file) String() string {
 // insertTo inserts node into tree which size is limited by the size parameter.
 // Only <size> max nodes will be in the tree
 func insertTo(tree rbtree.RbTree, size int, c rbtree.Comparable) {
-	min := tree.Minimum()
-	if tree.Len() < int64(size) || min.LessThan(c) {
-		if tree.Len() == int64(size) {
-			tree.DeleteNode(min)
-		}
+	if tree.Len() < int64(size) {
+		tree.Insert(c)
+		return
+	}
 
+	min := tree.Minimum()
+
+	if min.LessThan(c) {
+		tree.DeleteNode(min)
 		tree.Insert(c)
 	}
 }
