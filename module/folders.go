@@ -143,31 +143,21 @@ func (f *foldersRenderer) print(p printer) {
 
 	p.print("\nTOP %d folders by size:\n\n", f.work.top)
 
-	f.printTableHead(p, format)
-
-	i := 1
-
-	f.work.bySize.Descend(func(n rbtree.Node) bool {
-
-		folder := n.Key().(*folderS)
-		f.printTableRow(&i, folder, p)
-
-		// TODO: hack to prevent too much output because of rbtree bug
-		return i <= f.work.top
-	})
-
-	p.flush()
+	f.printTop(f.work.bySize, p, format, func(c rbtree.Comparable) folderI { return c.(*folderS) })
 
 	p.print("\nTOP %d folders by count:\n\n", f.work.top)
 
-	f.printTableHead(p, format)
+	f.printTop(f.work.byCount, p, format, func(c rbtree.Comparable) folderI { return c.(*folderC) })
+}
 
-	i = 1
+func (f *foldersRenderer) printTop(tree rbtree.RbTree, p printer, format string, conv func(c rbtree.Comparable) folderI) {
+	p.printtab(format, "Folder", "Files", "%", "Size", "%")
+	p.printtab(format, "------", "-----", "------", "----", "------")
 
-	f.work.byCount.Descend(func(n rbtree.Node) bool {
+	i := 1
 
-		folder := n.Key().(*folderC)
-		f.printTableRow(&i, folder, p)
+	tree.Descend(func(n rbtree.Node) bool {
+		f.printTableRow(&i, conv(n.Key()), p)
 
 		// TODO: hack to prevent too much output because of rbtree bug
 		return i <= f.work.top
@@ -185,9 +175,4 @@ func (f *foldersRenderer) printTableRow(i *int, fi folderI, p printer) {
 	sz := uint64(fi.Size())
 
 	f.work.total.printCountAndSizeStatLine(p, count, sz, h)
-}
-
-func (f *foldersRenderer) printTableHead(rc printer, format string) {
-	rc.printtab(format, "Folder", "Files", "%", "Size", "%")
-	rc.printtab(format, "------", "-----", "------", "----", "------")
 }
