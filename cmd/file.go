@@ -68,9 +68,7 @@ var fileCmd = &cobra.Command{
 
 		topfilesmod := module.NewTopFilesModule(ctx)
 
-		modules := []module.Module{totalfilemod, extmod, topfilesmod, rangemod, foldersmod, totalmod}
-
-		module.Execute(opt.Path, appFileSystem, appWriter, modules)
+		module.Execute(opt.Path, appFileSystem, appWriter, totalfilemod, extmod, topfilesmod, rangemod, foldersmod, totalmod)
 
 		printMemUsage(appWriter)
 		return nil

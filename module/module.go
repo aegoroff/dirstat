@@ -8,19 +8,31 @@ import (
 
 // Module defines working modules interface
 type Module interface {
-	worker
-	renderer
+	workers() []worker
+	renderers() []renderer
+}
+
+type module struct {
+	wks []worker
+	rnd []renderer
+}
+
+func (m *module) workers() []worker {
+	return m.wks
+}
+
+func (m *module) renderers() []renderer {
+	return m.rnd
 }
 
 type worker interface {
-	fileHandler(f *sys.FileEntry)
-	folderHandler(f *sys.FolderEntry)
-	postScan()
 	init()
+	handler(evt *sys.ScanEvent)
+	finalize()
 }
 
 type renderer interface {
-	output(p printer)
+	print(p printer)
 }
 
 // Context defines modules context
@@ -30,7 +42,7 @@ type Context struct {
 	top            int
 }
 
-// NewContext create new module's context that needed to create new modules
+// NewContext creates new module's context that needed to create new modules
 func NewContext(top int) *Context {
 	total := totalInfo{}
 
@@ -43,31 +55,110 @@ func NewContext(top int) *Context {
 }
 
 // Execute runs modules over path specified
-func Execute(path string, fs afero.Fs, w io.Writer, modules []Module) {
-	var handlers []sys.ScanHandler
+func Execute(path string, fs afero.Fs, w io.Writer, modules ...Module) {
 	var renderers []renderer
+	var workers []worker
 
 	for _, m := range modules {
-		renderers = append(renderers, m)
-		m.init()
-		handlers = append(handlers, scanEventHandler(m))
+		renderers = append(renderers, m.renderers()...)
+		workers = append(workers, m.workers()...)
+	}
+
+	var handlers []sys.ScanHandler
+	for _, wo := range workers {
+		wo.init()
+		handlers = append(handlers, wo.handler)
 	}
 
 	sys.Scan(path, fs, handlers)
 
-	for _, m := range modules {
-		m.postScan()
+	for _, wo := range workers {
+		wo.finalize()
 	}
 
 	render(w, renderers)
 }
 
-func scanEventHandler(m Module) sys.ScanHandler {
-	return func(evt *sys.ScanEvent) {
-		if evt.Folder != nil {
-			m.folderHandler(evt.Folder)
-		} else if evt.File != nil {
-			m.fileHandler(evt.File)
-		}
+// NewFoldersModule creates new folders module
+func NewFoldersModule(ctx *Context) Module {
+	work := newFoldersWorker(ctx)
+	rend := newFoldersRenderer(work)
+
+	m := newModuleW(work, rend)
+	return m
+}
+
+// NewFoldersHiddenModule creates new folders module
+// that has disabled output
+func NewFoldersHiddenModule(ctx *Context) Module {
+	work := newFoldersWorker(ctx)
+	m := newModuleW(work)
+	return m
+}
+
+// NewTopFilesModule creates new top files statistic module
+func NewTopFilesModule(ctx *Context) Module {
+	work := newTopFilesWorker(ctx.top)
+	rend := newTopFilesRenderer(work)
+	m := newModuleW(work, rend)
+	return m
+}
+
+// NewRangeModule creates new file statistic by file size range module
+func NewRangeModule(ctx *Context, verbose bool, enabledRanges []int) Module {
+	work := newRangeWorker(ctx, verbose, enabledRanges)
+	rend := newRangeRenderer(work)
+	m := newModuleW(work, rend)
+	return m
+}
+
+// NewExtensionModule creates new file extensions statistic module
+func NewExtensionModule(ctx *Context) Module {
+	work := newExtWorker(ctx)
+	rend := newExtRenderer(work)
+	m := newModuleW(work, rend)
+	return m
+}
+
+// NewExtensionHiddenModule creates new file extensions statistic module
+// that has disabled output
+func NewExtensionHiddenModule(ctx *Context) Module {
+	work := newExtWorker(ctx)
+	m := newModuleW(work)
+	return m
+}
+
+// NewTotalFileModule creates new total file statistic module
+func NewTotalFileModule(ctx *Context) Module {
+	r := newTotalFileRenderer(ctx)
+
+	m := newModuleR(r)
+	return m
+}
+
+// NewTotalModule creates new total statistic module
+func NewTotalModule(ctx *Context) Module {
+	work := newTotalWorker(ctx)
+	rend := newTotalRenderer(work)
+
+	m := newModuleW(work, rend)
+	return m
+}
+
+func newModuleW(w worker, r ...renderer) Module {
+	m := module{
+		[]worker{w},
+		[]renderer{},
 	}
+	m.rnd = append(m.rnd, r...)
+	return &m
+}
+
+func newModuleR(r renderer, w ...worker) Module {
+	m := module{
+		[]worker{},
+		[]renderer{r},
+	}
+	m.wks = append(m.wks, w...)
+	return &m
 }

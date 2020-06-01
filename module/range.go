@@ -20,31 +20,8 @@ func (r *Range) Contains(num int64) bool {
 	return num >= r.Min && num <= r.Max
 }
 
-// NewRangeModule creates new file statistic by file size range module
-func NewRangeModule(ctx *Context, verbose bool, enabledRanges []int) Module {
-	work := newRangeWorker(ctx, verbose, enabledRanges)
-	rend := rangeRenderer{work}
-	m := moduleRange{
-		work,
-		rend,
-	}
-	return &m
-}
-
-// NewRangeHiddenModule creates new file statistic by file size range module
-// that has disabled output
-func NewRangeHiddenModule(ctx *Context) Module {
-	work := newRangeWorker(ctx, false, []int{})
-
-	m := moduleRangeNoOut{
-		work,
-		emptyRenderer{},
-	}
-	return &m
-}
-
 type rangeWorker struct {
-	distribution     map[Range]containers
+	distribution     map[Range]files
 	aggregate        map[Range]fileStat
 	verbose          bool
 	enabledRanges    []int
@@ -52,27 +29,23 @@ type rangeWorker struct {
 }
 
 type rangeRenderer struct {
-	rangeWorker
+	work *rangeWorker
 }
 
-type moduleRange struct {
-	rangeWorker
-	rangeRenderer
-}
-
-type moduleRangeNoOut struct {
-	rangeWorker
-	emptyRenderer
-}
-
-func newRangeWorker(ctx *Context, verbose bool, enabledRanges []int) rangeWorker {
-	return rangeWorker{
+func newRangeWorker(ctx *Context, verbose bool, enabledRanges []int) *rangeWorker {
+	return &rangeWorker{
 		verbose:       verbose,
 		enabledRanges: enabledRanges,
 		aggregate:     ctx.rangeAggregate,
-		distribution:  make(map[Range]containers),
+		distribution:  make(map[Range]files),
 	}
 }
+
+func newRangeRenderer(work *rangeWorker) renderer {
+	return &rangeRenderer{work}
+}
+
+// Worker methods
 
 func (m *rangeWorker) init() {
 	m.enabledRangesMap = make(map[int]bool)
@@ -81,15 +54,16 @@ func (m *rangeWorker) init() {
 	}
 }
 
-func (m *rangeWorker) postScan() {
+func (m *rangeWorker) finalize() {
 
 }
 
-func (m *rangeWorker) folderHandler(_ *sys.FolderEntry) {
+func (m *rangeWorker) handler(evt *sys.ScanEvent) {
+	if evt.File == nil {
+		return
+	}
+	f := evt.File
 
-}
-
-func (m *rangeWorker) fileHandler(f *sys.FileEntry) {
 	unsignedSize := uint64(f.Size)
 
 	// Calculate files range statistic
@@ -110,30 +84,32 @@ func (m *rangeWorker) fileHandler(f *sys.FileEntry) {
 
 		nodes, ok := m.distribution[r]
 		if !ok {
-			m.distribution[r] = make(containers, 0)
+			m.distribution[r] = make(files, 0)
 		}
-		fileContainer := container{size: f.Size, name: f.Path, count: 1}
+		fileContainer := file{size: f.Size, path: f.Path}
 		m.distribution[r] = append(nodes, &fileContainer)
 	}
 }
 
-func (m *rangeRenderer) output(p printer) {
-	if m.verbose && len(m.enabledRanges) > 0 {
+// Renderer method
+
+func (m *rangeRenderer) print(p printer) {
+	if m.work.verbose && len(m.work.enabledRanges) > 0 {
 		heads := createRangesHeads()
 		p.print("\nDetailed files stat:\n")
 		for i, r := range fileSizeRanges {
-			if len(m.distribution[r]) == 0 {
+			if len(m.work.distribution[r]) == 0 {
 				continue
 			}
 
 			p.print("%s\n", heads[i])
 
-			items := m.distribution[r]
-			sort.Sort(sort.Reverse(items))
+			files := m.work.distribution[r]
+			sort.Sort(sort.Reverse(files))
 
-			for _, item := range items {
-				size := human(item.size)
-				p.print("   %s - %s\n", item.name, size)
+			for _, f := range files {
+				size := human(f.size)
+				p.print("   %s - %s\n", f, size)
 			}
 		}
 	}

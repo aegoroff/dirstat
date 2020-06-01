@@ -7,38 +7,48 @@ import (
 	"time"
 )
 
-// NewTotalModule creates new total statistic module
-func NewTotalModule(ctx *Context) Module {
-	m := moduleTotal{
-		start: time.Now(),
-		total: ctx.total,
-	}
-	return &m
-}
-
-type moduleTotal struct {
+type totalWorker struct {
 	total *totalInfo
 	start time.Time
 }
 
-func (m *moduleTotal) init() {
+type totalRenderer struct {
+	work *totalWorker
 }
 
-func (m *moduleTotal) postScan() {
+func newTotalRenderer(work *totalWorker) renderer {
+	return &totalRenderer{work}
+}
+
+func newTotalWorker(ctx *Context) *totalWorker {
+	return &totalWorker{
+		start: time.Now(),
+		total: ctx.total,
+	}
+}
+
+// Worker methods
+
+func (m *totalWorker) init() {
+}
+
+func (m *totalWorker) finalize() {
 	m.total.ReadingTime = time.Since(m.start)
 }
 
-func (m *moduleTotal) folderHandler(*sys.FolderEntry) {
+func (m *totalWorker) handler(evt *sys.ScanEvent) {
+	if evt.File == nil {
+		return
+	}
 
-}
-
-func (m *moduleTotal) fileHandler(f *sys.FileEntry) {
 	// Accumulate file statistic
 	m.total.FilesTotal.Count++
-	m.total.FilesTotal.Size += uint64(f.Size)
+	m.total.FilesTotal.Size += uint64(evt.File.Size)
 }
 
-func (m *moduleTotal) output(p printer) {
+// Renderer method
+
+func (m *totalRenderer) print(p printer) {
 	const totalTemplate = `
 Total files:            {{.FilesTotal.Count}} ({{.FilesTotal.Size | toBytesString }})
 Total folders:          {{.CountFolders}}
@@ -48,5 +58,5 @@ Read taken:    {{.ReadingTime}}
 `
 
 	var report = template.Must(template.New("totalstat").Funcs(template.FuncMap{"toBytesString": humanize.IBytes}).Parse(totalTemplate))
-	_ = report.Execute(p.writer(), m.total)
+	_ = report.Execute(p.writer(), m.work.total)
 }
