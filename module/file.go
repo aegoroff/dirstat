@@ -43,8 +43,8 @@ func insertTo(tree rbtree.RbTree, size int, c rbtree.Comparable) {
 
 	min := tree.Minimum()
 
-	if min.LessThan(c) {
-		tree.DeleteNode(min)
+	if min.Key().LessThan(c) {
+		tree.DeleteNode(min.Key())
 		tree.Insert(c)
 	}
 }
