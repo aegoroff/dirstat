@@ -117,9 +117,8 @@ func (m *foldersWorker) finalize() {
 
 		fc := folderC{*fn}
 		insertTo(m.byCount, m.top, &fc)
+		m.total.CountFolders++
 	})
-
-	m.total.CountFolders = m.folders.Len()
 }
 
 func (m *foldersWorker) handler(evt *sys.ScanEvent) {
@@ -159,7 +158,6 @@ func (f *foldersRenderer) printTop(tree rbtree.RbTree, p printer, format string,
 	tree.Descend(func(n rbtree.Node) bool {
 		f.printTableRow(&i, conv(n.Key()), p)
 
-		// TODO: hack to prevent too much output because of rbtree bug
 		return i <= f.work.top
 	})
 
