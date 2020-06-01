@@ -158,7 +158,7 @@ func (f *foldersRenderer) printTop(tree rbtree.RbTree, p printer, format string,
 	tree.Descend(func(n rbtree.Node) bool {
 		f.printTableRow(&i, conv(n.Key()), p)
 
-		return i <= f.work.top
+		return true
 	})
 
 	p.flush()

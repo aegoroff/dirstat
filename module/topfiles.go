@@ -60,7 +60,7 @@ func (m *topFilesRenderer) print(p printer) {
 
 		p.printtab("%v\t%v\n", h, human(file.size))
 
-		return i <= m.work.top
+		return true
 	})
 
 	p.flush()
