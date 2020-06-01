@@ -117,8 +117,9 @@ func (m *foldersWorker) finalize() {
 
 		fc := folderC{*fn}
 		insertTo(m.byCount, m.top, &fc)
-		m.total.CountFolders++
 	})
+
+	m.total.CountFolders = m.folders.Len()
 }
 
 func (m *foldersWorker) handler(evt *sys.ScanEvent) {
