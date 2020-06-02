@@ -1,6 +1,7 @@
 package module
 
 import (
+	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/dustin/go-humanize"
 	"time"
 )
@@ -57,4 +58,17 @@ func (t *totalInfo) printCountAndSizeStatLine(p printer, count int64, sz uint64,
 	percentOfSize := t.sizePercent(sz)
 
 	p.printtab("%v\t%v\t%.2f%%\t%v\t%.2f%%\n", title, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
+}
+
+// insertTo inserts node into tree which size is limited by the size parameter.
+// Only <size> max nodes will be in the tree
+func insertTo(tree rbtree.RbTree, size int, c rbtree.Comparable) {
+	min := tree.Minimum()
+	if tree.Len() < int64(size) || min.Key().LessThan(c) {
+		if tree.Len() == int64(size) {
+			tree.DeleteNode(min.Key())
+		}
+
+		tree.Insert(c)
+	}
 }

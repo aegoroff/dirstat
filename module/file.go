@@ -1,7 +1,5 @@
 package module
 
-import "github.com/aegoroff/godatastruct/rbtree"
-
 type file struct {
 	path string
 	size int64
@@ -31,17 +29,4 @@ func (f *file) EqualTo(y interface{}) bool {
 
 func (f *file) String() string {
 	return f.path
-}
-
-// insertTo inserts node into tree which size is limited by the size parameter.
-// Only <size> max nodes will be in the tree
-func insertTo(tree rbtree.RbTree, size int, c rbtree.Comparable) {
-	min := tree.Minimum()
-	if tree.Len() < int64(size) || min.Key().LessThan(c) {
-		if tree.Len() == int64(size) {
-			tree.DeleteNode(min.Key())
-		}
-
-		tree.Insert(c)
-	}
 }
