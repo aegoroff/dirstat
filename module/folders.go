@@ -4,6 +4,8 @@ import (
 	"dirstat/module/internal/sys"
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/akutz/sortfold"
+	"strings"
 )
 
 // Folder interface
@@ -34,10 +36,18 @@ type folderS struct {
 // Path sortable folder methods
 
 func (f *folder) LessThan(y interface{}) bool {
+	if sys.RunUnderWindows() {
+		return sortfold.CompareFold(f.String(), y.(*folder).String()) < 0
+	}
+
 	return f.String() < y.(*folder).String()
 }
 
 func (f *folder) EqualTo(y interface{}) bool {
+	if sys.RunUnderWindows() {
+		return strings.EqualFold(f.String(), y.(*folder).String())
+	}
+
 	return f.String() == y.(*folder).String()
 }
 
