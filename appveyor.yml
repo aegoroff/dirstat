@@ -27,6 +27,7 @@ install:
   - go get -u "github.com/spf13/cobra"
   - go get -u "github.com/dustin/go-humanize"
   - go get -u "gonum.org/v1/gonum/graph/simple"
+  - go get -u "github.com/akutz/sortfold"
   - go get "github.com/mitchellh/gox"
 
 stack: go 1.14
