@@ -33,7 +33,7 @@ type FolderEntry struct {
 	Count int64
 }
 
-// FileHandler defines function prototype that handles each file event received
+// ScanHandler defines function prototype that handles each file event received
 type ScanHandler func(f *ScanEvent)
 
 type filesystemItem struct {
