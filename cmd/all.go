@@ -45,11 +45,11 @@ var allCmd = &cobra.Command{
 		_, _ = fmt.Fprintf(appWriter, "Root: %s\n\n", opt.Path)
 
 		ctx := module.NewContext(top)
-		foldersmod := module.NewFoldersModule(ctx)
+		foldersmod := module.NewFoldersModule(ctx, false)
 		totalmod := module.NewTotalModule(ctx)
 		detailfilemod := module.NewDetailFileModule(opt.Verbosity, opt.Range)
 		totalfilemod := module.NewTotalFileModule(ctx)
-		extmod := module.NewExtensionModule(ctx)
+		extmod := module.NewExtensionModule(ctx, false)
 		topfilesmod := module.NewTopFilesModule(ctx)
 
 		module.Execute(opt.Path, appFileSystem, appWriter, totalfilemod, extmod, topfilesmod, foldersmod, detailfilemod, totalmod)

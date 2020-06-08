@@ -56,14 +56,14 @@ var fileCmd = &cobra.Command{
 		totalmod := module.NewTotalModule(ctx)
 		detailfilemod := module.NewDetailFileModule(opt.Verbosity, opt.Range)
 		totalfilemod := module.NewTotalFileModule(ctx)
-		foldersmod := module.NewFoldersHiddenModule(ctx)
+		foldersmod := module.NewFoldersModule(ctx, true)
 
 		var extmod module.Module
 
 		if showExtStatistic {
-			extmod = module.NewExtensionModule(ctx)
+			extmod = module.NewExtensionModule(ctx, false)
 		} else {
-			extmod = module.NewExtensionHiddenModule(ctx)
+			extmod = module.NewExtensionModule(ctx, true)
 		}
 
 		topfilesmod := module.NewTopFilesModule(ctx)

@@ -33,9 +33,9 @@ var folderCmd = &cobra.Command{
 		_, _ = fmt.Fprintf(appWriter, "Root: %s\n\n", opt.Path)
 
 		ctx := module.NewContext(top)
-		foldersmod := module.NewFoldersModule(ctx)
+		foldersmod := module.NewFoldersModule(ctx, false)
 		totalmod := module.NewTotalModule(ctx)
-		extmod := module.NewExtensionHiddenModule(ctx)
+		extmod := module.NewExtensionModule(ctx, true)
 
 		module.Execute(opt.Path, appFileSystem, appWriter, extmod, foldersmod, totalmod)
 

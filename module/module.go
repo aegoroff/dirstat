@@ -78,27 +78,20 @@ func Execute(path string, fs afero.Fs, w io.Writer, modules ...Module) {
 }
 
 // NewFoldersModule creates new folders module
-func NewFoldersModule(ctx *Context) Module {
+func NewFoldersModule(ctx *Context, hideOutput bool) Module {
 	work := newFoldersWorker(ctx)
+	if hideOutput {
+		return newModule(work)
+	}
 	rend := newFoldersRenderer(work)
-
-	m := newModuleW(work, rend)
-	return m
-}
-
-// NewFoldersHiddenModule creates new folders module
-// that has disabled output
-func NewFoldersHiddenModule(ctx *Context) Module {
-	work := newFoldersWorker(ctx)
-	m := newModuleW(work)
-	return m
+	return newModule(work, rend)
 }
 
 // NewTopFilesModule creates new top files statistic module
 func NewTopFilesModule(ctx *Context) Module {
 	work := newTopFilesWorker(ctx.top)
 	rend := newTopFilesRenderer(work)
-	m := newModuleW(work, rend)
+	m := newModule(work, rend)
 	return m
 }
 
@@ -113,24 +106,18 @@ func NewDetailFileModule(verbose bool, enabledRanges []int) Module {
 	}
 	work := newDetailFileWorker(enabledRanges)
 	rend := newDetailFileRenderer(work)
-	m := newModuleW(work, rend)
+	m := newModule(work, rend)
 	return m
 }
 
 // NewExtensionModule creates new file extensions statistic module
-func NewExtensionModule(ctx *Context) Module {
+func NewExtensionModule(ctx *Context, hideOutput bool) Module {
 	work := newExtWorker(ctx)
+	if hideOutput {
+		return newModule(work)
+	}
 	rend := newExtRenderer(work)
-	m := newModuleW(work, rend)
-	return m
-}
-
-// NewExtensionHiddenModule creates new file extensions statistic module
-// that has disabled output
-func NewExtensionHiddenModule(ctx *Context) Module {
-	work := newExtWorker(ctx)
-	m := newModuleW(work)
-	return m
+	return newModule(work, rend)
 }
 
 // NewTotalFileModule creates new total file statistic module
@@ -138,7 +125,7 @@ func NewTotalFileModule(ctx *Context) Module {
 	work := newTotalFileWorker()
 	rend := newTotalFileRenderer(ctx, work)
 
-	m := newModuleW(work, rend)
+	m := newModule(work, rend)
 	return m
 }
 
@@ -147,24 +134,15 @@ func NewTotalModule(ctx *Context) Module {
 	work := newTotalWorker(ctx)
 	rend := newTotalRenderer(work)
 
-	m := newModuleW(work, rend)
+	m := newModule(work, rend)
 	return m
 }
 
-func newModuleW(w worker, r ...renderer) Module {
+func newModule(w worker, r ...renderer) Module {
 	m := module{
 		[]worker{w},
 		[]renderer{},
 	}
 	m.rnd = append(m.rnd, r...)
-	return &m
-}
-
-func newModuleR(r renderer, w ...worker) Module {
-	m := module{
-		[]worker{},
-		[]renderer{r},
-	}
-	m.wks = append(m.wks, w...)
 	return &m
 }
