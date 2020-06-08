@@ -54,8 +54,6 @@ var allCmd = &cobra.Command{
 
 		module.Execute(opt.Path, appFileSystem, appWriter, totalfilemod, extmod, topfilesmod, foldersmod, detailfilemod, totalmod)
 
-		printMemUsage(appWriter)
-
 		return nil
 	},
 }

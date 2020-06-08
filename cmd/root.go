@@ -48,6 +48,8 @@ func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
+
+	printMemUsage(appWriter)
 }
 
 // printMemUsage outputs the current, total and OS memory being used. As well as the number
