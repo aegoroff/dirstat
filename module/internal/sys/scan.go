@@ -163,7 +163,6 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- *filesystemIte
 				size:  size,
 			}
 			results <- &dirEvent
-
 		}(currentDir)
 
 		// Pop

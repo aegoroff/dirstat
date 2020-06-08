@@ -25,10 +25,10 @@ func newTopFilesWorker(top int) *topFilesWorker {
 
 // Worker methods
 
-func (m *topFilesWorker) init() {
+func (*topFilesWorker) init() {
 }
 
-func (m *topFilesWorker) finalize() {
+func (*topFilesWorker) finalize() {
 
 }
 

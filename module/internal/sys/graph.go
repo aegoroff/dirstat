@@ -83,9 +83,7 @@ func runWalkingDir(path string, fs afero.Fs, nextID int64, ch chan<- *walkNode) 
 	go func() {
 		defer close(ch)
 		for item := range filesystemCh {
-			if item.event == fsEventDir {
-				// Continue
-			} else {
+			if item.event != fsEventDir {
 				node := &node{NodeID: nextID, Name: item.name, IsDir: item.count > 1}
 				ch <- &walkNode{Node: node, Parent: item.dir, Size: item.size}
 				nextID++

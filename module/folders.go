@@ -94,7 +94,7 @@ func newFoldersRenderer(work *foldersWorker) renderer {
 
 // Worker methods
 
-func (m *foldersWorker) init() {
+func (*foldersWorker) init() {
 }
 
 func (m *foldersWorker) finalize() {

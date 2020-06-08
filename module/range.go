@@ -54,7 +54,7 @@ func (m *rangeWorker) init() {
 	}
 }
 
-func (m *rangeWorker) finalize() {
+func (*rangeWorker) finalize() {
 
 }
 

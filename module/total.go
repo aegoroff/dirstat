@@ -29,7 +29,7 @@ func newTotalWorker(ctx *Context) *totalWorker {
 
 // Worker methods
 
-func (m *totalWorker) init() {
+func (*totalWorker) init() {
 }
 
 func (m *totalWorker) finalize() {

@@ -30,7 +30,7 @@ func newExtRenderer(work *extWorker) renderer {
 
 // Worker methods
 
-func (m *extWorker) init() {
+func (*extWorker) init() {
 }
 
 func (m *extWorker) finalize() {
@@ -91,7 +91,7 @@ func (e *extRenderer) print(p printer) {
 	p.flush()
 }
 
-func (e *extRenderer) printTableHead(p printer, format string) {
+func (*extRenderer) printTableHead(p printer, format string) {
 	p.printtab(format, "Extension", "Count", "%", "Size", "%")
 	p.printtab(format, "---------", "-----", "------", "----", "------")
 }
