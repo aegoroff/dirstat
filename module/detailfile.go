@@ -6,79 +6,48 @@ import (
 	"sort"
 )
 
-// Range defined integer value range
-type Range struct {
-	// Min value
-	Min int64
-
-	// Max value
-	Max int64
-}
-
-// Contains defines whether the number specified within range
-func (r *Range) Contains(num int64) bool {
-	return num >= r.Min && num <= r.Max
-}
-
-type rangeWorker struct {
+type detailFileWorker struct {
 	distribution     map[Range]files
-	aggregate        map[Range]fileStat
-	verbose          bool
 	enabledRanges    []int
 	enabledRangesMap map[int]bool
 }
 
-type rangeRenderer struct {
-	work *rangeWorker
+type detailFileRenderer struct {
+	work *detailFileWorker
 }
 
-func newRangeWorker(ctx *Context, verbose bool, enabledRanges []int) *rangeWorker {
-	return &rangeWorker{
-		verbose:       verbose,
+func newDetailFileWorker(enabledRanges []int) *detailFileWorker {
+	return &detailFileWorker{
 		enabledRanges: enabledRanges,
-		aggregate:     ctx.rangeAggregate,
 		distribution:  make(map[Range]files),
 	}
 }
 
-func newRangeRenderer(work *rangeWorker) renderer {
-	return &rangeRenderer{work}
+func newDetailFileRenderer(work *detailFileWorker) renderer {
+	return &detailFileRenderer{work}
 }
 
 // Worker methods
 
-func (m *rangeWorker) init() {
+func (m *detailFileWorker) init() {
 	m.enabledRangesMap = make(map[int]bool)
 	for _, x := range m.enabledRanges {
 		m.enabledRangesMap[x] = true
 	}
 }
 
-func (*rangeWorker) finalize() {
+func (*detailFileWorker) finalize() {}
 
-}
-
-func (m *rangeWorker) handler(evt *sys.ScanEvent) {
+func (m *detailFileWorker) handler(evt *sys.ScanEvent) {
 	if evt.File == nil {
 		return
 	}
 	f := evt.File
 
-	unsignedSize := uint64(f.Size)
-
 	// Calculate files range statistic
 	for i, r := range fileSizeRanges {
-		if !r.Contains(f.Size) {
-			continue
-		}
-
-		s := m.aggregate[r]
-		s.TotalFilesCount++
-		s.TotalFilesSize += unsignedSize
-		m.aggregate[r] = s
-
 		// Store each file info within range only i verbose option set
-		if !m.verbose || !m.enabledRangesMap[i+1] {
+		if !r.Contains(f.Size) || !m.enabledRangesMap[i+1] {
 			continue
 		}
 
@@ -93,8 +62,8 @@ func (m *rangeWorker) handler(evt *sys.ScanEvent) {
 
 // Renderer method
 
-func (m *rangeRenderer) print(p printer) {
-	if m.work.verbose && len(m.work.enabledRanges) > 0 {
+func (m *detailFileRenderer) print(p printer) {
+	if len(m.work.enabledRanges) > 0 {
 		heads := createRangesHeads()
 		p.print("\nDetailed files stat:\n")
 		for i, r := range fileSizeRanges {

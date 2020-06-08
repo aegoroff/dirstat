@@ -15,6 +15,20 @@ const (
 	pbyte
 )
 
+// Range defined integer value range
+type Range struct {
+	// Min value
+	Min int64
+
+	// Max value
+	Max int64
+}
+
+// Contains defines whether the number specified within range
+func (r *Range) Contains(num int64) bool {
+	return num >= r.Min && num <= r.Max
+}
+
 var fileSizeRanges = [...]Range{
 	{Min: 0, Max: 100 * kbyte},
 	{Min: 100 * kbyte, Max: mbyte},

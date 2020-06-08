@@ -37,9 +37,8 @@ type renderer interface {
 
 // Context defines modules context
 type Context struct {
-	total          *totalInfo
-	rangeAggregate map[Range]fileStat
-	top            int
+	total *totalInfo
+	top   int
 }
 
 // NewContext creates new module's context that needed to create new modules
@@ -47,9 +46,8 @@ func NewContext(top int) *Context {
 	total := totalInfo{}
 
 	ctx := Context{
-		total:          &total,
-		rangeAggregate: make(map[Range]fileStat),
-		top:            top,
+		total: &total,
+		top:   top,
 	}
 	return &ctx
 }
@@ -104,10 +102,17 @@ func NewTopFilesModule(ctx *Context) Module {
 	return m
 }
 
-// NewRangeModule creates new file statistic by file size range module
-func NewRangeModule(ctx *Context, verbose bool, enabledRanges []int) Module {
-	work := newRangeWorker(ctx, verbose, enabledRanges)
-	rend := newRangeRenderer(work)
+// NewDetailFileModule creates new file statistic by file size range module
+func NewDetailFileModule(verbose bool, enabledRanges []int) Module {
+	// Do nothing if verbose not enabled
+	if !verbose {
+		return &module{
+			[]worker{},
+			[]renderer{},
+		}
+	}
+	work := newDetailFileWorker(enabledRanges)
+	rend := newDetailFileRenderer(work)
 	m := newModuleW(work, rend)
 	return m
 }
@@ -130,9 +135,10 @@ func NewExtensionHiddenModule(ctx *Context) Module {
 
 // NewTotalFileModule creates new total file statistic module
 func NewTotalFileModule(ctx *Context) Module {
-	r := newTotalFileRenderer(ctx)
+	work := newTotalFileWorker()
+	rend := newTotalFileRenderer(ctx, work)
 
-	m := newModuleR(r)
+	m := newModuleW(work, rend)
 	return m
 }
 

@@ -25,12 +25,8 @@ func newTopFilesWorker(top int) *topFilesWorker {
 
 // Worker methods
 
-func (*topFilesWorker) init() {
-}
-
-func (*topFilesWorker) finalize() {
-
-}
+func (*topFilesWorker) init()     {}
+func (*topFilesWorker) finalize() {}
 
 func (m *topFilesWorker) handler(evt *sys.ScanEvent) {
 	if evt.File == nil {
