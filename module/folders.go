@@ -51,41 +51,20 @@ func (f *folder) EqualTo(y interface{}) bool {
 	return f.String() == y.(*folder).String()
 }
 
-func (f *folder) String() string {
-	return f.path
-}
-
-func (f *folder) Path() string {
-	return f.path
-}
-
-func (f *folder) Size() int64 {
-	return f.size
-}
-
-func (f *folder) Count() int64 {
-	return f.count
-}
+func (f *folder) String() string { return f.path }
+func (f *folder) Path() string   { return f.path }
+func (f *folder) Size() int64    { return f.size }
+func (f *folder) Count() int64   { return f.count }
 
 // Count sortable folder methods
 
-func (fc *folderC) LessThan(y interface{}) bool {
-	return fc.count < y.(*folderC).count
-}
-
-func (fc *folderC) EqualTo(y interface{}) bool {
-	return fc.count == y.(*folderC).count
-}
+func (fc *folderC) LessThan(y interface{}) bool { return fc.count < y.(*folderC).count }
+func (fc *folderC) EqualTo(y interface{}) bool  { return fc.count == y.(*folderC).count }
 
 // Size sortable folder methods
 
-func (fs *folderS) LessThan(y interface{}) bool {
-	return fs.size < y.(*folderS).size
-}
-
-func (fs *folderS) EqualTo(y interface{}) bool {
-	return fs.size == y.(*folderS).size
-}
+func (fs *folderS) LessThan(y interface{}) bool { return fs.size < y.(*folderS).size }
+func (fs *folderS) EqualTo(y interface{}) bool  { return fs.size == y.(*folderS).size }
 
 type foldersWorker struct {
 	total   *totalInfo
