@@ -41,7 +41,6 @@ func init() {
 	cobra.MousetrapHelpText = ""
 	appWriter = os.Stdout
 	appFileSystem = afero.NewOsFs()
-
 }
 
 // Execute starts package running
