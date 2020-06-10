@@ -8,42 +8,36 @@ import (
 	"path/filepath"
 )
 
-// folderCmd represents the folder command
-var folderCmd = &cobra.Command{
-	Use:     "fo",
-	Aliases: []string{"folder"},
-	Short:   "Show information about folders within folder on volume only",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		path, err := cmd.Flags().GetString(pathParamName)
+func newFolder() *cobra.Command {
+	opt := options{}
 
-		if err != nil {
-			return err
-		}
+	var cmd = &cobra.Command{
+		Use:     "fo",
+		Aliases: []string{"folder"},
+		Short:   "Show information about folders within folder on volume only",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if _, err := appFileSystem.Stat(opt.Path); os.IsNotExist(err) {
+				return err
+			}
 
-		opt := options{Path: path}
+			if opt.Path[len(opt.Path)-1] == ':' {
+				opt.Path = filepath.Join(opt.Path, "\\")
+			}
 
-		if _, err := appFileSystem.Stat(opt.Path); os.IsNotExist(err) {
-			return err
-		}
+			_, _ = fmt.Fprintf(appWriter, "Root: %s\n\n", opt.Path)
 
-		if opt.Path[len(opt.Path)-1] == ':' {
-			opt.Path = filepath.Join(opt.Path, "\\")
-		}
+			ctx := module.NewContext(top)
+			foldersmod := module.NewFoldersModule(ctx, false)
+			totalmod := module.NewTotalModule(ctx)
+			extmod := module.NewExtensionModule(ctx, true)
 
-		_, _ = fmt.Fprintf(appWriter, "Root: %s\n\n", opt.Path)
+			module.Execute(opt.Path, appFileSystem, appWriter, extmod, foldersmod, totalmod)
 
-		ctx := module.NewContext(top)
-		foldersmod := module.NewFoldersModule(ctx, false)
-		totalmod := module.NewTotalModule(ctx)
-		extmod := module.NewExtensionModule(ctx, true)
+			return nil
+		},
+	}
 
-		module.Execute(opt.Path, appFileSystem, appWriter, extmod, foldersmod, totalmod)
+	cmd.Flags().StringVarP(&opt.Path, pathParamName, "p", "", "REQUIRED. Directory path to show info.")
 
-		return nil
-	},
-}
-
-func init() {
-	rootCmd.AddCommand(folderCmd)
-	folderCmd.Flags().StringP(pathParamName, "p", "", "REQUIRED. Directory path to show info.")
+	return cmd
 }

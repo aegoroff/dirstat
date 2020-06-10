@@ -8,59 +8,41 @@ import (
 	"path/filepath"
 )
 
-// allCmd represents the all command
-var allCmd = &cobra.Command{
-	Use:     "a",
-	Aliases: []string{"all"},
-	Short:   "Show all information about folder/volume",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		path, err := cmd.Flags().GetString(pathParamName)
+func newAll() *cobra.Command {
+	opt := options{}
 
-		if err != nil {
-			return err
-		}
+	var cmd = &cobra.Command{
+		Use:     "a",
+		Aliases: []string{"all"},
+		Short:   "Show all information about folder/volume",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if _, err := appFileSystem.Stat(opt.Path); os.IsNotExist(err) {
+				return err
+			}
 
-		ranges, err := cmd.Flags().GetIntSlice(rangeParamName)
+			if opt.Path[len(opt.Path)-1] == ':' {
+				opt.Path = filepath.Join(opt.Path, "\\")
+			}
 
-		if err != nil {
-			return err
-		}
+			_, _ = fmt.Fprintf(appWriter, "Root: %s\n\n", opt.Path)
 
-		verbose, err := cmd.Flags().GetBool(verboseParamName)
+			ctx := module.NewContext(top)
+			foldersmod := module.NewFoldersModule(ctx, false)
+			totalmod := module.NewTotalModule(ctx)
+			detailfilemod := module.NewDetailFileModule(opt.Verbosity, opt.Range)
+			totalfilemod := module.NewTotalFileModule(ctx)
+			extmod := module.NewExtensionModule(ctx, false)
+			topfilesmod := module.NewTopFilesModule(ctx)
 
-		if err != nil {
-			return err
-		}
+			module.Execute(opt.Path, appFileSystem, appWriter, totalfilemod, extmod, topfilesmod, foldersmod, detailfilemod, totalmod)
 
-		opt := options{Verbosity: verbose, Path: path, Range: ranges}
+			return nil
+		},
+	}
 
-		if _, err := appFileSystem.Stat(opt.Path); os.IsNotExist(err) {
-			return err
-		}
+	cmd.Flags().StringVarP(&opt.Path, pathParamName, "p", "", "REQUIRED. Directory path to show info.")
+	cmd.Flags().IntSliceVarP(&opt.Range, rangeParamName, "r", []int{}, "Output verbose files info for range specified. Range is the number between 1 and 10")
+	cmd.Flags().BoolVarP(&opt.Verbosity, verboseParamName, "v", false, "Be verbose")
 
-		if opt.Path[len(opt.Path)-1] == ':' {
-			opt.Path = filepath.Join(opt.Path, "\\")
-		}
-
-		_, _ = fmt.Fprintf(appWriter, "Root: %s\n\n", opt.Path)
-
-		ctx := module.NewContext(top)
-		foldersmod := module.NewFoldersModule(ctx, false)
-		totalmod := module.NewTotalModule(ctx)
-		detailfilemod := module.NewDetailFileModule(opt.Verbosity, opt.Range)
-		totalfilemod := module.NewTotalFileModule(ctx)
-		extmod := module.NewExtensionModule(ctx, false)
-		topfilesmod := module.NewTopFilesModule(ctx)
-
-		module.Execute(opt.Path, appFileSystem, appWriter, totalfilemod, extmod, topfilesmod, foldersmod, detailfilemod, totalmod)
-
-		return nil
-	},
-}
-
-func init() {
-	rootCmd.AddCommand(allCmd)
-	allCmd.Flags().StringP(pathParamName, "p", "", "REQUIRED. Directory path to show info.")
-	allCmd.Flags().IntSliceP(rangeParamName, "r", []int{}, "Output verbose files info for range specified. Range is the number between 1 and 10")
-	allCmd.Flags().BoolP(verboseParamName, "v", false, "Be verbose")
+	return cmd
 }

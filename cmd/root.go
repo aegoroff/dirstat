@@ -23,28 +23,43 @@ const rangeParamName = "range"
 var top int
 var showMemory bool
 
-var appFileSystem = afero.NewOsFs()
+var appFileSystem afero.Fs
 var appWriter io.Writer
 
-// rootCmd represents the root command
-var rootCmd = &cobra.Command{
-	Use:   "dirstat",
-	Short: "Directory statistic tool",
-	Long:  ` A small tool that shows selected folder or drive (on Windows) usage statistic`,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		return cmd.Help()
-	},
+func newRoot() *cobra.Command {
+	return &cobra.Command{
+		Use:   "dirstat",
+		Short: "Directory statistic tool",
+		Long:  ` A small tool that shows selected folder or drive (on Windows) usage statistic`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return cmd.Help()
+		},
+	}
 }
 
 func init() {
 	cobra.MousetrapHelpText = ""
 	appWriter = os.Stdout
-	rootCmd.PersistentFlags().IntVarP(&top, "top", "t", 10, "The number of lines in top statistics.")
-	rootCmd.PersistentFlags().BoolVarP(&showMemory, "memory", "m", false, "Show memory statistic after run")
+	appFileSystem = afero.NewOsFs()
+
 }
 
 // Execute starts package running
-func Execute() {
+func Execute(args ...string) {
+	rootCmd := newRoot()
+
+	rootCmd.PersistentFlags().IntVarP(&top, "top", "t", 10, "The number of lines in top statistics.")
+	rootCmd.PersistentFlags().BoolVarP(&showMemory, "memory", "m", false, "Show memory statistic after run")
+
+	rootCmd.AddCommand(newAll())
+	rootCmd.AddCommand(newFile())
+	rootCmd.AddCommand(newFolder())
+	rootCmd.AddCommand(newVersion())
+
+	if args != nil && len(args) > 0 {
+		rootCmd.SetArgs(args)
+	}
+
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
