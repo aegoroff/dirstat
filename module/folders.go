@@ -140,8 +140,8 @@ func (f *foldersRenderer) print(p printer) {
 }
 
 func (f *foldersRenderer) printTop(tree rbtree.RbTree, p printer, format string, conv func(c rbtree.Comparable) folderI) {
-	p.printtab(format, "Folder", "Files", "%", "Size", "%")
-	p.printtab(format, "------", "-----", "------", "----", "------")
+	p.print(format, "Folder", "Files", "%", "Size", "%")
+	p.print(format, "------", "-----", "------", "----", "------")
 
 	i := 1
 

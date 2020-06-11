@@ -43,8 +43,8 @@ func (m *topFilesWorker) handler(evt *sys.ScanEvent) {
 func (m *topFilesRenderer) print(p printer) {
 	p.print("\nTOP %d files by size:\n\n", m.work.top)
 
-	p.printtab("%v\t%v\n", "File", "Size")
-	p.printtab("%v\t%v\n", "------", "----")
+	p.print("%v\t%v\n", "File", "Size")
+	p.print("%v\t%v\n", "------", "----")
 
 	i := 1
 
@@ -54,7 +54,7 @@ func (m *topFilesRenderer) print(p printer) {
 
 		i++
 
-		p.printtab("%v\t%v\n", h, human(file.size))
+		p.print("%v\t%v\n", h, human(file.size))
 
 		return true
 	})

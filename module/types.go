@@ -71,7 +71,7 @@ func (t *totalInfo) printCountAndSizeStatLine(p printer, count int64, sz uint64,
 	percentOfCount := t.countPercent(count)
 	percentOfSize := t.sizePercent(sz)
 
-	p.printtab("%v\t%v\t%.2f%%\t%v\t%.2f%%\n", title, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
+	p.print("%v\t%v\t%.2f%%\t%v\t%.2f%%\n", title, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
 }
 
 // insertTo inserts node into tree which size is limited by the size parameter.

@@ -11,7 +11,6 @@ type printer interface {
 	writer() io.Writer
 	flush()
 	print(format string, a ...interface{})
-	printtab(format string, a ...interface{})
 }
 
 type prn struct {
@@ -28,10 +27,6 @@ func (r *prn) flush() {
 }
 
 func (r *prn) print(format string, a ...interface{}) {
-	_, _ = fmt.Fprintf(r.w, format, a...)
-}
-
-func (r *prn) printtab(format string, a ...interface{}) {
 	_, _ = fmt.Fprintf(r.tw, format, a...)
 }
 
@@ -40,14 +35,19 @@ func human(n int64) string {
 }
 
 func render(w io.Writer, renderers []renderer) {
+	p := newPrinter(w)
+
+	for _, r := range renderers {
+		r.print(p)
+	}
+}
+
+func newPrinter(w io.Writer) printer {
 	tw := new(tabwriter.Writer).Init(w, 0, 8, 4, ' ', 0)
 
 	p := prn{
 		tw: tw,
 		w:  w,
 	}
-
-	for _, r := range renderers {
-		r.print(&p)
-	}
+	return &p
 }

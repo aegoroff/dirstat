@@ -92,8 +92,8 @@ func (e *extRenderer) print(p printer) {
 }
 
 func (*extRenderer) printTableHead(p printer, format string) {
-	p.printtab(format, "Extension", "Count", "%", "Size", "%")
-	p.printtab(format, "---------", "-----", "------", "----", "------")
+	p.print(format, "Extension", "Count", "%", "Size", "%")
+	p.print(format, "---------", "-----", "------", "----", "------")
 }
 
 func (e *extRenderer) printTopTen(p printer, data files, selector func(data files, item *file) (int64, uint64)) {

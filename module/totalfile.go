@@ -55,8 +55,8 @@ func (m *totalFileRenderer) print(p printer) {
 
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
-	p.printtab(format, "File size", "Amount", "%", "Size", "%")
-	p.printtab(format, "---------", "------", "------", "----", "------")
+	p.print(format, "File size", "Amount", "%", "Size", "%")
+	p.print(format, "---------", "------", "------", "----", "------")
 
 	heads := createRangesHeads()
 	for i, r := range fileSizeRanges {
