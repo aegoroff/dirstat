@@ -127,26 +127,31 @@ func (m *foldersWorker) handler(evt *sys.ScanEvent) {
 
 // Renderer method
 
+type folderCast func(c rbtree.Comparable) folderI
+
+func castSize(c rbtree.Comparable) folderI  { return c.(*folderS) }
+func castCount(c rbtree.Comparable) folderI { return c.(*folderC) }
+
 func (f *foldersRenderer) print(p printer) {
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
 	p.print("\nTOP %d folders by size:\n\n", f.work.top)
 
-	f.printTop(f.work.bySize, p, format, func(c rbtree.Comparable) folderI { return c.(*folderS) })
+	f.printTop(f.work.bySize, p, format, castSize)
 
 	p.print("\nTOP %d folders by count:\n\n", f.work.top)
 
-	f.printTop(f.work.byCount, p, format, func(c rbtree.Comparable) folderI { return c.(*folderC) })
+	f.printTop(f.work.byCount, p, format, castCount)
 }
 
-func (f *foldersRenderer) printTop(tree rbtree.RbTree, p printer, format string, conv func(c rbtree.Comparable) folderI) {
+func (f *foldersRenderer) printTop(tree rbtree.RbTree, p printer, format string, cast folderCast) {
 	p.print(format, "Folder", "Files", "%", "Size", "%")
 	p.print(format, "------", "-----", "------", "----", "------")
 
 	i := 1
 
 	tree.Descend(func(n rbtree.Node) bool {
-		f.printTableRow(&i, conv(n.Key()), p)
+		f.printTableRow(&i, cast(n.Key()), p)
 
 		return true
 	})
