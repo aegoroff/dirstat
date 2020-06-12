@@ -160,7 +160,7 @@ func (f *foldersRenderer) printTop(tree rbtree.RbTree, p printer, format string,
 }
 
 func (f *foldersRenderer) printTableRow(i *int, fi folderI, p printer) {
-	h := fmt.Sprintf("%d. %s", *i, fi.Path())
+	h := fmt.Sprintf("%2d. %s", *i, fi.Path())
 
 	*i++
 

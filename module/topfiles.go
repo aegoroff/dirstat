@@ -50,7 +50,7 @@ func (m *topFilesRenderer) print(p printer) {
 
 	m.work.tree.Descend(func(n rbtree.Node) bool {
 		file := n.Key().(*file)
-		h := fmt.Sprintf("%d. %s", i, file)
+		h := fmt.Sprintf("%2d. %s", i, file)
 
 		i++
 

@@ -87,7 +87,7 @@ func (m *detailFileRenderer) print(p printer) {
 func createRangesHeads() []string {
 	var heads []string
 	for i, r := range fileSizeRanges {
-		h := fmt.Sprintf("%d. Between %s and %s", i+1, human(r.Min), human(r.Max))
+		h := fmt.Sprintf("%2d. Between %s and %s", i+1, human(r.Min), human(r.Max))
 		heads = append(heads, h)
 	}
 	return heads
