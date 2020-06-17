@@ -2,6 +2,7 @@ package sys
 
 import (
 	"github.com/spf13/afero"
+	"os"
 	"path/filepath"
 	"sync"
 )
@@ -200,8 +201,12 @@ func dirents(path string, fs afero.Fs) []*filesysEntry {
 
 	var result = []*filesysEntry{}
 	for _, e := range entries {
-		fi := filesysEntry{name: e.Name(), size: e.Size(), isDir: e.IsDir()}
-		result = append(result, &fi)
+		e.Mode()
+
+		if e.Mode()&os.ModeSymlink == 0 {
+			fi := filesysEntry{name: e.Name(), size: e.Size(), isDir: e.IsDir()}
+			result = append(result, &fi)
+		}
 	}
 
 	return result
