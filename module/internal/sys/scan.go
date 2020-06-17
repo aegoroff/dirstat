@@ -201,8 +201,6 @@ func dirents(path string, fs afero.Fs) []*filesysEntry {
 
 	var result = []*filesysEntry{}
 	for _, e := range entries {
-		e.Mode()
-
 		// dont follow symlinks
 		if e.Mode()&os.ModeSymlink == 0 {
 			fi := filesysEntry{name: e.Name(), size: e.Size(), isDir: e.IsDir()}
