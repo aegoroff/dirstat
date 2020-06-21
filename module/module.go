@@ -120,10 +120,10 @@ func NewExtensionModule(ctx *Context, hideOutput bool) Module {
 	return newModule(work, rend)
 }
 
-// NewTotalFileModule creates new total file statistic module
-func NewTotalFileModule(ctx *Context) Module {
-	work := newTotalFileWorker()
-	rend := newTotalFileRenderer(ctx, work)
+// NewAggregateFileModule creates new total file statistic module
+func NewAggregateFileModule(ctx *Context) Module {
+	work := newAggregateFileWorker()
+	rend := newAggregateFileRenderer(ctx, work)
 
 	m := newModule(work, rend)
 	return m

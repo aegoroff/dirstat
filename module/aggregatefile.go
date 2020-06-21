@@ -2,32 +2,32 @@ package module
 
 import "dirstat/module/internal/sys"
 
-type totalFileWorker struct {
+type aggregateFileWorker struct {
 	aggregate map[Range]fileStat
 }
 
-type totalFileRenderer struct {
-	work  *totalFileWorker
+type aggregateFileRenderer struct {
+	work  *aggregateFileWorker
 	total *totalInfo
 }
 
-func newTotalFileWorker() *totalFileWorker {
-	return &totalFileWorker{
+func newAggregateFileWorker() *aggregateFileWorker {
+	return &aggregateFileWorker{
 		aggregate: make(map[Range]fileStat),
 	}
 }
 
-func newTotalFileRenderer(ctx *Context, w *totalFileWorker) *totalFileRenderer {
-	return &totalFileRenderer{
+func newAggregateFileRenderer(ctx *Context, w *aggregateFileWorker) *aggregateFileRenderer {
+	return &aggregateFileRenderer{
 		total: ctx.total,
 		work:  w,
 	}
 }
 
-func (*totalFileWorker) init()     {}
-func (*totalFileWorker) finalize() {}
+func (*aggregateFileWorker) init()     {}
+func (*aggregateFileWorker) finalize() {}
 
-func (m *totalFileWorker) handler(evt *sys.ScanEvent) {
+func (m *aggregateFileWorker) handler(evt *sys.ScanEvent) {
 	if evt.File == nil {
 		return
 	}
@@ -50,7 +50,7 @@ func (m *totalFileWorker) handler(evt *sys.ScanEvent) {
 
 // Renderer method
 
-func (m *totalFileRenderer) print(p printer) {
+func (m *aggregateFileRenderer) print(p printer) {
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
 	p.cprint("<gray>Total files stat:</>\n\n")

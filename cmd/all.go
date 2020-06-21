@@ -22,7 +22,7 @@ func newAll(c conf) *cobra.Command {
 			foldersmod := module.NewFoldersModule(ctx, false)
 			totalmod := module.NewTotalModule(ctx)
 			detailfilemod := module.NewDetailFileModule(opt.verbosity, opt.vrange)
-			totalfilemod := module.NewTotalFileModule(ctx)
+			totalfilemod := module.NewAggregateFileModule(ctx)
 			extmod := module.NewExtensionModule(ctx, false)
 			topfilesmod := module.NewTopFilesModule(ctx)
 

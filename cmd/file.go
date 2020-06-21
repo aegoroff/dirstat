@@ -23,7 +23,7 @@ func newFile(c conf) *cobra.Command {
 			ctx := module.NewContext(top)
 			totalmod := module.NewTotalModule(ctx)
 			detailfilemod := module.NewDetailFileModule(opt.verbosity, opt.vrange)
-			totalfilemod := module.NewTotalFileModule(ctx)
+			totalfilemod := module.NewAggregateFileModule(ctx)
 			foldersmod := module.NewFoldersModule(ctx, true)
 			extmod := module.NewExtensionModule(ctx, !showExtStatistic)
 
