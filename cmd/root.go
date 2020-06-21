@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/dustin/go-humanize"
 	"github.com/gookit/color"
 	"github.com/spf13/cobra"
@@ -61,10 +60,9 @@ func printMemUsage(w io.Writer) {
 	}
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
-	red := color.FgRed.Render
 	// For info on each, see: https://golang.org/pkg/runtime/#MemStats
-	_, _ = fmt.Fprintf(w, "\nAlloc = %s", red(humanize.IBytes(m.Alloc)))
-	_, _ = fmt.Fprintf(w, "\tTotalAlloc = %s", red(humanize.IBytes(m.TotalAlloc)))
-	_, _ = fmt.Fprintf(w, "\tSys = %s", red(humanize.IBytes(m.Sys)))
-	_, _ = fmt.Fprintf(w, "\tNumGC = %v\n", red(m.NumGC))
+	color.Fprintf(w, "\nAlloc = <red>%s</>", humanize.IBytes(m.Alloc))
+	color.Fprintf(w, "\tTotalAlloc = <red>%s</>", humanize.IBytes(m.TotalAlloc))
+	color.Fprintf(w, "\tSys = <red>%s</>", humanize.IBytes(m.Sys))
+	color.Fprintf(w, "\tNumGC = <red>%v</>\n", m.NumGC)
 }
