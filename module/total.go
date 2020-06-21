@@ -54,7 +54,7 @@ Total files:            {{.FilesTotal.Count}} ({{.FilesTotal.Size | toBytesStrin
 Total folders:          {{.CountFolders}}
 Total file extensions:  {{.CountFileExts}}
 
-Read taken:    {{.ReadingTime}}
+Read taken:             {{.ReadingTime}}
 `
 
 	var report = template.Must(template.New("totalstat").Funcs(template.FuncMap{"toBytesString": humanize.IBytes}).Parse(totalTemplate))
