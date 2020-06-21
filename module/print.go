@@ -3,6 +3,7 @@ package module
 import (
 	"fmt"
 	"github.com/dustin/go-humanize"
+	"github.com/gookit/color"
 	"io"
 	"text/tabwriter"
 )
@@ -11,6 +12,7 @@ type printer interface {
 	writer() io.Writer
 	flush()
 	print(format string, a ...interface{})
+	cprint(format string, a ...interface{})
 }
 
 type prn struct {
@@ -28,6 +30,10 @@ func (r *prn) flush() {
 
 func (r *prn) print(format string, a ...interface{}) {
 	_, _ = fmt.Fprintf(r.tw, format, a...)
+}
+
+func (r *prn) cprint(format string, a ...interface{}) {
+	color.Fprintf(r.w, format, a...)
 }
 
 func human(n int64) string {

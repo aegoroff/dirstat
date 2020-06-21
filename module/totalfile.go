@@ -51,10 +51,9 @@ func (m *totalFileWorker) handler(evt *sys.ScanEvent) {
 // Renderer method
 
 func (m *totalFileRenderer) print(p printer) {
-	p.print("Total files stat:\n\n")
-
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
+	p.cprint("<gray>Total files stat:</>\n\n")
 	p.print(format, "File size", "Amount", "%", "Size", "%")
 	p.print(format, "---------", "------", "------", "----", "------")
 

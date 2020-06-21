@@ -41,7 +41,7 @@ func (m *topFilesWorker) handler(evt *sys.ScanEvent) {
 // Renderer method
 
 func (m *topFilesRenderer) print(p printer) {
-	p.print("\nTOP %d files by size:\n\n", m.work.top)
+	p.cprint("\n<gray>TOP %d files by size:</>\n\n", m.work.top)
 
 	p.print("%v\t%v\n", "File", "Size")
 	p.print("%v\t%v\n", "------", "----")

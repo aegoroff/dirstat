@@ -3,6 +3,7 @@ package module
 import (
 	"dirstat/module/internal/sys"
 	"github.com/dustin/go-humanize"
+	"github.com/gookit/color"
 	"text/template"
 	"time"
 )
@@ -58,5 +59,9 @@ Read taken:             {{.ReadingTime}}
 `
 
 	var report = template.Must(template.New("totalstat").Funcs(template.FuncMap{"toBytesString": humanize.IBytes}).Parse(totalTemplate))
+
+	_, _ = color.Set(color.FgGray)
 	_ = report.Execute(p.writer(), m.work.total)
+
+	_, _ = color.Reset()
 }

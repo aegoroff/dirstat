@@ -61,8 +61,8 @@ func printMemUsage(w io.Writer) {
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
 	// For info on each, see: https://golang.org/pkg/runtime/#MemStats
-	color.Fprintf(w, "\nAlloc = <red>%s</>", humanize.IBytes(m.Alloc))
-	color.Fprintf(w, "\tTotalAlloc = <red>%s</>", humanize.IBytes(m.TotalAlloc))
-	color.Fprintf(w, "\tSys = <red>%s</>", humanize.IBytes(m.Sys))
-	color.Fprintf(w, "\tNumGC = <red>%v</>\n", m.NumGC)
+	color.Fprintf(w, "\nAlloc = <gray>%s</>", humanize.IBytes(m.Alloc))
+	color.Fprintf(w, "\tTotalAlloc = <gray>%s</>", humanize.IBytes(m.TotalAlloc))
+	color.Fprintf(w, "\tSys = <gray>%s</>", humanize.IBytes(m.Sys))
+	color.Fprintf(w, "\tNumGC = <gray>%v</>\n", m.NumGC)
 }

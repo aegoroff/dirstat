@@ -66,7 +66,7 @@ func (e *extRenderer) print(p printer) {
 
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
-	p.print("\nTOP %d file extensions by size:\n\n", e.work.top)
+	p.cprint("\n<gray>TOP %d file extensions by size:</>\n\n", e.work.top)
 
 	e.printTableHead(p, format)
 
@@ -78,7 +78,7 @@ func (e *extRenderer) print(p printer) {
 
 	p.flush()
 
-	p.print("\nTOP %d file extensions by count:\n\n", e.work.top)
+	p.cprint("\n<gray>TOP %d file extensions by count:</>\n\n", e.work.top)
 
 	e.printTableHead(p, format)
 

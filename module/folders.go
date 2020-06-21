@@ -135,11 +135,11 @@ func castCount(c rbtree.Comparable) folderI { return c.(*folderC) }
 func (f *foldersRenderer) print(p printer) {
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
-	p.print("\nTOP %d folders by size:\n\n", f.work.top)
+	p.cprint("\n<gray>TOP %d folders by size:</>\n\n", f.work.top)
 
 	f.printTop(f.work.bySize, p, format, castSize)
 
-	p.print("\nTOP %d folders by count:\n\n", f.work.top)
+	p.cprint("\n<gray>TOP %d folders by count:</>\n\n", f.work.top)
 
 	f.printTop(f.work.byCount, p, format, castCount)
 }

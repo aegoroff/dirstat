@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	"github.com/gookit/color"
 	"github.com/spf13/afero"
 	"io"
 	"os"
@@ -17,6 +17,6 @@ func beforeRunCmd(path *string, fs afero.Fs, w io.Writer) error {
 		*path = filepath.Join(*path, "\\")
 	}
 
-	_, _ = fmt.Fprintf(w, "Root: %s\n\n", *path)
+	color.Fprintf(w, "Root: <red>%s</>\n\n", *path)
 	return nil
 }
