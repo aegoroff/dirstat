@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"runtime"
+	"time"
 )
 
 func newRoot() *cobra.Command {
@@ -45,9 +46,15 @@ func Execute(args ...string) {
 	rootCmd.AddCommand(newFolder(conf))
 	rootCmd.AddCommand(newVersion(conf.w()))
 
+	start := time.Now()
+
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
+
+	readingtime := time.Since(start)
+
+	color.Fprintf(conf.w(), "\n\n<gray>Read taken:\t%v</>\n", readingtime)
 
 	printMemUsage(conf.w())
 }
