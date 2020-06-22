@@ -116,7 +116,7 @@ func NewExtensionModule(ctx *Context, hideOutput bool) Module {
 	if hideOutput {
 		return newModule(work)
 	}
-	rend := newExtRenderer(work)
+	rend := newExtRenderer(work, ctx.top)
 	return newModule(work, rend)
 }
 
@@ -131,11 +131,13 @@ func NewAggregateFileModule(ctx *Context) Module {
 
 // NewTotalModule creates new total statistic module
 func NewTotalModule(ctx *Context) Module {
-	work := newTotalWorker(ctx)
-	rend := newTotalRenderer(work)
+	rend := newTotalRenderer(ctx)
 
-	m := newModule(work, rend)
-	return m
+	m := module{
+		[]worker{},
+		[]renderer{rend},
+	}
+	return &m
 }
 
 func newModule(w worker, r ...renderer) Module {
