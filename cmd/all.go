@@ -13,11 +13,6 @@ func newAll(c conf) *cobra.Command {
 		Aliases: []string{"all"},
 		Short:   "Show all information about folder/volume",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			err := beforeRunCmd(&opt.path, c.fs(), c.w())
-			if err != nil {
-				return err
-			}
-
 			ctx := module.NewContext(top)
 			foldersmod := module.NewFoldersModule(ctx, false)
 			totalmod := module.NewTotalModule(ctx)
@@ -26,8 +21,9 @@ func newAll(c conf) *cobra.Command {
 			extmod := module.NewExtensionModule(ctx, false)
 			topfilesmod := module.NewTopFilesModule(ctx)
 
-			withtiming := module.NewTimeMeasureCommand(module.Execute)
-			withtiming(opt.path, c.fs(), c.w(), totalfilemod, extmod, topfilesmod, foldersmod, detailfilemod, totalmod)
+			withtiming := newTimeMeasureCommand(module.Execute)
+			pathcmd := newPathCorrectionCommand(withtiming)
+			pathcmd(opt.path, c.fs(), c.w(), totalfilemod, extmod, topfilesmod, foldersmod, detailfilemod, totalmod)
 
 			return nil
 		},

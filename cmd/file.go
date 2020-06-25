@@ -15,11 +15,6 @@ func newFile(c conf) *cobra.Command {
 		Aliases: []string{"file"},
 		Short:   "Show information about files within folder on volume only",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			err := beforeRunCmd(&opt.path, c.fs(), c.w())
-			if err != nil {
-				return err
-			}
-
 			ctx := module.NewContext(top)
 			totalmod := module.NewTotalModule(ctx)
 			detailfilemod := module.NewDetailFileModule(opt.verbosity, opt.vrange)
@@ -29,8 +24,9 @@ func newFile(c conf) *cobra.Command {
 
 			topfilesmod := module.NewTopFilesModule(ctx)
 
-			withtiming := module.NewTimeMeasureCommand(module.Execute)
-			withtiming(opt.path, c.fs(), c.w(), totalfilemod, extmod, topfilesmod, detailfilemod, foldersmod, totalmod)
+			withtiming := newTimeMeasureCommand(module.Execute)
+			pathcmd := newPathCorrectionCommand(withtiming)
+			pathcmd(opt.path, c.fs(), c.w(), totalfilemod, extmod, topfilesmod, detailfilemod, foldersmod, totalmod)
 
 			return nil
 		},

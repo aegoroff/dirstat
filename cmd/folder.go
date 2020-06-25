@@ -13,18 +13,14 @@ func newFolder(c conf) *cobra.Command {
 		Aliases: []string{"folder"},
 		Short:   "Show information about folders within folder on volume only",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			err := beforeRunCmd(&path, c.fs(), c.w())
-			if err != nil {
-				return err
-			}
-
 			ctx := module.NewContext(top)
 			foldersmod := module.NewFoldersModule(ctx, false)
 			totalmod := module.NewTotalModule(ctx)
 			extmod := module.NewExtensionModule(ctx, true)
 
-			withtiming := module.NewTimeMeasureCommand(module.Execute)
-			withtiming(path, c.fs(), c.w(), extmod, foldersmod, totalmod)
+			withtiming := newTimeMeasureCommand(module.Execute)
+			pathcmd := newPathCorrectionCommand(withtiming)
+			pathcmd(path, c.fs(), c.w(), extmod, foldersmod, totalmod)
 
 			return nil
 		},
