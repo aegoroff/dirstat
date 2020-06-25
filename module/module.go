@@ -104,7 +104,7 @@ func NewDetailFileModule(verbose bool, enabledRanges []int) Module {
 			[]renderer{},
 		}
 	}
-	work := newDetailFileWorker(enabledRanges)
+	work := newDetailFileWorker(fileSizeRanges, enabledRanges)
 	rend := newDetailFileRenderer(work)
 	m := newModule(work, rend)
 	return m
@@ -122,7 +122,7 @@ func NewExtensionModule(ctx *Context, hideOutput bool) Module {
 
 // NewAggregateFileModule creates new total file statistic module
 func NewAggregateFileModule(ctx *Context) Module {
-	work := newAggregateFileWorker()
+	work := newAggregateFileWorker(fileSizeRanges)
 	rend := newAggregateFileRenderer(ctx, work)
 
 	m := newModule(work, rend)

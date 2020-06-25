@@ -3,7 +3,8 @@ package module
 import "dirstat/module/internal/sys"
 
 type aggregateFileWorker struct {
-	aggregate map[Range]fileStat
+	aggregate  map[Range]fileStat
+	fileRanges ranges
 }
 
 type aggregateFileRenderer struct {
@@ -11,9 +12,10 @@ type aggregateFileRenderer struct {
 	total *totalInfo
 }
 
-func newAggregateFileWorker() *aggregateFileWorker {
+func newAggregateFileWorker(rs ranges) *aggregateFileWorker {
 	return &aggregateFileWorker{
-		aggregate: make(map[Range]fileStat),
+		aggregate:  make(map[Range]fileStat),
+		fileRanges: rs,
 	}
 }
 
@@ -36,7 +38,7 @@ func (m *aggregateFileWorker) handler(evt *sys.ScanEvent) {
 	unsignedSize := uint64(f.Size)
 
 	// Calculate files range statistic
-	for _, r := range fileSizeRanges {
+	for _, r := range m.fileRanges {
 		if !r.Contains(f.Size) {
 			continue
 		}
@@ -57,8 +59,8 @@ func (m *aggregateFileRenderer) print(p printer) {
 	p.print(format, "File size", "Amount", "%", "Size", "%")
 	p.print(format, "---------", "------", "------", "----", "------")
 
-	heads := createRangesHeads()
-	for i, r := range fileSizeRanges {
+	heads := m.work.fileRanges.heads()
+	for i, r := range m.work.fileRanges {
 		count := m.work.aggregate[r].TotalFilesCount
 		sz := m.work.aggregate[r].TotalFilesSize
 

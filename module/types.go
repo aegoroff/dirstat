@@ -1,6 +1,7 @@
 package module
 
 import (
+	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/dustin/go-humanize"
 	"time"
@@ -28,6 +29,8 @@ type Range struct {
 func (r *Range) Contains(num int64) bool {
 	return num >= r.Min && num <= r.Max
 }
+
+type ranges [10]Range
 
 var fileSizeRanges = [...]Range{
 	{Min: 0, Max: 100 * kbyte},
@@ -85,4 +88,13 @@ func insertTo(tree rbtree.RbTree, size int, c rbtree.Comparable) {
 
 		tree.Insert(c)
 	}
+}
+
+func (r ranges) heads() []string {
+	var heads []string
+	for i, r := range r {
+		h := fmt.Sprintf("%2d. Between %s and %s", i+1, human(r.Min), human(r.Max))
+		heads = append(heads, h)
+	}
+	return heads
 }
