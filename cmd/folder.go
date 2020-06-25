@@ -23,7 +23,8 @@ func newFolder(c conf) *cobra.Command {
 			totalmod := module.NewTotalModule(ctx)
 			extmod := module.NewExtensionModule(ctx, true)
 
-			module.Execute(path, c.fs(), c.w(), extmod, foldersmod, totalmod)
+			withtiming := module.NewTimeMeasureCommand(module.Execute)
+			withtiming(path, c.fs(), c.w(), extmod, foldersmod, totalmod)
 
 			return nil
 		},

@@ -29,7 +29,8 @@ func newFile(c conf) *cobra.Command {
 
 			topfilesmod := module.NewTopFilesModule(ctx)
 
-			module.Execute(opt.path, c.fs(), c.w(), totalfilemod, extmod, topfilesmod, detailfilemod, foldersmod, totalmod)
+			withtiming := module.NewTimeMeasureCommand(module.Execute)
+			withtiming(opt.path, c.fs(), c.w(), totalfilemod, extmod, topfilesmod, detailfilemod, foldersmod, totalmod)
 
 			return nil
 		},
