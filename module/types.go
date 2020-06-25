@@ -25,24 +25,11 @@ type Range struct {
 	Max int64
 }
 
+type ranges [10]Range
+
 // Contains defines whether the number specified within range
 func (r *Range) Contains(num int64) bool {
 	return num >= r.Min && num <= r.Max
-}
-
-type ranges [10]Range
-
-var fileSizeRanges = [...]Range{
-	{Min: 0, Max: 100 * kbyte},
-	{Min: 100 * kbyte, Max: mbyte},
-	{Min: mbyte, Max: 10 * mbyte},
-	{Min: 10 * mbyte, Max: 100 * mbyte},
-	{Min: 100 * mbyte, Max: gbyte},
-	{Min: gbyte, Max: 10 * gbyte},
-	{Min: 10 * gbyte, Max: 100 * gbyte},
-	{Min: 100 * gbyte, Max: tbyte},
-	{Min: tbyte, Max: 10 * tbyte},
-	{Min: 10 * tbyte, Max: pbyte},
 }
 
 type fileStat struct {
