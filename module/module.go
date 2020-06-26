@@ -12,8 +12,8 @@ type Module interface {
 	renderers() []renderer
 }
 
-// Command defines executable function prototype
-type Command func(path string, fs afero.Fs, w io.Writer, modules ...Module)
+// Runner defines executable function prototype
+type Runner func(path string, fs afero.Fs, w io.Writer, modules ...Module)
 
 type module struct {
 	wks []worker

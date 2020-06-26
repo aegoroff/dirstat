@@ -13,13 +13,13 @@ import (
 )
 
 func run(path string, c conf, modules ...module.Module) {
-	timing := newTimeMeasureCommand(module.Execute)
-	memory := newPrintMemoryCommand(timing)
-	pathing := newPathCorrectionCommand(memory)
+	timing := newTimeMeasureR(module.Execute)
+	memory := newPrintMemoryR(timing)
+	pathing := newPathCorrectionR(memory)
 	pathing(path, c.fs(), c.w(), modules...)
 }
 
-func newTimeMeasureCommand(c module.Command) module.Command {
+func newTimeMeasureR(c module.Runner) module.Runner {
 	return func(path string, fs afero.Fs, w io.Writer, modules ...module.Module) {
 		start := time.Now()
 
@@ -31,7 +31,7 @@ func newTimeMeasureCommand(c module.Command) module.Command {
 	}
 }
 
-func newPathCorrectionCommand(c module.Command) module.Command {
+func newPathCorrectionR(c module.Runner) module.Runner {
 	return func(path string, fs afero.Fs, w io.Writer, modules ...module.Module) {
 		if _, err := fs.Stat(path); os.IsNotExist(err) {
 			return
@@ -47,9 +47,9 @@ func newPathCorrectionCommand(c module.Command) module.Command {
 	}
 }
 
-// newPrintMemoryCommand outputs the current, total and OS memory being used. As well as the number
+// newPrintMemoryR outputs the current, total and OS memory being used. As well as the number
 // of garage collection cycles completed.
-func newPrintMemoryCommand(c module.Command) module.Command {
+func newPrintMemoryR(c module.Runner) module.Runner {
 	return func(path string, fs afero.Fs, w io.Writer, modules ...module.Module) {
 		c(path, fs, w, modules...)
 
