@@ -49,6 +49,11 @@ type countSizeAggregate struct {
 	Size  uint64
 }
 
+type fixedTree struct {
+	tree rbtree.RbTree
+	size int
+}
+
 func (t *totalInfo) countPercent(count int64) float64 {
 	return (float64(count) / float64(t.FilesTotal.Count)) * 100
 }
@@ -64,16 +69,23 @@ func (t *totalInfo) printCountAndSizeStatLine(p printer, count int64, sz uint64,
 	p.print("%v\t%v\t%.2f%%\t%v\t%.2f%%\n", title, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
 }
 
-// insertTo inserts node into tree which size is limited by the size parameter.
+func newFixedTree(sz int) *fixedTree {
+	return &fixedTree{
+		tree: rbtree.NewRbTree(),
+		size: sz,
+	}
+}
+
+// insert inserts node into tree which size is limited
 // Only <size> max nodes will be in the tree
-func insertTo(tree rbtree.RbTree, size int, c rbtree.Comparable) {
-	min := tree.Minimum()
-	if tree.Len() < int64(size) || min.Key().LessThan(c) {
-		if tree.Len() == int64(size) {
-			tree.DeleteNode(min.Key())
+func (t *fixedTree) insert(c rbtree.Comparable) {
+	min := t.tree.Minimum()
+	if t.tree.Len() < int64(t.size) || min.Key().LessThan(c) {
+		if t.tree.Len() == int64(t.size) {
+			t.tree.DeleteNode(min.Key())
 		}
 
-		tree.Insert(c)
+		t.tree.Insert(c)
 	}
 }
 

@@ -11,8 +11,7 @@ func newTopFilesRenderer(work *topFilesWorker) renderer {
 }
 
 type topFilesWorker struct {
-	tree rbtree.RbTree
-	top  int
+	tree *fixedTree
 }
 
 type topFilesRenderer struct {
@@ -20,7 +19,7 @@ type topFilesRenderer struct {
 }
 
 func newTopFilesWorker(top int) *topFilesWorker {
-	return &topFilesWorker{rbtree.NewRbTree(), top}
+	return &topFilesWorker{newFixedTree(top)}
 }
 
 // Worker methods
@@ -35,20 +34,20 @@ func (m *topFilesWorker) handler(evt *sys.ScanEvent) {
 	f := evt.File
 
 	fileContainer := file{size: f.Size, path: f.Path}
-	insertTo(m.tree, m.top, &fileContainer)
+	m.tree.insert(&fileContainer)
 }
 
 // Renderer method
 
 func (m *topFilesRenderer) print(p printer) {
-	p.cprint("\n<gray>TOP %d files by size:</>\n\n", m.work.top)
+	p.cprint("\n<gray>TOP %d files by size:</>\n\n", m.work.tree.size)
 
 	p.print("%v\t%v\n", "File", "Size")
 	p.print("%v\t%v\n", "------", "----")
 
 	i := 1
 
-	m.work.tree.Descend(func(n rbtree.Node) bool {
+	m.work.tree.tree.Descend(func(n rbtree.Node) bool {
 		file := n.Key().(*file)
 		h := fmt.Sprintf("%2d. %s", i, file)
 
