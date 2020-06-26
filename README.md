@@ -42,8 +42,14 @@ dirstat a -p d:\folder
 ```
 Show all statistic and additional verbose statistic about files in ranges Between 10 GiB and 100 GiB and Between 100 GiB and 1.0 TiB 
 ```
-dirstat a -p d:\ -v -r 7 -r 8
+dirstat a -p d:\ -r 7 -r 8
 ```
+or
+```
+dirstat a -p d:\ -r 7,8
+```
+The second form is equivalent
+
 Output example:
 ---------------
 ```
