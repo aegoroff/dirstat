@@ -74,7 +74,7 @@ type foldersWorker struct {
 }
 
 type foldersRenderer struct {
-	work *foldersWorker
+	*foldersWorker
 }
 
 func newFoldersWorker(ctx *Context) *foldersWorker {
@@ -133,13 +133,13 @@ func castCount(c rbtree.Comparable) folderI { return c.(*folderC) }
 func (f *foldersRenderer) print(p printer) {
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
-	p.cprint("\n<gray>TOP %d folders by size:</>\n\n", f.work.bySize.size)
+	p.cprint("\n<gray>TOP %d folders by size:</>\n\n", f.bySize.size)
 
-	f.printTop(f.work.bySize, p, format, castSize)
+	f.printTop(f.bySize, p, format, castSize)
 
-	p.cprint("\n<gray>TOP %d folders by count:</>\n\n", f.work.byCount.size)
+	p.cprint("\n<gray>TOP %d folders by count:</>\n\n", f.byCount.size)
 
-	f.printTop(f.work.byCount, p, format, castCount)
+	f.printTop(f.byCount, p, format, castCount)
 }
 
 func (f *foldersRenderer) printTop(ft *fixedTree, p printer, format string, cast folderCast) {
@@ -165,5 +165,5 @@ func (f *foldersRenderer) printTableRow(i *int, fi folderI, p printer) {
 	count := fi.Count()
 	sz := uint64(fi.Size())
 
-	f.work.total.printCountAndSizeStatLine(p, count, sz, h)
+	f.total.printCountAndSizeStatLine(p, count, sz, h)
 }

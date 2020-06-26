@@ -13,7 +13,7 @@ type detailFileWorker struct {
 }
 
 type detailFileRenderer struct {
-	work *detailFileWorker
+	*detailFileWorker
 }
 
 func newDetailFileWorker(rs ranges, enabledRanges []int) *detailFileWorker {
@@ -64,17 +64,17 @@ func (m *detailFileWorker) handler(evt *sys.ScanEvent) {
 // Renderer method
 
 func (m *detailFileRenderer) print(p printer) {
-	if len(m.work.enabledRanges) > 0 {
-		heads := m.work.fileRanges.heads()
+	if len(m.enabledRanges) > 0 {
+		heads := m.fileRanges.heads()
 		p.cprint("\n<gray>Detailed files stat:</>\n")
-		for i, r := range m.work.fileRanges {
-			if len(m.work.distribution[r]) == 0 {
+		for i, r := range m.fileRanges {
+			if len(m.distribution[r]) == 0 {
 				continue
 			}
 
 			p.cprint("<gray>%s</>\n", heads[i])
 
-			files := m.work.distribution[r]
+			files := m.distribution[r]
 			sort.Sort(sort.Reverse(files))
 
 			for _, f := range files {
