@@ -2,17 +2,20 @@ package cmd
 
 import (
 	"dirstat/module"
+	"github.com/dustin/go-humanize"
 	"github.com/gookit/color"
 	"github.com/spf13/afero"
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
 	"time"
 )
 
 func run(path string, c conf, modules ...module.Module) {
 	timing := newTimeMeasureCommand(module.Execute)
-	pathing := newPathCorrectionCommand(timing)
+	memory := newPrintMemoryCommand(timing)
+	pathing := newPathCorrectionCommand(memory)
 	pathing(path, c.fs(), c.w(), modules...)
 }
 
@@ -41,5 +44,24 @@ func newPathCorrectionCommand(c module.Command) module.Command {
 		color.Fprintf(w, "Root: <red>%s</>\n\n", path)
 
 		c(path, fs, w, modules...)
+	}
+}
+
+// newPrintMemoryCommand outputs the current, total and OS memory being used. As well as the number
+// of garage collection cycles completed.
+func newPrintMemoryCommand(c module.Command) module.Command {
+	return func(path string, fs afero.Fs, w io.Writer, modules ...module.Module) {
+		c(path, fs, w, modules...)
+
+		if !showMemory {
+			return
+		}
+		var m runtime.MemStats
+		runtime.ReadMemStats(&m)
+		// For info on each, see: https://golang.org/pkg/runtime/#MemStats
+		color.Fprintf(w, "\nAlloc = <gray>%s</>", humanize.IBytes(m.Alloc))
+		color.Fprintf(w, "\tTotalAlloc = <gray>%s</>", humanize.IBytes(m.TotalAlloc))
+		color.Fprintf(w, "\tSys = <gray>%s</>", humanize.IBytes(m.Sys))
+		color.Fprintf(w, "\tNumGC = <gray>%v</>\n", m.NumGC)
 	}
 }

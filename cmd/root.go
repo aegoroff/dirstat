@@ -1,12 +1,8 @@
 package cmd
 
 import (
-	"github.com/dustin/go-humanize"
-	"github.com/gookit/color"
 	"github.com/spf13/cobra"
-	"io"
 	"os"
-	"runtime"
 )
 
 func newRoot() *cobra.Command {
@@ -48,21 +44,4 @@ func Execute(args ...string) {
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
-
-	printMemUsage(conf.w())
-}
-
-// printMemUsage outputs the current, total and OS memory being used. As well as the number
-// of garage collection cycles completed.
-func printMemUsage(w io.Writer) {
-	if !showMemory {
-		return
-	}
-	var m runtime.MemStats
-	runtime.ReadMemStats(&m)
-	// For info on each, see: https://golang.org/pkg/runtime/#MemStats
-	color.Fprintf(w, "\nAlloc = <gray>%s</>", humanize.IBytes(m.Alloc))
-	color.Fprintf(w, "\tTotalAlloc = <gray>%s</>", humanize.IBytes(m.TotalAlloc))
-	color.Fprintf(w, "\tSys = <gray>%s</>", humanize.IBytes(m.Sys))
-	color.Fprintf(w, "\tNumGC = <gray>%v</>\n", m.NumGC)
 }
