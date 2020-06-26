@@ -21,9 +21,7 @@ func newAll(c conf) *cobra.Command {
 			extmod := module.NewExtensionModule(ctx, false)
 			topfilesmod := module.NewTopFilesModule(ctx)
 
-			withtiming := newTimeMeasureCommand(module.Execute)
-			pathcmd := newPathCorrectionCommand(withtiming)
-			pathcmd(opt.path, c.fs(), c.w(), totalfilemod, extmod, topfilesmod, foldersmod, detailfilemod, totalmod)
+			run(opt.path, c, totalfilemod, extmod, topfilesmod, foldersmod, detailfilemod, totalmod)
 
 			return nil
 		},

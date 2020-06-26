@@ -18,9 +18,7 @@ func newFolder(c conf) *cobra.Command {
 			totalmod := module.NewTotalModule(ctx)
 			extmod := module.NewExtensionModule(ctx, true)
 
-			withtiming := newTimeMeasureCommand(module.Execute)
-			pathcmd := newPathCorrectionCommand(withtiming)
-			pathcmd(path, c.fs(), c.w(), extmod, foldersmod, totalmod)
+			run(path, c, extmod, foldersmod, totalmod)
 
 			return nil
 		},

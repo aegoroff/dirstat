@@ -10,6 +10,12 @@ import (
 	"time"
 )
 
+func run(path string, c conf, modules ...module.Module) {
+	timing := newTimeMeasureCommand(module.Execute)
+	pathing := newPathCorrectionCommand(timing)
+	pathing(path, c.fs(), c.w(), modules...)
+}
+
 func newTimeMeasureCommand(c module.Command) module.Command {
 	return func(path string, fs afero.Fs, w io.Writer, modules ...module.Module) {
 		start := time.Now()
