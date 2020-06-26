@@ -99,9 +99,9 @@ func NewTopFilesModule(ctx *Context) Module {
 }
 
 // NewDetailFileModule creates new file statistic by file size range module
-func NewDetailFileModule(verbose bool, enabledRanges []int) Module {
+func NewDetailFileModule(enabledRanges []int) Module {
 	// Do nothing if verbose not enabled
-	if !verbose {
+	if len(enabledRanges) == 0 {
 		return &module{
 			[]worker{},
 			[]renderer{},

@@ -17,7 +17,7 @@ func newFile(c conf) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := module.NewContext(top)
 			totalmod := module.NewTotalModule(ctx)
-			detailfilemod := module.NewDetailFileModule(opt.verbosity, opt.vrange)
+			detailfilemod := module.NewDetailFileModule(opt.vrange)
 			totalfilemod := module.NewAggregateFileModule(ctx)
 			foldersmod := module.NewFoldersModule(ctx, true)
 			extmod := module.NewExtensionModule(ctx, !showExtStatistic)

@@ -8,9 +8,8 @@ import (
 )
 
 type options struct {
-	verbosity bool
-	vrange    []int
-	path      string
+	vrange []int
+	path   string
 }
 
 type conf interface {
@@ -45,11 +44,6 @@ func newAppConf() conf {
 func configure(cmd *cobra.Command, opt *options) {
 	configurePath(cmd, &opt.path)
 	confRange(cmd, &opt.vrange)
-	confVerbose(cmd, &opt.verbosity)
-}
-
-func confVerbose(cmd *cobra.Command, v *bool) {
-	cmd.Flags().BoolVarP(v, "verbose", "v", false, "Be verbose")
 }
 
 func confRange(cmd *cobra.Command, rn *[]int) {

@@ -16,7 +16,7 @@ func newAll(c conf) *cobra.Command {
 			ctx := module.NewContext(top)
 			foldersmod := module.NewFoldersModule(ctx, false)
 			totalmod := module.NewTotalModule(ctx)
-			detailfilemod := module.NewDetailFileModule(opt.verbosity, opt.vrange)
+			detailfilemod := module.NewDetailFileModule(opt.vrange)
 			totalfilemod := module.NewAggregateFileModule(ctx)
 			extmod := module.NewExtensionModule(ctx, false)
 			topfilesmod := module.NewTopFilesModule(ctx)
