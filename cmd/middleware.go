@@ -24,11 +24,11 @@ func run(path string, c conf, modules ...module.Module) {
 	r(path, c.fs(), c.w(), modules...)
 }
 
-func newTimeMeasureR(c module.Runner) module.Runner {
+func newTimeMeasureR(wrapped module.Runner) module.Runner {
 	return func(path string, fs afero.Fs, w io.Writer, modules ...module.Module) {
 		start := time.Now()
 
-		c(path, fs, w, modules...)
+		wrapped(path, fs, w, modules...)
 
 		elapsed := time.Since(start)
 
@@ -36,7 +36,7 @@ func newTimeMeasureR(c module.Runner) module.Runner {
 	}
 }
 
-func newPathCorrectionR(c module.Runner) module.Runner {
+func newPathCorrectionR(wrapped module.Runner) module.Runner {
 	return func(path string, fs afero.Fs, w io.Writer, modules ...module.Module) {
 		if _, err := fs.Stat(path); os.IsNotExist(err) {
 			return
@@ -48,15 +48,15 @@ func newPathCorrectionR(c module.Runner) module.Runner {
 
 		color.Fprintf(w, "Root: <red>%s</>\n\n", path)
 
-		c(path, fs, w, modules...)
+		wrapped(path, fs, w, modules...)
 	}
 }
 
 // newPrintMemoryR outputs the current, total and OS memory being used. As well as the number
 // of garage collection cycles completed.
-func newPrintMemoryR(c module.Runner) module.Runner {
+func newPrintMemoryR(wrapped module.Runner) module.Runner {
 	return func(path string, fs afero.Fs, w io.Writer, modules ...module.Module) {
-		c(path, fs, w, modules...)
+		wrapped(path, fs, w, modules...)
 
 		if !showMemory {
 			return
