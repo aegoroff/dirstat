@@ -25,7 +25,7 @@ type Range struct {
 	Max int64
 }
 
-type ranges [10]Range
+type ranges []Range
 
 // Contains defines whether the number specified within range
 func (r *Range) Contains(num int64) bool {

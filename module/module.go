@@ -153,7 +153,7 @@ func newModule(w worker, r ...renderer) Module {
 }
 
 func newRanges() ranges {
-	rs := [...]Range{
+	rs := []Range{
 		{Min: 0, Max: 100 * kbyte},
 		{Min: 100 * kbyte, Max: mbyte},
 		{Min: mbyte, Max: 10 * mbyte},
