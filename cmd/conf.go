@@ -21,22 +21,22 @@ type conf interface {
 }
 
 type appConf struct {
-	afero  afero.Fs
-	stdout io.Writer
+	filesystem afero.Fs
+	writer     io.Writer
 }
 
 func (a *appConf) fs() afero.Fs {
-	return a.afero
+	return a.filesystem
 }
 
 func (a *appConf) w() io.Writer {
-	return a.stdout
+	return a.writer
 }
 
 func newAppConf() conf {
 	c := appConf{
-		afero:  afero.NewOsFs(),
-		stdout: os.Stdout,
+		filesystem: afero.NewOsFs(),
+		writer:     os.Stdout,
 	}
 	return &c
 }
