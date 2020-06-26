@@ -13,10 +13,15 @@ import (
 )
 
 func run(path string, c conf, modules ...module.Module) {
-	timing := newTimeMeasureR(module.Execute)
-	memory := newPrintMemoryR(timing)
-	pathing := newPathCorrectionR(memory)
-	pathing(path, c.fs(), c.w(), modules...)
+	var r module.Runner
+	{
+		r = module.Execute
+		r = newTimeMeasureR(r)
+		r = newPrintMemoryR(r)
+		r = newPathCorrectionR(r)
+	}
+
+	r(path, c.fs(), c.w(), modules...)
 }
 
 func newTimeMeasureR(c module.Runner) module.Runner {
