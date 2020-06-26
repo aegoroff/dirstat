@@ -15,7 +15,7 @@ type topFilesWorker struct {
 }
 
 type topFilesRenderer struct {
-	work *topFilesWorker
+	*topFilesWorker
 }
 
 func newTopFilesWorker(top int) *topFilesWorker {
@@ -40,14 +40,14 @@ func (m *topFilesWorker) handler(evt *sys.ScanEvent) {
 // Renderer method
 
 func (m *topFilesRenderer) print(p printer) {
-	p.cprint("\n<gray>TOP %d files by size:</>\n\n", m.work.tree.size)
+	p.cprint("\n<gray>TOP %d files by size:</>\n\n", m.tree.size)
 
 	p.print("%v\t%v\n", "File", "Size")
 	p.print("%v\t%v\n", "------", "----")
 
 	i := 1
 
-	m.work.tree.tree.Descend(func(n rbtree.Node) bool {
+	m.tree.tree.Descend(func(n rbtree.Node) bool {
 		file := n.Key().(*file)
 		h := fmt.Sprintf("%2d. %s", i, file)
 
