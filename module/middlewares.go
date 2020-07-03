@@ -14,7 +14,7 @@ func newFileFilterMiddleware(wrk worker) worker {
 	}
 }
 
-func (f *fileFilterMiddleware) init() {}
+func (*fileFilterMiddleware) init() {}
 
 func (f *fileFilterMiddleware) handler(evt *sys.ScanEvent) {
 	if evt.File == nil {
@@ -23,4 +23,4 @@ func (f *fileFilterMiddleware) handler(evt *sys.ScanEvent) {
 	f.wrk.handler(evt)
 }
 
-func (f *fileFilterMiddleware) finalize() {}
+func (*fileFilterMiddleware) finalize() {}
