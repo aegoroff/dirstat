@@ -7,6 +7,7 @@ import (
 )
 
 type extWorker struct {
+	voidInit
 	total      *totalInfo
 	aggregator map[string]countSizeAggregate
 }
@@ -28,9 +29,6 @@ func newExtRenderer(work *extWorker, top int) renderer {
 }
 
 // Worker methods
-
-func (*extWorker) init() {
-}
 
 func (m *extWorker) finalize() {
 	m.total.CountFileExts = len(m.aggregator)

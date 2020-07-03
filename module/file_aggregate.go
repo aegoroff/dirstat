@@ -3,6 +3,8 @@ package module
 import "dirstat/module/internal/sys"
 
 type aggregateFileWorker struct {
+	voidInit
+	voidFinalize
 	aggregate  map[Range]fileStat
 	fileRanges ranges
 }
@@ -25,9 +27,6 @@ func newAggregateFileRenderer(ctx *Context, w *aggregateFileWorker) *aggregateFi
 		work:  w,
 	}
 }
-
-func (*aggregateFileWorker) init()     {}
-func (*aggregateFileWorker) finalize() {}
 
 func (m *aggregateFileWorker) handler(evt *sys.ScanEvent) {
 	f := evt.File

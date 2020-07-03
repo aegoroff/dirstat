@@ -29,10 +29,26 @@ func (m *module) renderers() []renderer {
 }
 
 type worker interface {
-	init()
+	initer
+	finalizer
 	handler(evt *sys.ScanEvent)
+}
+
+type initer interface {
+	init()
+}
+
+type finalizer interface {
 	finalize()
 }
+
+type voidInit struct{}
+
+func (*voidInit) init() {}
+
+type voidFinalize struct{}
+
+func (*voidFinalize) finalize() {}
 
 type renderer interface {
 	print(p printer)

@@ -67,6 +67,7 @@ func (fs *folderS) LessThan(y interface{}) bool { return fs.size < y.(*folderS).
 func (fs *folderS) EqualTo(y interface{}) bool  { return fs.size == y.(*folderS).size }
 
 type foldersWorker struct {
+	voidInit
 	total   *totalInfo
 	folders rbtree.RbTree
 	bySize  *fixedTree
@@ -91,9 +92,6 @@ func newFoldersRenderer(work *foldersWorker) renderer {
 }
 
 // Worker methods
-
-func (*foldersWorker) init() {
-}
 
 func (m *foldersWorker) finalize() {
 	m.folders.WalkInorder(func(node rbtree.Node) {

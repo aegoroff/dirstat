@@ -6,6 +6,7 @@ import (
 )
 
 type detailFileWorker struct {
+	voidFinalize
 	distribution     map[Range]files
 	enabledRanges    []int
 	enabledRangesMap map[int]bool
@@ -36,8 +37,6 @@ func (m *detailFileWorker) init() {
 		m.enabledRangesMap[x] = true
 	}
 }
-
-func (*detailFileWorker) finalize() {}
 
 func (m *detailFileWorker) handler(evt *sys.ScanEvent) {
 	f := evt.File

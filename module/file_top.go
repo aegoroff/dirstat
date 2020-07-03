@@ -11,6 +11,8 @@ func newTopFilesRenderer(work *topFilesWorker) renderer {
 }
 
 type topFilesWorker struct {
+	voidInit
+	voidFinalize
 	tree *fixedTree
 }
 
@@ -19,13 +21,10 @@ type topFilesRenderer struct {
 }
 
 func newTopFilesWorker(top int) *topFilesWorker {
-	return &topFilesWorker{newFixedTree(top)}
+	return &topFilesWorker{tree: newFixedTree(top)}
 }
 
 // Worker methods
-
-func (*topFilesWorker) init()     {}
-func (*topFilesWorker) finalize() {}
 
 func (m *topFilesWorker) handler(evt *sys.ScanEvent) {
 	f := evt.File
