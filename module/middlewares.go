@@ -5,6 +5,8 @@ import (
 )
 
 type fileFilterMiddleware struct {
+	voidInit
+	voidFinalize
 	wrk worker
 }
 
@@ -14,13 +16,9 @@ func newFileFilterMiddleware(wrk worker) worker {
 	}
 }
 
-func (*fileFilterMiddleware) init() {}
-
 func (f *fileFilterMiddleware) handler(evt *sys.ScanEvent) {
 	if evt.File == nil {
 		return
 	}
 	f.wrk.handler(evt)
 }
-
-func (*fileFilterMiddleware) finalize() {}
