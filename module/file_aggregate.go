@@ -30,9 +30,6 @@ func (*aggregateFileWorker) init()     {}
 func (*aggregateFileWorker) finalize() {}
 
 func (m *aggregateFileWorker) handler(evt *sys.ScanEvent) {
-	if evt.File == nil {
-		return
-	}
 	f := evt.File
 
 	unsignedSize := uint64(f.Size)

@@ -94,7 +94,7 @@ func NewFoldersModule(ctx *Context, hideOutput bool) Module {
 func NewTopFilesModule(ctx *Context) Module {
 	work := newTopFilesWorker(ctx.top)
 	rend := newTopFilesRenderer(work)
-	m := newModule(work, rend)
+	m := newModule(newFileFilterMiddleware(work), rend)
 	return m
 }
 
@@ -109,7 +109,7 @@ func NewDetailFileModule(enabledRanges []int) Module {
 	}
 	work := newDetailFileWorker(newRanges(), enabledRanges)
 	rend := newDetailFileRenderer(work)
-	m := newModule(work, rend)
+	m := newModule(newFileFilterMiddleware(work), rend)
 	return m
 }
 
@@ -117,10 +117,10 @@ func NewDetailFileModule(enabledRanges []int) Module {
 func NewExtensionModule(ctx *Context, hideOutput bool) Module {
 	work := newExtWorker(ctx)
 	if hideOutput {
-		return newModule(work)
+		return newModule(newFileFilterMiddleware(work))
 	}
 	rend := newExtRenderer(work, ctx.top)
-	return newModule(work, rend)
+	return newModule(newFileFilterMiddleware(work), rend)
 }
 
 // NewAggregateFileModule creates new total file statistic module
@@ -128,7 +128,7 @@ func NewAggregateFileModule(ctx *Context) Module {
 	work := newAggregateFileWorker(newRanges())
 	rend := newAggregateFileRenderer(ctx, work)
 
-	m := newModule(work, rend)
+	m := newModule(newFileFilterMiddleware(work), rend)
 	return m
 }
 

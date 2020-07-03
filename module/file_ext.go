@@ -37,9 +37,6 @@ func (m *extWorker) finalize() {
 }
 
 func (m *extWorker) handler(evt *sys.ScanEvent) {
-	if evt.File == nil {
-		return
-	}
 	f := evt.File
 
 	// Accumulate file statistic

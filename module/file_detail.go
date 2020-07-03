@@ -40,9 +40,6 @@ func (m *detailFileWorker) init() {
 func (*detailFileWorker) finalize() {}
 
 func (m *detailFileWorker) handler(evt *sys.ScanEvent) {
-	if evt.File == nil {
-		return
-	}
 	f := evt.File
 
 	// Calculate files range statistic

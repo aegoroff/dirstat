@@ -28,9 +28,6 @@ func (*topFilesWorker) init()     {}
 func (*topFilesWorker) finalize() {}
 
 func (m *topFilesWorker) handler(evt *sys.ScanEvent) {
-	if evt.File == nil {
-		return
-	}
 	f := evt.File
 
 	fileContainer := file{size: f.Size, path: f.Path}
