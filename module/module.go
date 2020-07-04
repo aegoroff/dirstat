@@ -6,15 +6,6 @@ import (
 	"io"
 )
 
-// Module defines working modules interface
-type Module interface {
-	workers() []worker
-	renderers() []renderer
-}
-
-// Runner defines executable function prototype
-type Runner func(path string, fs afero.Fs, w io.Writer, modules ...Module)
-
 type module struct {
 	wks []worker
 	rnd []renderer
@@ -28,20 +19,6 @@ func (m *module) renderers() []renderer {
 	return m.rnd
 }
 
-type worker interface {
-	initer
-	finalizer
-	handler(evt *sys.ScanEvent)
-}
-
-type initer interface {
-	init()
-}
-
-type finalizer interface {
-	finalize()
-}
-
 type voidInit struct{}
 
 func (*voidInit) init() {}
@@ -49,10 +26,6 @@ func (*voidInit) init() {}
 type voidFinalize struct{}
 
 func (*voidFinalize) finalize() {}
-
-type renderer interface {
-	print(p printer)
-}
 
 // Context defines modules context
 type Context struct {
