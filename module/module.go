@@ -6,27 +6,6 @@ import (
 	"io"
 )
 
-type module struct {
-	wks []worker
-	rnd []renderer
-}
-
-func (m *module) workers() []worker {
-	return m.wks
-}
-
-func (m *module) renderers() []renderer {
-	return m.rnd
-}
-
-type voidInit struct{}
-
-func (*voidInit) init() {}
-
-type voidFinalize struct{}
-
-func (*voidFinalize) finalize() {}
-
 // Context defines modules context
 type Context struct {
 	total *totalInfo
@@ -131,6 +110,27 @@ func NewTotalModule(ctx *Context) Module {
 	}
 	return &m
 }
+
+type module struct {
+	wks []worker
+	rnd []renderer
+}
+
+func (m *module) workers() []worker {
+	return m.wks
+}
+
+func (m *module) renderers() []renderer {
+	return m.rnd
+}
+
+type voidInit struct{}
+
+func (*voidInit) init() {}
+
+type voidFinalize struct{}
+
+func (*voidFinalize) finalize() {}
 
 func newModule(w worker, r ...renderer) Module {
 	m := module{
