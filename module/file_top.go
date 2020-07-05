@@ -6,6 +6,10 @@ import (
 	"github.com/aegoroff/godatastruct/rbtree"
 )
 
+func newTopFilesWorker(top int) *topFilesWorker {
+	return &topFilesWorker{tree: newFixedTree(top)}
+}
+
 func newTopFilesRenderer(work *topFilesWorker) renderer {
 	return &topFilesRenderer{work}
 }
@@ -20,17 +24,13 @@ type topFilesRenderer struct {
 	*topFilesWorker
 }
 
-func newTopFilesWorker(top int) *topFilesWorker {
-	return &topFilesWorker{tree: newFixedTree(top)}
-}
-
 // Worker methods
 
 func (m *topFilesWorker) handler(evt *sys.ScanEvent) {
 	f := evt.File
 
-	fileContainer := file{size: f.Size, path: f.Path}
-	m.tree.insert(&fileContainer)
+	fc := file{size: f.Size, path: f.Path}
+	m.tree.insert(&fc)
 }
 
 // Renderer method
