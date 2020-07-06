@@ -4,15 +4,15 @@ import (
 	"dirstat/module/internal/sys"
 )
 
+type fileHandler func(f *sys.FileEntry)
+
 type fileFilterMiddleware struct {
-	voidInit
-	voidFinalize
-	wrk worker
+	h fileHandler
 }
 
-func newFileFilterMiddleware(wrk worker) worker {
+func newFileFilterMiddleware(h fileHandler) *fileFilterMiddleware {
 	return &fileFilterMiddleware{
-		wrk: wrk,
+		h: h,
 	}
 }
 
@@ -20,5 +20,5 @@ func (f *fileFilterMiddleware) handler(evt *sys.ScanEvent) {
 	if evt.File == nil {
 		return
 	}
-	f.wrk.handler(evt)
+	f.h(evt.File)
 }

@@ -8,6 +8,7 @@ import (
 
 type extWorker struct {
 	voidInit
+	*fileFilterMiddleware
 	total      *totalInfo
 	aggregator map[string]countSizeAggregate
 }
@@ -18,10 +19,14 @@ type extRenderer struct {
 }
 
 func newExtWorker(ctx *Context) *extWorker {
-	return &extWorker{
+	w := extWorker{
 		total:      ctx.total,
 		aggregator: make(map[string]countSizeAggregate),
 	}
+
+	w.fileFilterMiddleware = newFileFilterMiddleware(w.onFile)
+
+	return &w
 }
 
 func newExtRenderer(work *extWorker, top int) renderer {
@@ -34,9 +39,7 @@ func (m *extWorker) finalize() {
 	m.total.CountFileExts = len(m.aggregator)
 }
 
-func (m *extWorker) handler(evt *sys.ScanEvent) {
-	f := evt.File
-
+func (m *extWorker) onFile(f *sys.FileEntry) {
 	// Accumulate file statistic
 	m.total.FilesTotal.Count++
 	m.total.FilesTotal.Size += uint64(f.Size)

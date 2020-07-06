@@ -18,6 +18,10 @@ type Runner func(path string, fs afero.Fs, w io.Writer, modules ...Module)
 type worker interface {
 	initer
 	finalizer
+	handlerer
+}
+
+type handlerer interface {
 	handler(evt *sys.ScanEvent)
 }
 

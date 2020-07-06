@@ -7,6 +7,7 @@ import (
 
 type detailFileWorker struct {
 	voidFinalize
+	*fileFilterMiddleware
 	distribution     map[Range]files
 	enabledRanges    []int
 	enabledRangesMap map[int]bool
@@ -18,11 +19,15 @@ type detailFileRenderer struct {
 }
 
 func newDetailFileWorker(rs ranges, enabledRanges []int) *detailFileWorker {
-	return &detailFileWorker{
+	w := detailFileWorker{
 		enabledRanges: enabledRanges,
 		distribution:  make(map[Range]files),
 		fileRanges:    rs,
 	}
+
+	w.fileFilterMiddleware = newFileFilterMiddleware(w.onFile)
+
+	return &w
 }
 
 func newDetailFileRenderer(work *detailFileWorker) renderer {
@@ -38,9 +43,7 @@ func (m *detailFileWorker) init() {
 	}
 }
 
-func (m *detailFileWorker) handler(evt *sys.ScanEvent) {
-	f := evt.File
-
+func (m *detailFileWorker) onFile(f *sys.FileEntry) {
 	// Calculate files range statistic
 	for i, r := range m.fileRanges {
 		// Store each file info within range only i verbose option set

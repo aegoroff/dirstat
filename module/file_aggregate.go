@@ -5,6 +5,7 @@ import "dirstat/module/internal/sys"
 type aggregateFileWorker struct {
 	voidInit
 	voidFinalize
+	*fileFilterMiddleware
 	aggregate  map[Range]fileStat
 	fileRanges ranges
 }
@@ -15,10 +16,14 @@ type aggregateFileRenderer struct {
 }
 
 func newAggregateFileWorker(rs ranges) *aggregateFileWorker {
-	return &aggregateFileWorker{
+	w := aggregateFileWorker{
 		aggregate:  make(map[Range]fileStat),
 		fileRanges: rs,
 	}
+
+	w.fileFilterMiddleware = newFileFilterMiddleware(w.onFile)
+
+	return &w
 }
 
 func newAggregateFileRenderer(ctx *Context, w *aggregateFileWorker) *aggregateFileRenderer {
@@ -28,9 +33,7 @@ func newAggregateFileRenderer(ctx *Context, w *aggregateFileWorker) *aggregateFi
 	}
 }
 
-func (m *aggregateFileWorker) handler(evt *sys.ScanEvent) {
-	f := evt.File
-
+func (m *aggregateFileWorker) onFile(f *sys.FileEntry) {
 	unsignedSize := uint64(f.Size)
 
 	// Calculate files range statistic

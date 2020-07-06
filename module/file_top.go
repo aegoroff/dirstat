@@ -11,12 +11,17 @@ func newTopFilesWorker(top int) *topFilesWorker {
 }
 
 func newTopFilesRenderer(work *topFilesWorker) renderer {
-	return &topFilesRenderer{work}
+	w := topFilesRenderer{work}
+
+	w.fileFilterMiddleware = newFileFilterMiddleware(w.onFile)
+
+	return &w
 }
 
 type topFilesWorker struct {
 	voidInit
 	voidFinalize
+	*fileFilterMiddleware
 	tree *fixedTree
 }
 
@@ -26,9 +31,7 @@ type topFilesRenderer struct {
 
 // Worker methods
 
-func (m *topFilesWorker) handler(evt *sys.ScanEvent) {
-	f := evt.File
-
+func (m *topFilesWorker) onFile(f *sys.FileEntry) {
 	fc := file{size: f.Size, path: f.Path}
 	m.tree.insert(&fc)
 }
