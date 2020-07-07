@@ -12,8 +12,10 @@ import (
 	"time"
 )
 
+type runner func(path string, fs afero.Fs, w io.Writer, modules ...module.Module)
+
 func run(path string, c conf, modules ...module.Module) {
-	var r module.Runner
+	var r runner
 	{
 		r = module.Execute
 		r = newTimeMeasureR(r)
@@ -24,7 +26,7 @@ func run(path string, c conf, modules ...module.Module) {
 	r(path, c.fs(), c.w(), modules...)
 }
 
-func newTimeMeasureR(wrapped module.Runner) module.Runner {
+func newTimeMeasureR(wrapped runner) runner {
 	return func(path string, fs afero.Fs, w io.Writer, modules ...module.Module) {
 		start := time.Now()
 
@@ -36,7 +38,7 @@ func newTimeMeasureR(wrapped module.Runner) module.Runner {
 	}
 }
 
-func newPathCorrectionR(wrapped module.Runner) module.Runner {
+func newPathCorrectionR(wrapped runner) runner {
 	return func(path string, fs afero.Fs, w io.Writer, modules ...module.Module) {
 		if _, err := fs.Stat(path); os.IsNotExist(err) {
 			return
@@ -54,7 +56,7 @@ func newPathCorrectionR(wrapped module.Runner) module.Runner {
 
 // newPrintMemoryR outputs the current, total and OS memory being used. As well as the number
 // of garage collection cycles completed.
-func newPrintMemoryR(wrapped module.Runner) module.Runner {
+func newPrintMemoryR(wrapped runner) runner {
 	return func(path string, fs afero.Fs, w io.Writer, modules ...module.Module) {
 		wrapped(path, fs, w, modules...)
 
