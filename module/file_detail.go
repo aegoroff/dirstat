@@ -7,7 +7,7 @@ import (
 
 type detailFileWorker struct {
 	voidFinalize
-	*fileFilterMiddleware
+	*fileFilter
 	distribution     map[Range]files
 	enabledRanges    []int
 	enabledRangesMap map[int]bool
@@ -25,7 +25,7 @@ func newDetailFileWorker(rs ranges, enabledRanges []int) *detailFileWorker {
 		fileRanges:    rs,
 	}
 
-	w.fileFilterMiddleware = newFileFilterMiddleware(w.onFile)
+	w.fileFilter = newFileFilter(w.onFile)
 
 	return &w
 }

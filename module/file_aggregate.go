@@ -5,7 +5,7 @@ import "dirstat/module/internal/sys"
 type aggregateFileWorker struct {
 	voidInit
 	voidFinalize
-	*fileFilterMiddleware
+	*fileFilter
 	aggregate  map[Range]fileStat
 	fileRanges ranges
 }
@@ -21,7 +21,7 @@ func newAggregateFileWorker(rs ranges) *aggregateFileWorker {
 		fileRanges: rs,
 	}
 
-	w.fileFilterMiddleware = newFileFilterMiddleware(w.onFile)
+	w.fileFilter = newFileFilter(w.onFile)
 
 	return &w
 }

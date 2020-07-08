@@ -8,7 +8,7 @@ import (
 
 type extWorker struct {
 	voidInit
-	*fileFilterMiddleware
+	*fileFilter
 	total      *totalInfo
 	aggregator map[string]countSizeAggregate
 }
@@ -24,7 +24,7 @@ func newExtWorker(ctx *Context) *extWorker {
 		aggregator: make(map[string]countSizeAggregate),
 	}
 
-	w.fileFilterMiddleware = newFileFilterMiddleware(w.onFile)
+	w.fileFilter = newFileFilter(w.onFile)
 
 	return &w
 }

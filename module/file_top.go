@@ -13,7 +13,7 @@ func newTopFilesWorker(top int) *topFilesWorker {
 func newTopFilesRenderer(work *topFilesWorker) renderer {
 	w := topFilesRenderer{work}
 
-	w.fileFilterMiddleware = newFileFilterMiddleware(w.onFile)
+	w.fileFilter = newFileFilter(w.onFile)
 
 	return &w
 }
@@ -21,7 +21,7 @@ func newTopFilesRenderer(work *topFilesWorker) renderer {
 type topFilesWorker struct {
 	voidInit
 	voidFinalize
-	*fileFilterMiddleware
+	*fileFilter
 	tree *fixedTree
 }
 
