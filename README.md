@@ -2,6 +2,7 @@ dirstat
 =======
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/771c99225c8c4ad0a83115d2403f9fa0)](https://app.codacy.com/manual/egoroff/dirstat?utm_source=github.com&utm_medium=referral&utm_content=aegoroff/dirstat&utm_campaign=Badge_Grade_Dashboard)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Faegoroff%2Fdirstat.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Faegoroff%2Fdirstat?ref=badge_shield)
 
 A small tool that shows selected folder or drive (on Windows) usage statistic.
 The tool shows file and folder statistic like the number of files or folders, top 10 files and folders by size,
@@ -153,3 +154,6 @@ Read taken:    8.0340003s
 
 Alloc = 142 MiB TotalAlloc = 3.4 GiB    Sys = 732 MiB   NumGC = 87
 ```
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Faegoroff%2Fdirstat.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Faegoroff%2Fdirstat?ref=badge_large)
