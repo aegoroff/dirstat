@@ -21,7 +21,7 @@ type detailFileRenderer struct {
 func newDetailFileWorker(rs ranges, enabledRanges []int) *detailFileWorker {
 	w := detailFileWorker{
 		enabledRanges: enabledRanges,
-		distribution:  make(map[Range]files),
+		distribution:  make(map[Range]files, len(rs)),
 		fileRanges:    rs,
 	}
 

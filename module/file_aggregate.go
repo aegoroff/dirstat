@@ -17,7 +17,7 @@ type aggregateFileRenderer struct {
 
 func newAggregateFileWorker(rs ranges) *aggregateFileWorker {
 	w := aggregateFileWorker{
-		aggregate:  make(map[Range]fileStat),
+		aggregate:  make(map[Range]fileStat, len(rs)),
 		fileRanges: rs,
 	}
 

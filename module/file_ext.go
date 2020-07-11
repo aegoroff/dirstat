@@ -21,7 +21,7 @@ type extRenderer struct {
 func newExtWorker(ctx *Context) *extWorker {
 	w := extWorker{
 		total:      ctx.total,
-		aggregator: make(map[string]countSizeAggregate),
+		aggregator: make(map[string]countSizeAggregate, 8192),
 	}
 
 	w.fileFilter = newFileFilter(w.onFile)
