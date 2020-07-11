@@ -190,7 +190,7 @@ func dirents(path string, fs afero.Fs, restrict chan struct{}) []*filesysEntry {
 	if err != nil {
 		return nil
 	}
-	defer f.Close()
+	defer Close(f)
 
 	entries, err := f.Readdir(-1)
 	if err != nil {
