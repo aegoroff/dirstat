@@ -27,15 +27,15 @@ type walkNode struct {
 	Size   int64
 }
 
-func (n node) ID() int64 {
+func (n *node) ID() int64 {
 	return n.NodeID
 }
 
-func (n node) DOTID() string {
+func (n *node) DOTID() string {
 	return fmt.Sprintf("\"%s\"", n.Name)
 }
 
-func createFileSystemGraph(path string, fs afero.Fs) (graph *simple.WeightedDirectedGraph, root *node, elapsed time.Duration) {
+func newFileSystemGraph(path string, fs afero.Fs) (graph *simple.WeightedDirectedGraph, root *node, elapsed time.Duration) {
 	graph = simple.NewWeightedDirectedGraph(0, math.Inf(1))
 
 	start := time.Now()
