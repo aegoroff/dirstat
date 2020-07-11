@@ -22,13 +22,6 @@ install:
   - set PATH=%GOPATH%\bin;c:\go\bin;C:\msys64\usr\bin;%PATH%
   - go version
   - go env
-  - go get -u "github.com/aegoroff/godatastruct/rbtree"
-  - go get -u "github.com/spf13/afero"
-  - go get -u "github.com/spf13/cobra"
-  - go get -u "github.com/dustin/go-humanize"
-  - go get -u "gonum.org/v1/gonum/graph/simple"
-  - go get -u "github.com/akutz/sortfold"
-  - go get -u "github.com/gookit/color"
   - go get "github.com/mitchellh/gox"
 
 stack: go ^1.14
