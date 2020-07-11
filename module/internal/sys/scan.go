@@ -62,9 +62,7 @@ const (
 // and all file handlers on each file
 func Scan(path string, fs afero.Fs, handlers []ScanHandler) {
 	filesystemCh := make(chan *filesystemItem, 1024)
-	go func() {
-		walkDirBreadthFirst(path, fs, filesystemCh)
-	}()
+	go walkDirBreadthFirst(path, fs, filesystemCh)
 
 	scanChan := make(chan *ScanEvent, 1024)
 
