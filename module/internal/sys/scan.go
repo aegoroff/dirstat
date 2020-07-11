@@ -100,6 +100,8 @@ func Scan(path string, fs afero.Fs, handlers []ScanHandler) {
 
 func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- *filesystemItem) {
 	defer close(results)
+	var concurrencyRestrict = make(chan struct{}, 32)
+	defer close(concurrencyRestrict)
 
 	var wg sync.WaitGroup
 	var mu sync.RWMutex
@@ -119,7 +121,7 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- *filesystemIte
 		go func(d string) {
 			defer wg.Done()
 
-			entries := dirents(d, fs)
+			entries := dirents(d, fs, concurrencyRestrict)
 
 			if entries == nil {
 				return
@@ -181,11 +183,9 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- *filesystemIte
 	}
 }
 
-var concurrencyRestrictor = make(chan struct{}, 32)
-
-func dirents(path string, fs afero.Fs) []*filesysEntry {
-	concurrencyRestrictor <- struct{}{}
-	defer func() { <-concurrencyRestrictor }()
+func dirents(path string, fs afero.Fs, restrict chan struct{}) []*filesysEntry {
+	restrict <- struct{}{}
+	defer func() { <-restrict }()
 	f, err := fs.Open(path)
 	if err != nil {
 		return nil
