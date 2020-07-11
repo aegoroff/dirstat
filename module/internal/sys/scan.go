@@ -197,7 +197,7 @@ func dirents(path string, fs afero.Fs, restrict chan struct{}) []*filesysEntry {
 		return nil
 	}
 
-	var result = []*filesysEntry{}
+	var result []*filesysEntry
 	for _, e := range entries {
 		// dont follow symlinks
 		if e.Mode()&os.ModeSymlink == 0 {
