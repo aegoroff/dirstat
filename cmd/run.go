@@ -70,6 +70,6 @@ func newPrintMemoryR(wrapped runner) runner {
 		color.Fprintf(w, "\tTotalAlloc = <gray>%s</>", humanize.IBytes(m.TotalAlloc))
 		color.Fprintf(w, "\tSys = <gray>%s</>", humanize.IBytes(m.Sys))
 		color.Fprintf(w, "\tNumGC = <gray>%v</>", m.NumGC)
-		color.Fprintf(w, "\tNumGoRoutines = <gray>%v</>\n", runtime.NumCgoCall())
+		color.Fprintf(w, "\tNumGoRoutines = <gray>%v</>\n", runtime.NumGoroutine())
 	}
 }
