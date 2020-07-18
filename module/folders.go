@@ -141,8 +141,8 @@ func (f *foldersRenderer) print(p printer) {
 }
 
 func (f *foldersRenderer) printTop(ft *fixedTree, p printer, format string, cast folderCast) {
-	p.print(format, "Folder", "Files", "%", "Size", "%")
-	p.print(format, "------", "-----", "------", "----", "------")
+	p.tprint(format, "Folder", "Files", "%", "Size", "%")
+	p.tprint(format, "------", "-----", "------", "----", "------")
 
 	i := 1
 

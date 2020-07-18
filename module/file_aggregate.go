@@ -55,8 +55,8 @@ func (m *aggregateFileRenderer) print(p printer) {
 	const format = "%v\t%v\t%v\t%v\t%v\n"
 
 	p.cprint("<gray>Total files stat:</>\n\n")
-	p.print(format, "File size", "Amount", "%", "Size", "%")
-	p.print(format, "---------", "------", "------", "----", "------")
+	p.tprint(format, "File size", "Amount", "%", "Size", "%")
+	p.tprint(format, "---------", "------", "------", "----", "------")
 
 	heads := m.work.fileRanges.heads()
 	for i, r := range m.work.fileRanges {

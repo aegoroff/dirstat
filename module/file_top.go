@@ -41,8 +41,8 @@ func (m *topFilesWorker) onFile(f *sys.FileEntry) {
 func (m *topFilesRenderer) print(p printer) {
 	p.cprint("\n<gray>TOP %d files by size:</>\n\n", m.tree.size)
 
-	p.print("%v\t%v\n", "File", "Size")
-	p.print("%v\t%v\n", "------", "----")
+	p.tprint("%v\t%v\n", "File", "Size")
+	p.tprint("%v\t%v\n", "------", "----")
 
 	i := 1
 
@@ -52,7 +52,7 @@ func (m *topFilesRenderer) print(p printer) {
 
 		i++
 
-		p.print("%v\t%v\n", h, human(file.size))
+		p.tprint("%v\t%v\n", h, human(file.size))
 
 		return true
 	})

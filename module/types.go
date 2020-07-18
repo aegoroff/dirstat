@@ -66,7 +66,7 @@ func (t *totalInfo) printCountAndSizeStatLine(p printer, count int64, sz uint64,
 	percentOfCount := t.countPercent(count)
 	percentOfSize := t.sizePercent(sz)
 
-	p.print("%v\t%v\t%.2f%%\t%v\t%.2f%%\n", title, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
+	p.tprint("%v\t%v\t%.2f%%\t%v\t%.2f%%\n", title, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
 }
 
 func newFixedTree(sz int) *fixedTree {

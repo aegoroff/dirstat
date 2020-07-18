@@ -11,7 +11,11 @@ import (
 type printer interface {
 	writer() io.Writer
 	flush()
-	print(format string, a ...interface{})
+
+	// tprint prints using tab writer
+	tprint(format string, a ...interface{})
+
+	// cprint prints data with suppport colorizing
 	cprint(format string, a ...interface{})
 }
 
@@ -28,7 +32,7 @@ func (r *prn) flush() {
 	_ = r.tw.Flush()
 }
 
-func (r *prn) print(format string, a ...interface{}) {
+func (r *prn) tprint(format string, a ...interface{}) {
 	_, _ = fmt.Fprintf(r.tw, format, a...)
 }
 
