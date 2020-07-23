@@ -64,7 +64,7 @@ func (m *detailFileWorker) onFile(f *sys.FileEntry) {
 
 func (m *detailFileRenderer) print(p printer) {
 	if len(m.enabledRanges) > 0 {
-		heads := m.fileRanges.heads()
+		heads := m.fileRanges.heads(true)
 		p.cprint("\n<gray>Detailed files stat:</>\n")
 		for i, r := range m.fileRanges {
 			if len(m.distribution[r]) == 0 {

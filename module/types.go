@@ -66,11 +66,11 @@ func percent(value float64, total float64) float64 {
 	return (value / total) * 100
 }
 
-func (t *totalInfo) printCountAndSizeStatLine(p printer, count int64, sz uint64, title string) {
+func (t *totalInfo) printCountAndSizeStatLine(p printer, ix int, count int64, sz uint64, title string) {
 	percentOfCount := t.countPercent(count)
 	percentOfSize := t.sizePercent(sz)
 
-	p.tprint("%v\t%v\t%.2f%%\t%v\t%.2f%%\n", title, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
+	p.tprint("%2d\t%v\t%v\t%.2f%%\t%v\t%.2f%%\n", ix, title, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
 }
 
 func newFixedTree(sz int) *fixedTree {
@@ -93,10 +93,13 @@ func (t *fixedTree) insert(c rbtree.Comparable) {
 	}
 }
 
-func (r ranges) heads() []string {
+func (r ranges) heads(addNum bool) []string {
 	var heads []string
 	for i, r := range r {
-		h := fmt.Sprintf("%2d. Between %s and %s", i+1, human(r.Min), human(r.Max))
+		h := fmt.Sprintf("Between %s and %s", human(r.Min), human(r.Max))
+		if addNum {
+			h = fmt.Sprintf("%2d. %s", i+1, h)
+		}
 		heads = append(heads, h)
 	}
 	return heads

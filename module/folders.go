@@ -2,7 +2,6 @@ package module
 
 import (
 	"dirstat/module/internal/sys"
-	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
 	"strings"
@@ -129,7 +128,7 @@ func castSize(c rbtree.Comparable) folderI  { return c.(*folderS) }
 func castCount(c rbtree.Comparable) folderI { return c.(*folderC) }
 
 func (f *foldersRenderer) print(p printer) {
-	const format = "%v\t%v\t%v\t%v\t%v\n"
+	const format = "%v\t%v\t%v\t%v\t%v\t%v\n"
 
 	p.cprint("\n<gray>TOP %d folders by size:</>\n\n", f.bySize.size)
 
@@ -141,8 +140,8 @@ func (f *foldersRenderer) print(p printer) {
 }
 
 func (f *foldersRenderer) printTop(ft *fixedTree, p printer, format string, cast folderCast) {
-	p.tprint(format, "Folder", "Files", "%", "Size", "%")
-	p.tprint(format, "------", "-----", "------", "----", "------")
+	p.tprint(format, " #", "Folder", "Files", "%", "Size", "%")
+	p.tprint(format, "--", "------", "-----", "------", "----", "------")
 
 	i := 1
 
@@ -156,12 +155,12 @@ func (f *foldersRenderer) printTop(ft *fixedTree, p printer, format string, cast
 }
 
 func (f *foldersRenderer) printTableRow(i *int, fi folderI, p printer) {
-	h := fmt.Sprintf("%2d. %s", *i, fi.Path())
-
-	*i++
+	h := fi.Path()
 
 	count := fi.Count()
 	sz := uint64(fi.Size())
 
-	f.total.printCountAndSizeStatLine(p, count, sz, h)
+	f.total.printCountAndSizeStatLine(p, *i, count, sz, h)
+
+	*i++
 }

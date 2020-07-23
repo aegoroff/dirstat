@@ -65,7 +65,7 @@ func (e *extRenderer) print(p printer) {
 	sort.Sort(sort.Reverse(extBySize))
 	sort.Sort(sort.Reverse(extByCount))
 
-	const format = "%v\t%v\t%v\t%v\t%v\n"
+	const format = "%v\t%v\t%v\t%v\t%v\t%v\n"
 
 	p.cprint("\n<gray>TOP %d file extensions by size:</>\n\n", e.top)
 
@@ -93,8 +93,8 @@ func (e *extRenderer) print(p printer) {
 }
 
 func (*extRenderer) printTableHead(p printer, format string) {
-	p.tprint(format, "Extension", "Count", "%", "Size", "%")
-	p.tprint(format, "---------", "-----", "------", "----", "------")
+	p.tprint(format, " #", "Extension", "Count", "%", "Size", "%")
+	p.tprint(format, "--", "---------", "-----", "------", "----", "------")
 }
 
 func (e *extRenderer) printTopTen(p printer, data files, selector func(data files, item *file) (int64, uint64)) {
@@ -103,7 +103,7 @@ func (e *extRenderer) printTopTen(p printer, data files, selector func(data file
 
 		count, sz := selector(data, data[i])
 
-		e.work.total.printCountAndSizeStatLine(p, count, sz, h)
+		e.work.total.printCountAndSizeStatLine(p, i+1, count, sz, h)
 	}
 }
 

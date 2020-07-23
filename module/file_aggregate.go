@@ -52,18 +52,18 @@ func (m *aggregateFileWorker) onFile(f *sys.FileEntry) {
 // Renderer method
 
 func (m *aggregateFileRenderer) print(p printer) {
-	const format = "%v\t%v\t%v\t%v\t%v\n"
+	const format = "%v\t%v\t%v\t%v\t%v\t%v\n"
 
 	p.cprint("<gray>Total files stat:</>\n\n")
-	p.tprint(format, "File size", "Amount", "%", "Size", "%")
-	p.tprint(format, "---------", "------", "------", "----", "------")
+	p.tprint(format, " #", "File size", "Amount", "%", "Size", "%")
+	p.tprint(format, "--", "---------", "------", "------", "----", "------")
 
-	heads := m.work.fileRanges.heads()
+	heads := m.work.fileRanges.heads(false)
 	for i, r := range m.work.fileRanges {
 		count := m.work.aggregate[r].TotalFilesCount
 		sz := m.work.aggregate[r].TotalFilesSize
 
-		m.total.printCountAndSizeStatLine(p, count, sz, heads[i])
+		m.total.printCountAndSizeStatLine(p, i+1, count, sz, heads[i])
 	}
 	p.flush()
 }
