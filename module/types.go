@@ -55,11 +55,15 @@ type fixedTree struct {
 }
 
 func (t *totalInfo) countPercent(count int64) float64 {
-	return (float64(count) / float64(t.FilesTotal.Count)) * 100
+	return percent(float64(count), float64(t.FilesTotal.Count))
 }
 
 func (t *totalInfo) sizePercent(size uint64) float64 {
-	return (float64(size) / float64(t.FilesTotal.Size)) * 100
+	return percent(float64(size), float64(t.FilesTotal.Size))
+}
+
+func percent(value float64, total float64) float64 {
+	return (value / total) * 100
 }
 
 func (t *totalInfo) printCountAndSizeStatLine(p printer, count int64, sz uint64, title string) {
