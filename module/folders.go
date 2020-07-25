@@ -67,8 +67,8 @@ func (fs *folderS) EqualTo(y interface{}) bool  { return fs.size == y.(*folderS)
 
 type foldersWorker struct {
 	voidInit
+	voidFinalize
 	total   *totalInfo
-	folders rbtree.RbTree
 	bySize  *fixedTree
 	byCount *fixedTree
 }
@@ -80,7 +80,6 @@ type foldersRenderer struct {
 func newFoldersWorker(ctx *Context) *foldersWorker {
 	return &foldersWorker{
 		total:   ctx.total,
-		folders: rbtree.NewRbTree(),
 		bySize:  newFixedTree(ctx.top),
 		byCount: newFixedTree(ctx.top),
 	}
@@ -91,20 +90,6 @@ func newFoldersRenderer(work *foldersWorker) renderer {
 }
 
 // Worker methods
-
-func (m *foldersWorker) finalize() {
-	m.folders.WalkInorder(func(node rbtree.Node) {
-		fn := node.Key().(*folder)
-
-		fs := folderS{*fn}
-		m.bySize.insert(&fs)
-
-		fc := folderC{*fn}
-		m.byCount.insert(&fc)
-	})
-
-	m.total.CountFolders = m.folders.Len()
-}
 
 func (m *foldersWorker) handler(evt *sys.ScanEvent) {
 	if evt.Folder == nil {
@@ -117,7 +102,14 @@ func (m *foldersWorker) handler(evt *sys.ScanEvent) {
 		count: fe.Count,
 		size:  fe.Size,
 	}
-	m.folders.Insert(&fn)
+
+	fs := folderS{fn}
+	m.bySize.insert(&fs)
+
+	fc := folderC{fn}
+	m.byCount.insert(&fc)
+
+	m.total.CountFolders++
 }
 
 // Renderer method
