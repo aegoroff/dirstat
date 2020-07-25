@@ -65,7 +65,7 @@ func (e *extRenderer) print(p printer) {
 	sort.Sort(sort.Reverse(extBySize))
 	sort.Sort(sort.Reverse(extByCount))
 
-	sizePrint := file_ext_print{
+	sizePrint := fileExtPrint{
 		data:    extBySize,
 		count:   func(f *file) int64 { return e.work.aggregator[f.path].Count },
 		size:    func(f *file) uint64 { return uint64(f.size) },
@@ -76,7 +76,7 @@ func (e *extRenderer) print(p printer) {
 
 	sizePrint.print(e.top)
 
-	countPrint := file_ext_print{
+	countPrint := fileExtPrint{
 		data:    extByCount,
 		count:   func(f *file) int64 { return f.size },
 		size:    func(f *file) uint64 { return e.work.aggregator[f.path].Size },
@@ -88,7 +88,7 @@ func (e *extRenderer) print(p printer) {
 	countPrint.print(e.top)
 }
 
-type file_ext_print struct {
+type fileExtPrint struct {
 	data    files
 	count   func(f *file) int64
 	size    func(f *file) uint64
@@ -97,7 +97,7 @@ type file_ext_print struct {
 	total   *totalInfo
 }
 
-func (fp *file_ext_print) print(top int) {
+func (fp *fileExtPrint) print(top int) {
 	const format = "%v\t%v\t%v\t%v\t%v\t%v\n"
 
 	fp.p.cprint(fp.headfmt, top)
@@ -113,12 +113,12 @@ func (fp *file_ext_print) print(top int) {
 	fp.p.flush()
 }
 
-func (fp *file_ext_print) printTableHead(format string) {
+func (fp *fileExtPrint) printTableHead(format string) {
 	fp.p.tprint(format, " #", "Extension", "Count", "%", "Size", "%")
 	fp.p.tprint(format, "--", "---------", "-----", "------", "----", "------")
 }
 
-func (fp *file_ext_print) printTopTen(top int, data files, selector func(data files, item *file) (int64, uint64)) {
+func (fp *fileExtPrint) printTopTen(top int, data files, selector func(data files, item *file) (int64, uint64)) {
 	for i := 0; i < top && i < len(data); i++ {
 		h := data[i].path
 
