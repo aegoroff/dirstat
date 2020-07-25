@@ -46,7 +46,7 @@ func (m *detailFileWorker) init() {
 func (m *detailFileWorker) onFile(f *sys.FileEntry) {
 	// Calculate files range statistic
 	for i, r := range m.fileRanges {
-		// Store each file info within range only i verbose option set
+		// Store each file info within range only if this this file size detail option set
 		if !r.Contains(f.Size) || !m.enabledRangesMap[i+1] {
 			continue
 		}
