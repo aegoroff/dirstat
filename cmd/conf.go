@@ -18,11 +18,19 @@ type conf interface {
 
 	// w defines app output
 	w() io.Writer
+
+	// replaceRoot defines whether to replace root part of full path by <root> macro
+	replaceRoot() bool
 }
 
 type appConf struct {
 	filesystem afero.Fs
 	writer     io.Writer
+	rr         bool
+}
+
+func (a *appConf) replaceRoot() bool {
+	return a.rr
 }
 
 func (a *appConf) fs() afero.Fs {
@@ -33,10 +41,11 @@ func (a *appConf) w() io.Writer {
 	return a.writer
 }
 
-func newAppConf() conf {
+func newAppConf(replaceRoot bool) conf {
 	c := appConf{
 		filesystem: afero.NewOsFs(),
 		writer:     os.Stdout,
+		rr:         replaceRoot,
 	}
 	return &c
 }
