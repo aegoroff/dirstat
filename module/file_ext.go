@@ -65,45 +65,66 @@ func (e *extRenderer) print(p printer) {
 	sort.Sort(sort.Reverse(extBySize))
 	sort.Sort(sort.Reverse(extByCount))
 
+	sizePrint := file_ext_print{
+		data:    extBySize,
+		count:   func(f *file) int64 { return e.work.aggregator[f.path].Count },
+		size:    func(f *file) uint64 { return uint64(f.size) },
+		p:       p,
+		headfmt: "\n<gray>TOP %d file extensions by size:</>\n\n",
+		total:   e.work.total,
+	}
+
+	sizePrint.print(e.top)
+
+	countPrint := file_ext_print{
+		data:    extByCount,
+		count:   func(f *file) int64 { return f.size },
+		size:    func(f *file) uint64 { return e.work.aggregator[f.path].Size },
+		p:       p,
+		headfmt: "\n<gray>TOP %d file extensions by count:</>\n\n",
+		total:   e.work.total,
+	}
+
+	countPrint.print(e.top)
+}
+
+type file_ext_print struct {
+	data    files
+	count   func(f *file) int64
+	size    func(f *file) uint64
+	p       printer
+	headfmt string
+	total   *totalInfo
+}
+
+func (fp *file_ext_print) print(top int) {
 	const format = "%v\t%v\t%v\t%v\t%v\t%v\n"
 
-	p.cprint("\n<gray>TOP %d file extensions by size:</>\n\n", e.top)
+	fp.p.cprint(fp.headfmt, top)
 
-	e.printTableHead(p, format)
+	fp.printTableHead(format)
 
-	e.printTopTen(p, extBySize, func(data files, item *file) (int64, uint64) {
-		count := e.work.aggregator[item.path].Count
-		sz := uint64(item.size)
+	fp.printTopTen(top, fp.data, func(data files, item *file) (int64, uint64) {
+		count := fp.count(item)
+		sz := fp.size(item)
 		return count, sz
 	})
 
-	p.flush()
-
-	p.cprint("\n<gray>TOP %d file extensions by count:</>\n\n", e.top)
-
-	e.printTableHead(p, format)
-
-	e.printTopTen(p, extByCount, func(data files, item *file) (int64, uint64) {
-		count := item.size
-		sz := e.work.aggregator[item.path].Size
-		return count, sz
-	})
-
-	p.flush()
+	fp.p.flush()
 }
 
-func (*extRenderer) printTableHead(p printer, format string) {
-	p.tprint(format, " #", "Extension", "Count", "%", "Size", "%")
-	p.tprint(format, "--", "---------", "-----", "------", "----", "------")
+func (fp *file_ext_print) printTableHead(format string) {
+	fp.p.tprint(format, " #", "Extension", "Count", "%", "Size", "%")
+	fp.p.tprint(format, "--", "---------", "-----", "------", "----", "------")
 }
 
-func (e *extRenderer) printTopTen(p printer, data files, selector func(data files, item *file) (int64, uint64)) {
-	for i := 0; i < e.top && i < len(data); i++ {
+func (fp *file_ext_print) printTopTen(top int, data files, selector func(data files, item *file) (int64, uint64)) {
+	for i := 0; i < top && i < len(data); i++ {
 		h := data[i].path
 
 		count, sz := selector(data, data[i])
 
-		e.work.total.printCountAndSizeStatLine(p, i+1, count, sz, h)
+		fp.total.printCountAndSizeStatLine(fp.p, i+1, count, sz, h)
 	}
 }
 
