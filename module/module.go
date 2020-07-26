@@ -65,13 +65,13 @@ func NewFoldersModule(ctx *Context, hideOutput bool) Module {
 // NewTopFilesModule creates new top files statistic module
 func NewTopFilesModule(ctx *Context) Module {
 	work := newTopFilesWorker(ctx.top)
-	rend := newTopFilesRenderer(work)
+	rend := newTopFilesRenderer(work, ctx)
 	m := newModule(work, rend)
 	return m
 }
 
 // NewDetailFileModule creates new file statistic by file size range module
-func NewDetailFileModule(enabledRanges []int) Module {
+func NewDetailFileModule(ctx *Context, enabledRanges []int) Module {
 	// Do nothing if verbose not enabled
 	if len(enabledRanges) == 0 {
 		return &module{
@@ -80,7 +80,7 @@ func NewDetailFileModule(enabledRanges []int) Module {
 		}
 	}
 	work := newDetailFileWorker(newRanges(), enabledRanges)
-	rend := newDetailFileRenderer(work)
+	rend := newDetailFileRenderer(work, ctx)
 	m := newModule(work, rend)
 	return m
 }

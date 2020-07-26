@@ -16,6 +16,7 @@ type detailFileWorker struct {
 
 type detailFileRenderer struct {
 	*detailFileWorker
+	*rootMiddleware
 }
 
 func newDetailFileWorker(rs ranges, enabledRanges []int) *detailFileWorker {
@@ -30,8 +31,9 @@ func newDetailFileWorker(rs ranges, enabledRanges []int) *detailFileWorker {
 	return &w
 }
 
-func newDetailFileRenderer(work *detailFileWorker) renderer {
-	return &detailFileRenderer{work}
+func newDetailFileRenderer(work *detailFileWorker, ctx *Context) renderer {
+	m := &rootMiddleware{removeRoot: ctx.removeRoot, root: ctx.root}
+	return &detailFileRenderer{detailFileWorker: work, rootMiddleware: m}
 }
 
 // Worker methods
@@ -78,7 +80,7 @@ func (m *detailFileRenderer) print(p printer) {
 
 			for _, f := range files {
 				size := human(f.size)
-				p.cprint("   %s - <yellow>%s</>\n", f, size)
+				p.cprint("   %s - <yellow>%s</>\n", m.decorate(f.String()), size)
 			}
 		}
 	}

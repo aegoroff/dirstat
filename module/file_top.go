@@ -10,8 +10,9 @@ func newTopFilesWorker(top int) *topFilesWorker {
 	return &topFilesWorker{tree: newFixedTree(top)}
 }
 
-func newTopFilesRenderer(work *topFilesWorker) renderer {
-	w := topFilesRenderer{work}
+func newTopFilesRenderer(work *topFilesWorker, ctx *Context) renderer {
+	m := &rootMiddleware{removeRoot: ctx.removeRoot, root: ctx.root}
+	w := topFilesRenderer{topFilesWorker: work, rootMiddleware: m}
 
 	w.fileFilter = newFileFilter(w.onFile)
 
@@ -27,6 +28,7 @@ type topFilesWorker struct {
 
 type topFilesRenderer struct {
 	*topFilesWorker
+	*rootMiddleware
 }
 
 // Worker methods
@@ -48,7 +50,7 @@ func (m *topFilesRenderer) print(p printer) {
 
 	m.tree.tree.Descend(func(n rbtree.Node) bool {
 		file := n.Key().(*file)
-		h := fmt.Sprintf("%2d. %s", i, file)
+		h := fmt.Sprintf("%2d. %s", i, m.decorate(file.String()))
 
 		i++
 
