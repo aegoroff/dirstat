@@ -15,7 +15,7 @@ func newFile(c conf) *cobra.Command {
 		Aliases: []string{"file"},
 		Short:   "Show information about files within folder on volume only",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := module.NewContext(top, replaceRoot, opt.path)
+			ctx := module.NewContext(top, removeRoot, opt.path)
 			totalmod := module.NewTotalModule(ctx)
 			detailfilemod := module.NewDetailFileModule(opt.vrange)
 			totalfilemod := module.NewAggregateFileModule(ctx)

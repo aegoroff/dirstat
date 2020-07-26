@@ -57,8 +57,8 @@ type foldersWorker struct {
 
 type foldersRenderer struct {
 	*foldersWorker
-	replaceRoot bool
-	root        string
+	removeRoot bool
+	root       string
 }
 
 func newFoldersWorker(ctx *Context) *foldersWorker {
@@ -70,7 +70,7 @@ func newFoldersWorker(ctx *Context) *foldersWorker {
 }
 
 func newFoldersRenderer(work *foldersWorker, ctx *Context) renderer {
-	return &foldersRenderer{foldersWorker: work, replaceRoot: ctx.replaceRoot, root: ctx.root}
+	return &foldersRenderer{foldersWorker: work, removeRoot: ctx.removeRoot, root: ctx.root}
 }
 
 // Worker methods
@@ -133,8 +133,8 @@ func (f *foldersRenderer) printTop(ft *fixedTree, p printer, format string, cast
 func (f *foldersRenderer) printTableRow(i *int, fi folderI, p printer) {
 	h := fi.Path()
 
-	if f.replaceRoot {
-		h = "<root>" + h[len(f.root):]
+	if f.removeRoot {
+		h = h[len(f.root):]
 	}
 
 	count := fi.Count()

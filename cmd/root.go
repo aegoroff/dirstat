@@ -22,7 +22,7 @@ func init() {
 
 var showMemory bool
 var top int
-var replaceRoot bool
+var removeRoot bool
 
 // Execute starts package running
 func Execute(args ...string) {
@@ -34,7 +34,7 @@ func Execute(args ...string) {
 
 	rootCmd.PersistentFlags().IntVarP(&top, "top", "t", 10, "The number of lines in top statistics.")
 	rootCmd.PersistentFlags().BoolVarP(&showMemory, "memory", "m", false, "Show memory statistic after run")
-	rootCmd.PersistentFlags().BoolVarP(&replaceRoot, "replaceroot", "o", false, "Replace root part in full path to <root> macro")
+	rootCmd.PersistentFlags().BoolVarP(&removeRoot, "removeroot", "o", false, "Remove root part from full path i.e. output relative paths")
 
 	conf := newAppConf()
 
