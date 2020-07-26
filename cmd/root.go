@@ -22,6 +22,7 @@ func init() {
 
 var showMemory bool
 var top int
+var replaceRoot bool
 
 // Execute starts package running
 func Execute(args ...string) {
@@ -30,13 +31,12 @@ func Execute(args ...string) {
 	if args != nil && len(args) > 0 {
 		rootCmd.SetArgs(args)
 	}
-	var replaceRoot bool
 
 	rootCmd.PersistentFlags().IntVarP(&top, "top", "t", 10, "The number of lines in top statistics.")
 	rootCmd.PersistentFlags().BoolVarP(&showMemory, "memory", "m", false, "Show memory statistic after run")
 	rootCmd.PersistentFlags().BoolVarP(&replaceRoot, "replaceroot", "o", false, "Replace root part in full path to <root> macro")
 
-	conf := newAppConf(replaceRoot)
+	conf := newAppConf()
 
 	rootCmd.AddCommand(newAll(conf))
 	rootCmd.AddCommand(newFile(conf))

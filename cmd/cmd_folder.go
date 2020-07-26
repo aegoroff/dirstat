@@ -13,7 +13,7 @@ func newFolder(c conf) *cobra.Command {
 		Aliases: []string{"folder"},
 		Short:   "Show information about folders within folder on volume only",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := module.NewContext(top)
+			ctx := module.NewContext(top, replaceRoot, path)
 			foldersmod := module.NewFoldersModule(ctx, false)
 			totalmod := module.NewTotalModule(ctx)
 			extmod := module.NewExtensionModule(ctx, true)

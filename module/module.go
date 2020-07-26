@@ -8,17 +8,21 @@ import (
 
 // Context defines modules context
 type Context struct {
-	total *totalInfo
-	top   int
+	total       *totalInfo
+	top         int
+	replaceRoot bool
+	root        string
 }
 
 // NewContext creates new module's context that needed to create new modules
-func NewContext(top int) *Context {
+func NewContext(top int, replaceRoot bool, root string) *Context {
 	total := totalInfo{}
 
 	ctx := Context{
-		total: &total,
-		top:   top,
+		total:       &total,
+		top:         top,
+		replaceRoot: replaceRoot,
+		root:        root,
 	}
 	return &ctx
 }
@@ -54,7 +58,7 @@ func NewFoldersModule(ctx *Context, hideOutput bool) Module {
 	if hideOutput {
 		return newModule(work)
 	}
-	rend := newFoldersRenderer(work)
+	rend := newFoldersRenderer(work, ctx)
 	return newModule(work, rend)
 }
 
