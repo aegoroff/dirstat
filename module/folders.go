@@ -18,6 +18,7 @@ type folder struct {
 	path  string
 	size  int64
 	count int64
+	pd    *pathDecorator
 }
 
 // Count sortable folder
@@ -33,9 +34,14 @@ type folderS struct {
 // Path sortable folder methods
 
 func (f *folder) String() string { return f.path }
-func (f *folder) Path() string   { return f.path }
 func (f *folder) Size() int64    { return f.size }
 func (f *folder) Count() int64   { return f.count }
+func (f *folder) Path() string {
+	if f.pd == nil {
+		return f.path
+	}
+	return f.pd.decorate(f.path)
+}
 
 // Count sortable folder methods
 
@@ -53,11 +59,11 @@ type foldersWorker struct {
 	total   *totalInfo
 	bySize  *fixedTree
 	byCount *fixedTree
+	pd      *pathDecorator
 }
 
 type foldersRenderer struct {
 	*foldersWorker
-	*pathDecorator
 }
 
 func newFoldersWorker(ctx *Context) *foldersWorker {
@@ -65,11 +71,12 @@ func newFoldersWorker(ctx *Context) *foldersWorker {
 		total:   ctx.total,
 		bySize:  newFixedTree(ctx.top),
 		byCount: newFixedTree(ctx.top),
+		pd:      ctx.pd,
 	}
 }
 
-func newFoldersRenderer(work *foldersWorker, ctx *Context) renderer {
-	return &foldersRenderer{foldersWorker: work, pathDecorator: ctx.pd}
+func newFoldersRenderer(work *foldersWorker) renderer {
+	return &foldersRenderer{foldersWorker: work}
 }
 
 // Worker methods
@@ -84,6 +91,7 @@ func (m *foldersWorker) handler(evt *sys.ScanEvent) {
 		path:  fe.Path,
 		count: fe.Count,
 		size:  fe.Size,
+		pd:    m.pd,
 	}
 
 	fs := folderS{fn}
@@ -130,12 +138,10 @@ func (f *foldersRenderer) printTop(ft *fixedTree, p printer, format string, cast
 }
 
 func (f *foldersRenderer) printTableRow(i *int, fi folderI, p printer) {
-	h := f.decorate(fi.Path())
-
 	count := fi.Count()
 	sz := uint64(fi.Size())
 
-	f.total.printCountAndSizeStatLine(p, *i, count, sz, h)
+	f.total.printCountAndSizeStatLine(p, *i, count, sz, fi.Path())
 
 	*i++
 }

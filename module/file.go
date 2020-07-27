@@ -22,7 +22,12 @@ func (fi files) Swap(i, j int)      { fi[i], fi[j] = fi[j], fi[i] }
 
 func (f *file) LessThan(y interface{}) bool { return f.size < y.(*file).size }
 func (f *file) EqualTo(y interface{}) bool  { return f.size == y.(*file).size }
-func (f *file) String() string              { return f.pd.decorate(f.path) }
+func (f *file) String() string {
+	if f.pd == nil {
+		return f.path
+	}
+	return f.pd.decorate(f.path)
+}
 
 func newFileFilter(h fileHandler) *fileFilter {
 	return &fileFilter{

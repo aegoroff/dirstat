@@ -59,7 +59,7 @@ func NewFoldersModule(ctx *Context, hideOutput bool) Module {
 	if hideOutput {
 		return newModule(work)
 	}
-	rend := newFoldersRenderer(work, ctx)
+	rend := newFoldersRenderer(work)
 	return newModule(work, rend)
 }
 
