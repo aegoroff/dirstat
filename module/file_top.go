@@ -2,7 +2,6 @@ package module
 
 import (
 	"dirstat/module/internal/sys"
-	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
 )
 
@@ -42,19 +41,18 @@ func (m *topFilesWorker) onFile(f *sys.FileEntry) {
 func (m *topFilesRenderer) print(p printer) {
 	p.cprint("\n<gray>TOP %d files by size:</>\n\n", m.tree.size)
 
-	p.tprint("%v\t%v\n", "File", "Size")
-	p.tprint("%v\t%v\n", "------", "----")
+	const format = "%v\t%v\t%v\n"
+
+	p.tprint(format, " #", "File", "Size")
+	p.tprint(format, "--", "------", "----")
 
 	i := 1
 
 	m.tree.tree.Descend(func(n rbtree.Node) bool {
 		file := n.Key().(*file)
-		h := fmt.Sprintf("%2d. %s", i, file)
 
+		p.tprint("%2d\t%v\t%v\n", i, file, human(file.size))
 		i++
-
-		p.tprint("%v\t%v\n", h, human(file.size))
-
 		return true
 	})
 
