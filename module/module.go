@@ -65,8 +65,8 @@ func NewFoldersModule(ctx *Context, hideOutput bool) Module {
 
 // NewTopFilesModule creates new top files statistic module
 func NewTopFilesModule(ctx *Context) Module {
-	work := newTopFilesWorker(ctx.top)
-	rend := newTopFilesRenderer(work, ctx)
+	work := newTopFilesWorker(ctx.top, ctx.pd)
+	rend := newTopFilesRenderer(work)
 	m := newModule(work, rend)
 	return m
 }
@@ -80,8 +80,8 @@ func NewDetailFileModule(ctx *Context, enabledRanges []int) Module {
 			[]renderer{},
 		}
 	}
-	work := newDetailFileWorker(newRanges(), enabledRanges)
-	rend := newDetailFileRenderer(work, ctx)
+	work := newDetailFileWorker(newRanges(), enabledRanges, ctx.pd)
+	rend := newDetailFileRenderer(work)
 	m := newModule(work, rend)
 	return m
 }

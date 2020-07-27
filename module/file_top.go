@@ -6,12 +6,12 @@ import (
 	"github.com/aegoroff/godatastruct/rbtree"
 )
 
-func newTopFilesWorker(top int) *topFilesWorker {
-	return &topFilesWorker{tree: newFixedTree(top)}
+func newTopFilesWorker(top int, pd *pathDecorator) *topFilesWorker {
+	return &topFilesWorker{tree: newFixedTree(top), pd: pd}
 }
 
-func newTopFilesRenderer(work *topFilesWorker, ctx *Context) renderer {
-	w := topFilesRenderer{topFilesWorker: work, pathDecorator: ctx.pd}
+func newTopFilesRenderer(work *topFilesWorker) renderer {
+	w := topFilesRenderer{topFilesWorker: work}
 
 	w.fileFilter = newFileFilter(w.onFile)
 
@@ -23,17 +23,17 @@ type topFilesWorker struct {
 	voidFinalize
 	*fileFilter
 	tree *fixedTree
+	pd   *pathDecorator
 }
 
 type topFilesRenderer struct {
 	*topFilesWorker
-	*pathDecorator
 }
 
 // Worker methods
 
 func (m *topFilesWorker) onFile(f *sys.FileEntry) {
-	fc := file{size: f.Size, path: f.Path}
+	fc := file{size: f.Size, path: f.Path, pd: m.pd}
 	m.tree.insert(&fc)
 }
 
@@ -49,7 +49,7 @@ func (m *topFilesRenderer) print(p printer) {
 
 	m.tree.tree.Descend(func(n rbtree.Node) bool {
 		file := n.Key().(*file)
-		h := fmt.Sprintf("%2d. %s", i, m.decorate(file.String()))
+		h := fmt.Sprintf("%2d. %s", i, file)
 
 		i++
 

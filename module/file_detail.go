@@ -12,18 +12,19 @@ type detailFileWorker struct {
 	enabledRanges    []int
 	enabledRangesMap map[int]bool
 	fileRanges       ranges
+	pd               *pathDecorator
 }
 
 type detailFileRenderer struct {
 	*detailFileWorker
-	*pathDecorator
 }
 
-func newDetailFileWorker(rs ranges, enabledRanges []int) *detailFileWorker {
+func newDetailFileWorker(rs ranges, enabledRanges []int, pd *pathDecorator) *detailFileWorker {
 	w := detailFileWorker{
 		enabledRanges: enabledRanges,
 		distribution:  make(map[Range]files, len(rs)),
 		fileRanges:    rs,
+		pd:            pd,
 	}
 
 	w.fileFilter = newFileFilter(w.onFile)
@@ -31,8 +32,8 @@ func newDetailFileWorker(rs ranges, enabledRanges []int) *detailFileWorker {
 	return &w
 }
 
-func newDetailFileRenderer(work *detailFileWorker, ctx *Context) renderer {
-	return &detailFileRenderer{detailFileWorker: work, pathDecorator: ctx.pd}
+func newDetailFileRenderer(work *detailFileWorker) renderer {
+	return &detailFileRenderer{work}
 }
 
 // Worker methods
@@ -56,7 +57,7 @@ func (m *detailFileWorker) onFile(f *sys.FileEntry) {
 		if !ok {
 			m.distribution[r] = make(files, 0)
 		}
-		fileContainer := file{size: f.Size, path: f.Path}
+		fileContainer := file{size: f.Size, path: f.Path, pd: m.pd}
 		m.distribution[r] = append(nodes, &fileContainer)
 	}
 }
@@ -79,7 +80,7 @@ func (m *detailFileRenderer) print(p printer) {
 
 			for _, f := range files {
 				size := human(f.size)
-				p.cprint("   %s - <yellow>%s</>\n", m.decorate(f.String()), size)
+				p.cprint("   %s - <yellow>%s</>\n", f, size)
 			}
 		}
 	}
