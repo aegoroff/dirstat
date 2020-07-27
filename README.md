@@ -58,99 +58,99 @@ Root: c:\
 
 Total files stat:
 
-File size                          Amount     %         Size       %
----------                          ------     ------    ----       ------
- 1. Between 0 B and 100 KiB        1898300    89.50%    18 GiB     5.50%
- 2. Between 100 KiB and 1.0 MiB    182968     8.63%     54 GiB     16.13%
- 3. Between 1.0 MiB and 10 MiB     35430      1.67%     91 GiB     27.36%
- 4. Between 10 MiB and 100 MiB     4432       0.21%     113 GiB    33.84%
- 5. Between 100 MiB and 1.0 GiB    151        0.01%     32 GiB     9.61%
- 6. Between 1.0 GiB and 10 GiB     7          0.00%     26 GiB     7.72%
- 7. Between 10 GiB and 100 GiB     0          0.00%     0 B        0.00%
- 8. Between 100 GiB and 1.0 TiB    0          0.00%     0 B        0.00%
- 9. Between 1.0 TiB and 10 TiB     0          0.00%     0 B        0.00%
-10. Between 10 TiB and 1.0 PiB     0          0.00%     0 B        0.00%
+ #    File size                      Amount     %         Size       %
+--    ---------                      ------     ------    ----       ------
+ 1    Between 0 B and 100 KiB        1889276    89.45%    18 GiB     5.30%
+ 2    Between 100 KiB and 1.0 MiB    183373     8.68%     54 GiB     15.44%
+ 3    Between 1.0 MiB and 10 MiB     35261      1.67%     91 GiB     26.02%
+ 4    Between 10 MiB and 100 MiB     4366       0.21%     112 GiB    32.05%
+ 5    Between 100 MiB and 1.0 GiB    145        0.01%     32 GiB     9.19%
+ 6    Between 1.0 GiB and 10 GiB     5          0.00%     18 GiB     5.13%
+ 7    Between 10 GiB and 100 GiB     1          0.00%     24 GiB     7.04%
+ 8    Between 100 GiB and 1.0 TiB    0          0.00%     0 B        0.00%
+ 9    Between 1.0 TiB and 10 TiB     0          0.00%     0 B        0.00%
+10    Between 10 TiB and 1.0 PiB     0          0.00%     0 B        0.00%
 
 TOP 10 file extensions by size:
 
-Extension    Count     %         Size       %
----------    -----     ------    ----       ------
-.dll         219033    10.33%    82 GiB     24.50%
-.lib         16109     0.76%     20 GiB     6.11%
-.exe         17194     0.81%     20 GiB     6.00%
-.vhdx        5         0.00%     16 GiB     4.70%
-.cab         2543      0.12%     14 GiB     4.19%
-.xml         98048     4.62%     14 GiB     4.16%
-.msi         2911      0.14%     12 GiB     3.72%
-             183501    8.65%     12 GiB     3.53%
-.pdb         12072     0.57%     10 GiB     2.99%
-.ipch        390       0.02%     9.9 GiB    2.97%
+ #    Extension    Count     %         Size      %
+--    ---------    -----     ------    ----      ------
+ 1    .dll         223227    10.57%    80 GiB    23.02%
+ 2    .vhdx        5         0.00%     37 GiB    10.52%
+ 3    .exe         17275     0.82%     20 GiB    5.84%
+ 4    .lib         16111     0.76%     20 GiB    5.82%
+ 5    .xml         97838     4.63%     14 GiB    4.04%
+ 6    .msi         2866      0.14%     12 GiB    3.52%
+ 7    .cab         2494      0.12%     12 GiB    3.44%
+ 8                 184215    8.72%     11 GiB    3.28%
+ 9    .pdb         13551     0.64%     10 GiB    3.02%
+10    .ipch        404       0.02%     10 GiB    2.99%
 
 TOP 10 file extensions by count:
 
-Extension    Count     %         Size       %
----------    -----     ------    ----       ------
-.dll         219033    10.33%    82 GiB     24.50%
-             183501    8.65%     12 GiB     3.53%
-.js          173216    8.17%     3.3 GiB    0.99%
-.xml         98048     4.62%     14 GiB     4.16%
-.png         88031     4.15%     992 MiB    0.29%
-.py          76470     3.61%     805 MiB    0.24%
-.h           74113     3.49%     2.9 GiB    0.86%
-.cs          59033     2.78%     642 MiB    0.19%
-.html        51327     2.42%     801 MiB    0.23%
-.pyc         50191     2.37%     524 MiB    0.15%
+ #    Extension    Count     %         Size       %
+--    ---------    -----     ------    ----       ------
+ 1    .dll         223227    10.57%    80 GiB     23.02%
+ 2                 184215    8.72%     11 GiB     3.28%
+ 3    .js          168308    7.97%     3.3 GiB    0.95%
+ 4    .xml         97838     4.63%     14 GiB     4.04%
+ 5    .py          76695     3.63%     809 MiB    0.23%
+ 6    .png         76384     3.62%     919 MiB    0.26%
+ 7    .h           75181     3.56%     2.9 GiB    0.83%
+ 8    .cs          59030     2.79%     643 MiB    0.18%
+ 9    .html        51372     2.43%     800 MiB    0.22%
+10    .pyc         50191     2.38%     524 MiB    0.15%
 
 TOP 10 files by size:
 
-File                                                                                                                Size
-------                                                                                                              ----
- 1. c:\ProgramData\DockerDesktop\vm-data\DockerDesktop.vhdx                                                         9.5 GiB
- 2. c:\ProgramData\Microsoft\Search\Data\Applications\Windows\Windows.edb                                           4.3 GiB
- 3. c:\Users\egr\AppData\Local\Docker\wsl\data\ext4.vhdx                                                            3.6 GiB
- 4. c:\Program Files (x86)\Windows Kits\10\Emulation\Mobile\10.0.10586.0\flash.vhd                                  2.6 GiB
- 5. c:\Users\egr\AppData\Local\Packages\CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc\LocalState\ext4.vhdx    2.4 GiB
- 6. c:\Program Files (x86)\Microsoft SDKs\Windows Phone\v8.0\Emulation\Images\Flash.vhd                             1.9 GiB
- 7. c:\Program Files (x86)\Microsoft SDKs\Windows Phone\v8.1\Emulation\Images\flash.vhd                             1.5 GiB
- 8. c:\Program Files\MongoDB\Server\4.0\data\collection-2-2535253104322579421.wt                                    891 MiB
- 9. c:\Windows\Installer\13b2694.msi                                                                                887 MiB
-10. c:\Windows\Installer\9da85.msp                                                                                  779 MiB
+ #    File                                                                                                                 Size
+--    ------                                                                                                               ----
+ 1    c:\Users\egr\AppData\Local\Docker\wsl\data\ext4.vhdx                                                                 24 GiB
+ 2    c:\ProgramData\DockerDesktop\vm-data\DockerDesktop.vhdx                                                              9.5 GiB
+ 3    c:\Program Files (x86)\Windows Kits\10\Emulation\Mobile\10.0.10586.0\flash.vhd                                       2.6 GiB
+ 4    c:\Users\egr\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu20.04onWindows_79rhkp1fndgsc\LocalState\ext4.vhdx    2.5 GiB
+ 5    c:\Program Files (x86)\Microsoft SDKs\Windows Phone\v8.0\Emulation\Images\Flash.vhd                                  1.9 GiB
+ 6    c:\Program Files (x86)\Microsoft SDKs\Windows Phone\v8.1\Emulation\Images\flash.vhd                                  1.5 GiB
+ 7    c:\Program Files\MongoDB\Server\4.0\data\collection-7--2807253782407563390.wt                                        962 MiB
+ 8    c:\Program Files\MongoDB\Server\4.0\data\collection-2-2535253104322579421.wt                                         902 MiB
+ 9    c:\Windows\Installer\13b2694.msi                                                                                     887 MiB
+10    c:\Windows\Installer\9da85.msp                                                                                       779 MiB
 
 TOP 10 folders by size:
 
-Folder                                                                                                    Files    %         Size       %
-------                                                                                                    -----    ------    ----       ------
- 1. c:\Windows\Installer                                                                                  2872     0.14%     13 GiB     4.02%
- 2. c:\ProgramData\DockerDesktop\vm-data                                                                  1        0.00%     9.5 GiB    2.84%
- 3. c:\ProgramData\Microsoft\Search\Data\Applications\Windows                                             10       0.00%     4.3 GiB    1.30%
- 4. c:\Users\egr\AppData\Local\Docker\wsl\data                                                            1        0.00%     3.6 GiB    1.07%
- 5. c:\Windows\System32                                                                                   5079     0.24%     2.7 GiB    0.81%
- 6. c:\Program Files (x86)\Windows Kits\10\Emulation\Mobile\10.0.10586.0                                  1        0.00%     2.6 GiB    0.77%
- 7. c:\Users\egr\AppData\Local\Packages\CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc\LocalState    2        0.00%     2.4 GiB    0.73%
- 8. c:\code\openssl\test                                                                                  1253     0.06%     2.1 GiB    0.63%
- 9. c:\Program Files (x86)\Microsoft SDKs\Windows Phone\v8.0\Emulation\Images                             5        0.00%     2.0 GiB    0.59%
-10. c:\Program Files\MongoDB\Server\4.0\data                                                              35       0.00%     1.7 GiB    0.51%
+ #    Folder                                                                                                       Files    %         Size       %
+--    ------                                                                                                       -----    ------    ----       ------
+ 1    c:\Users\egr\AppData\Local\Docker\wsl\data                                                                   1        0.00%     24 GiB     7.04%
+ 2    c:\Windows\Installer                                                                                         2882     0.14%     14 GiB     4.03%
+ 3    c:\ProgramData\DockerDesktop\vm-data                                                                         1        0.00%     9.5 GiB    2.72%
+ 4    c:\Program Files\MongoDB\Server\4.0\data                                                                     39       0.00%     3.3 GiB    0.96%
+ 5    c:\Windows\System32                                                                                          5080     0.24%     2.6 GiB    0.76%
+ 6    c:\Program Files (x86)\Windows Kits\10\Emulation\Mobile\10.0.10586.0                                         1        0.00%     2.6 GiB    0.73%
+ 7    c:\Users\egr\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu20.04onWindows_79rhkp1fndgsc\LocalState      1        0.00%     2.5 GiB    0.71%
+ 8    c:\code\openssl\test                                                                                         1253     0.06%     2.1 GiB    0.61%
+ 9    c:\Program Files (x86)\Microsoft SDKs\Windows Phone\v8.0\Emulation\Images                                    5        0.00%     2.0 GiB    0.57%
+10    c:\ProgramData\Package Cache\{EA923538-8370-4294-A5CC-F6130FAAD89D}v10.1.10586.11\Redistributable\1.0.0.0    51       0.00%     1.5 GiB    0.43%
 
 TOP 10 folders by count:
 
-Folder                                                                                                 Files    %         Size       %
-------                                                                                                 -----    ------    ----       ------
- 1. c:\Windows\WinSxS\Manifests                                                                        24056    1.13%     23 MiB     0.01%
- 2. c:\Windows\servicing\LCU\Package_for_RollupFix~31bf3856ad364e35~amd64~~19041.329.1.7               11665    0.55%     298 MiB    0.09%
- 3. c:\Users\egr\AppData\Local\Google\Chrome\User Data\Default\Local Storage                           6864     0.32%     84 MiB     0.02%
- 4. c:\msys64\usr\share\man\man3                                                                       6739     0.32%     24 MiB     0.01%
- 5. c:\Users\egr\AppData\Local\Microsoft\Edge\User Data\Default\Code Cache\js                          5383     0.25%     294 MiB    0.09%
- 6. c:\Users\egr\AppData\Roaming\Microsoft\Crypto\RSA\S-1-5-21-2126183571-1528345743-823968152-1001    5144     0.24%     15 MiB     0.00%
- 7. c:\Windows\System32                                                                                5079     0.24%     2.7 GiB    0.81%
- 8. c:\Windows\servicing\Packages                                                                      4410     0.21%     74 MiB     0.02%
- 9. c:\msys64\usr\share\doc\openssl\html\man3                                                          3792     0.18%     36 MiB     0.01%
-10. c:\Program Files\Adobe\Adobe Premiere Rush\PNG                                                     3593     0.17%     18 MiB     0.01%
+ #    Folder                                                                                             Files    %         Size       %
+--    ------                                                                                             -----    ------    ----       ------
+ 1    c:\Windows\WinSxS\Manifests                                                                        22722    1.08%     20 MiB     0.01%
+ 2    c:\Windows\servicing\LCU\Package_for_RollupFix~31bf3856ad364e35~amd64~~19041.388.1.7               13655    0.65%     331 MiB    0.09%
+ 3    c:\Windows\servicing\LCU\Package_for_RollupFix~31bf3856ad364e35~amd64~~19041.329.1.7               11665    0.55%     298 MiB    0.08%
+ 4    c:\Users\egr\AppData\Local\Microsoft\Edge\User Data\Default\Code Cache\js                          11472    0.54%     285 MiB    0.08%
+ 5    c:\Users\egr\AppData\Local\Google\Chrome\User Data\Default\Local Storage                           6864     0.32%     84 MiB     0.02%
+ 6    c:\msys64\usr\share\man\man3                                                                       6739     0.32%     24 MiB     0.01%
+ 7    c:\Users\egr\AppData\Roaming\Microsoft\Crypto\RSA\S-1-5-21-2126183571-1528345743-823968152-1001    5144     0.24%     15 MiB     0.00%
+ 8    c:\Windows\System32                                                                                5080     0.24%     2.6 GiB    0.76%
+ 9    c:\Windows\servicing\Packages                                                                      3838     0.18%     56 MiB     0.02%
+10    c:\msys64\usr\share\doc\openssl\html\man3                                                          3792     0.18%     36 MiB     0.01%
 
-Total files:            2120914 (333 GiB)
-Total folders:          437235
-Total file extensions:  9804
+Total files:            2112029 (348 GiB)
+Total folders:          445144
+Total file extensions:  7579
 
-Read taken:    8.0340003s
+Read taken:	8.4079962s
 
-Alloc = 142 MiB TotalAlloc = 3.4 GiB    Sys = 732 MiB   NumGC = 87
+Alloc = 44 MiB	TotalAlloc = 3.4 GiB	Sys = 714 MiB	NumGC = 117	NumGoRoutines = 1
 ```
