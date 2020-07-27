@@ -16,7 +16,7 @@ type detailFileWorker struct {
 
 type detailFileRenderer struct {
 	*detailFileWorker
-	*rootMiddleware
+	*pathDecorator
 }
 
 func newDetailFileWorker(rs ranges, enabledRanges []int) *detailFileWorker {
@@ -32,8 +32,7 @@ func newDetailFileWorker(rs ranges, enabledRanges []int) *detailFileWorker {
 }
 
 func newDetailFileRenderer(work *detailFileWorker, ctx *Context) renderer {
-	m := &rootMiddleware{removeRoot: ctx.removeRoot, root: ctx.root}
-	return &detailFileRenderer{detailFileWorker: work, rootMiddleware: m}
+	return &detailFileRenderer{detailFileWorker: work, pathDecorator: ctx.pd}
 }
 
 // Worker methods

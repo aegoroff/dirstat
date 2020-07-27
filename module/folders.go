@@ -57,7 +57,7 @@ type foldersWorker struct {
 
 type foldersRenderer struct {
 	*foldersWorker
-	*rootMiddleware
+	*pathDecorator
 }
 
 func newFoldersWorker(ctx *Context) *foldersWorker {
@@ -69,8 +69,7 @@ func newFoldersWorker(ctx *Context) *foldersWorker {
 }
 
 func newFoldersRenderer(work *foldersWorker, ctx *Context) renderer {
-	m := &rootMiddleware{removeRoot: ctx.removeRoot, root: ctx.root}
-	return &foldersRenderer{foldersWorker: work, rootMiddleware: m}
+	return &foldersRenderer{foldersWorker: work, pathDecorator: ctx.pd}
 }
 
 // Worker methods

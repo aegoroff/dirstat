@@ -8,10 +8,9 @@ import (
 
 // Context defines modules context
 type Context struct {
-	total      *totalInfo
-	top        int
-	removeRoot bool
-	root       string
+	total *totalInfo
+	top   int
+	pd    *pathDecorator
 }
 
 // NewContext creates new module's context that needed to create new modules
@@ -19,10 +18,12 @@ func NewContext(top int, rr bool, root string) *Context {
 	total := totalInfo{}
 
 	ctx := Context{
-		total:      &total,
-		top:        top,
-		removeRoot: rr,
-		root:       root,
+		total: &total,
+		top:   top,
+		pd: &pathDecorator{
+			removeRoot: rr,
+			root:       root,
+		},
 	}
 	return &ctx
 }

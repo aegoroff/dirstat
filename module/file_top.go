@@ -11,8 +11,7 @@ func newTopFilesWorker(top int) *topFilesWorker {
 }
 
 func newTopFilesRenderer(work *topFilesWorker, ctx *Context) renderer {
-	m := &rootMiddleware{removeRoot: ctx.removeRoot, root: ctx.root}
-	w := topFilesRenderer{topFilesWorker: work, rootMiddleware: m}
+	w := topFilesRenderer{topFilesWorker: work, pathDecorator: ctx.pd}
 
 	w.fileFilter = newFileFilter(w.onFile)
 
@@ -28,7 +27,7 @@ type topFilesWorker struct {
 
 type topFilesRenderer struct {
 	*topFilesWorker
-	*rootMiddleware
+	*pathDecorator
 }
 
 // Worker methods
