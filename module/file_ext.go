@@ -100,11 +100,14 @@ func (fp *fileExtPrint) print(data files, top int) {
 
 	sort.Sort(sort.Reverse(data))
 
-	fp.printTopTen(top, data, func(data files, item *file) (int64, uint64) {
-		count := fp.count(item)
-		sz := fp.size(item)
-		return count, sz
-	})
+	for i := 0; i < top && i < len(data); i++ {
+		h := data[i].path
+
+		count := fp.count(data[i])
+		sz := fp.size(data[i])
+
+		fp.total.printCountAndSizeStatLine(fp.p, i+1, count, sz, h)
+	}
 
 	fp.p.flush()
 }
@@ -112,16 +115,6 @@ func (fp *fileExtPrint) print(data files, top int) {
 func (fp *fileExtPrint) printTableHead(format string) {
 	fp.p.tprint(format, " #", "Extension", "Count", "%", "Size", "%")
 	fp.p.tprint(format, "--", "---------", "-----", "------", "----", "------")
-}
-
-func (fp *fileExtPrint) printTopTen(top int, data files, selector func(data files, item *file) (int64, uint64)) {
-	for i := 0; i < top && i < len(data); i++ {
-		h := data[i].path
-
-		count, sz := selector(data, data[i])
-
-		fp.total.printCountAndSizeStatLine(fp.p, i+1, count, sz, h)
-	}
 }
 
 func (e *extRenderer) evolventMap(mapper func(countSizeAggregate) int64) files {
