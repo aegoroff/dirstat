@@ -4,7 +4,6 @@ go 1.14
 
 require (
 	github.com/aegoroff/godatastruct v0.4.0
-	github.com/akutz/sortfold v0.2.1
 	github.com/dustin/go-humanize v1.0.0
 	github.com/gookit/color v1.2.7
 	github.com/spf13/afero v1.3.2
