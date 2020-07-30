@@ -3,6 +3,7 @@ package module
 import (
 	"dirstat/module/internal/sys"
 	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/pkg/errors"
 )
 
 // Folder interface
@@ -105,10 +106,25 @@ func (m *foldersWorker) handler(evt *sys.ScanEvent) {
 
 // Renderer method
 
-type folderCast func(c rbtree.Comparable) folderI
+type folderCast func(c rbtree.Comparable) (folderI, error)
 
-func castSize(c rbtree.Comparable) folderI  { return c.(*folderS) }
-func castCount(c rbtree.Comparable) folderI { return c.(*folderC) }
+func castSize(c rbtree.Comparable) (folderI, error) {
+	f, ok := c.(*folderS)
+
+	if !ok {
+		return nil, errors.New("Invalid casting: expected *folderS key type but it wasn`t")
+	}
+	return f, nil
+}
+
+func castCount(c rbtree.Comparable) (folderI, error) {
+	f, ok := c.(*folderC)
+
+	if !ok {
+		return nil, errors.New("Invalid casting: expected *folderC key type but it wasn`t")
+	}
+	return f, nil
+}
 
 func (f *foldersRenderer) print(p printer) {
 	const format = "%v\t%v\t%v\t%v\t%v\t%v\n"
@@ -129,7 +145,12 @@ func (f *foldersRenderer) printTop(ft *fixedTree, p printer, format string, cast
 	i := 1
 
 	ft.tree.Descend(func(n rbtree.Node) bool {
-		f.printTableRow(&i, cast(n.Key()), p)
+		fi, err := cast(n.Key())
+		if err != nil {
+			p.cprint("<red>%v</>", err)
+			return false
+		}
+		f.printTableRow(&i, fi, p)
 
 		return true
 	})

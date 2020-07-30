@@ -49,7 +49,12 @@ func (m *topFilesRenderer) print(p printer) {
 	i := 1
 
 	m.tree.tree.Descend(func(n rbtree.Node) bool {
-		file := n.Key().(*file)
+		file, ok := n.Key().(*file)
+
+		if !ok {
+			p.cprint("<red>Invalid casting: expected *file key type but it wasn`t</>")
+			return false
+		}
 
 		p.tprint("%2d\t%v\t%v\n", i, file, human(file.size))
 		i++
