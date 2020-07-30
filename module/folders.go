@@ -2,8 +2,8 @@ package module
 
 import (
 	"dirstat/module/internal/sys"
+	"errors"
 	"github.com/aegoroff/godatastruct/rbtree"
-	"github.com/pkg/errors"
 )
 
 // Folder interface
