@@ -112,7 +112,7 @@ func castSize(c rbtree.Comparable) (folderI, error) {
 	f, ok := c.(*folderS)
 
 	if !ok {
-		return nil, errors.New("Invalid casting: expected *folderS key type but it wasn`t")
+		return nil, errors.New("invalid casting: expected *folderS key type but it wasn`t")
 	}
 	return f, nil
 }
@@ -121,7 +121,7 @@ func castCount(c rbtree.Comparable) (folderI, error) {
 	f, ok := c.(*folderC)
 
 	if !ok {
-		return nil, errors.New("Invalid casting: expected *folderC key type but it wasn`t")
+		return nil, errors.New("invalid casting: expected *folderC key type but it wasn`t")
 	}
 	return f, nil
 }
