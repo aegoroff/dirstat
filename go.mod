@@ -8,5 +8,6 @@ require (
 	github.com/gookit/color v1.2.7
 	github.com/spf13/afero v1.3.3
 	github.com/spf13/cobra v1.0.0
+	github.com/stretchr/testify v1.4.0
 	gonum.org/v1/gonum v0.7.0 // indirect
 )
