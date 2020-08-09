@@ -34,6 +34,11 @@ build_script:
 test_script:
   - go test -coverprofile=coverage.txt -covermode=atomic dirstat/...
 
+after_test:
+  - ps: |
+      Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
+      ./codecov.sh -f "coverage.txt" -t $env:CODECOV_TOKEN
+
 artifacts:
   - path: dirstat_windows_amd64.exe
     name: binary
