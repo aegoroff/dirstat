@@ -31,6 +31,9 @@ image: Visual Studio 2019
 build_script:
   - gox -osarch="linux/amd64 linux/arm linux/arm64 linux/386 darwin/amd64 windows/amd64 windows/386 freebsd/386 freebsd/amd64 freebsd/arm openbsd/386 openbsd/amd64 netbsd/386 netbsd/amd64 solaris/amd64" -ldflags "-X dirstat/cmd.Version=%APPVEYOR_BUILD_VERSION%" dirstat
 
+test_script:
+  - go test -coverprofile=coverage.txt -covermode=atomic dirstat/...
+
 artifacts:
   - path: dirstat_windows_amd64.exe
     name: binary
