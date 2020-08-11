@@ -33,3 +33,31 @@ func TestRange_Contains(t *testing.T) {
 		ass.Equal(test.result, contains)
 	}
 }
+
+func Test_countPercent(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	ti := totalInfo{
+		FilesTotal: countSizeAggregate{Count: 100},
+	}
+
+	// Act
+	r := ti.countPercent(10)
+
+	// Assert
+	ass.Equal(10.0, r)
+}
+
+func Test_sizePercent(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	ti := totalInfo{
+		FilesTotal: countSizeAggregate{Size: 100},
+	}
+
+	// Act
+	r := ti.sizePercent(10)
+
+	// Assert
+	ass.Equal(10.0, r)
+}
