@@ -61,3 +61,28 @@ func Test_sizePercent(t *testing.T) {
 	// Assert
 	ass.Equal(10.0, r)
 }
+
+func Test_heads(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	rs := newRanges()
+
+	var tests = []struct {
+		addNum bool
+		match  string
+	}{
+		{true, "^\\s{0,1}\\d{1,2}\\..+"},
+		{false, "^\\w.+"},
+	}
+
+	for _, test := range tests {
+
+		// Act
+		ss := rs.heads(test.addNum)
+
+		// Assert
+		for _, s := range ss {
+			ass.Regexp(test.match, s)
+		}
+	}
+}
