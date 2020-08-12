@@ -76,7 +76,6 @@ func Test_heads(t *testing.T) {
 	}
 
 	for _, test := range tests {
-
 		// Act
 		ss := rs.heads(test.addNum)
 
