@@ -1,7 +1,9 @@
 package module
 
 import (
+	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/stretchr/testify/assert"
+	"strconv"
 	"testing"
 )
 
@@ -84,4 +86,26 @@ func Test_heads(t *testing.T) {
 			ass.Regexp(test.match, s)
 		}
 	}
+}
+
+func Test_insertToFixedTree(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	tree := newFixedTree(3)
+
+	// Act
+	for i := 0; i < 5; i++ {
+		s := rbtree.NewString(strconv.Itoa(i))
+		tree.insert(s)
+	}
+
+	// Assert
+	ass.Equal(int64(3), tree.tree.Len())
+	var r []string
+	tree.tree.Descend(func(n rbtree.Node) bool {
+		r = append(r, n.Key().String())
+		return true
+	})
+
+	ass.ElementsMatch([]string{"4", "3", "2"}, r)
 }
