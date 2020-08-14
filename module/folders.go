@@ -34,7 +34,7 @@ type folderS struct {
 
 // Path sortable folder methods
 
-func (f *folder) String() string { return f.path }
+func (f *folder) String() string { return f.Path() }
 func (f *folder) Size() int64    { return f.size }
 func (f *folder) Count() int64   { return f.count }
 func (f *folder) Path() string {
