@@ -1,7 +1,9 @@
 package module
 
 import (
+	"dirstat/module/internal/sys"
 	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -94,4 +96,25 @@ func Test_byCountFoldersTest(t *testing.T) {
 	})
 
 	ass.ElementsMatch([]string{"/f1", "/f2"}, r)
+}
+
+func Test_folderHandler(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	appFS := afero.NewMemMapFs()
+	_ = appFS.MkdirAll("/f/s", 0755)
+	_ = afero.WriteFile(appFS, "/f/f.txt", []byte("123"), 0644)
+	_ = afero.WriteFile(appFS, "/f/s/f.txt", []byte("1234"), 0644)
+	ctx := NewContext(2, false, "/")
+	worker := newFoldersWorker(ctx)
+	var handlers []sys.ScanHandler
+	handlers = append(handlers, worker.handler)
+
+	// Act
+	sys.Scan("/", appFS, handlers)
+
+	// Assert
+	ass.Equal(int64(3), worker.total.CountFolders)
+	ass.Equal(int64(2), worker.byCount.tree.Len())
+	ass.Equal(int64(2), worker.bySize.tree.Len())
 }
