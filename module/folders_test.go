@@ -118,3 +118,21 @@ func Test_folderHandler(t *testing.T) {
 	ass.Equal(int64(2), worker.byCount.tree.Len())
 	ass.Equal(int64(2), worker.bySize.tree.Len())
 }
+
+func Test_folderHandler_EmptyFileSystem(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	appFS := afero.NewMemMapFs()
+	ctx := NewContext(2, false, "/")
+	worker := newFoldersWorker(ctx)
+	var handlers []sys.ScanHandler
+	handlers = append(handlers, worker.handler)
+
+	// Act
+	sys.Scan("/", appFS, handlers)
+
+	// Assert
+	ass.Equal(int64(1), worker.total.CountFolders)
+	ass.Equal(int64(1), worker.byCount.tree.Len())
+	ass.Equal(int64(1), worker.bySize.tree.Len())
+}
