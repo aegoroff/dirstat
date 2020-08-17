@@ -155,3 +155,21 @@ func Test_ExecuteFoldersModule_NoOutput(t *testing.T) {
 	// Assert
 	ass.Equal(0, w.Len())
 }
+
+func Test_ExecuteFoldersModule_WithOutput(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	appFS := afero.NewMemMapFs()
+	_ = appFS.MkdirAll("/f/s", 0755)
+	_ = afero.WriteFile(appFS, "/f/f.txt", []byte("123"), 0644)
+	_ = afero.WriteFile(appFS, "/f/s/f.txt", []byte("1234"), 0644)
+	ctx := NewContext(2, false, "/")
+	m := NewFoldersModule(ctx, false)
+	w := bytes.NewBufferString("")
+
+	// Act
+	Execute("/", appFS, w, m)
+
+	// Assert
+	ass.Greater(w.Len(), 0)
+}
