@@ -1,6 +1,7 @@
 package module
 
 import (
+	"bytes"
 	"dirstat/module/internal/sys"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/spf13/afero"
@@ -135,4 +136,22 @@ func Test_folderHandler_EmptyFileSystem(t *testing.T) {
 	ass.Equal(int64(1), worker.total.CountFolders)
 	ass.Equal(int64(1), worker.byCount.tree.Len())
 	ass.Equal(int64(1), worker.bySize.tree.Len())
+}
+
+func Test_ExecuteFoldersModule_NoOutput(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	appFS := afero.NewMemMapFs()
+	_ = appFS.MkdirAll("/f/s", 0755)
+	_ = afero.WriteFile(appFS, "/f/f.txt", []byte("123"), 0644)
+	_ = afero.WriteFile(appFS, "/f/s/f.txt", []byte("1234"), 0644)
+	ctx := NewContext(2, false, "/")
+	m := NewFoldersModule(ctx, true)
+	w := bytes.NewBufferString("")
+
+	// Act
+	Execute("/", appFS, w, m)
+
+	// Assert
+	ass.Equal(0, w.Len())
 }
