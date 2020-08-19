@@ -86,6 +86,20 @@ func NewDetailFileModule(ctx *Context, enabledRanges []int) Module {
 	return m
 }
 
+// NewBendfordFileModule creates new file size bendford statistic
+func NewBendfordFileModule(ctx *Context, enabled bool) Module {
+	if !enabled {
+		return &module{
+			[]worker{},
+			[]renderer{},
+		}
+	}
+	work := newBendfordFileWorker(ctx)
+	rend := newBendfordFileRenderer(work)
+	m := newModule(work, rend)
+	return m
+}
+
 // NewExtensionModule creates new file extensions statistic module
 func NewExtensionModule(ctx *Context, hideOutput bool) Module {
 	work := newExtWorker(ctx)

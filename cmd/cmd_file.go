@@ -9,6 +9,7 @@ func newFile(c conf) *cobra.Command {
 	opt := options{}
 
 	showExtStatistic := false
+	showBendfordStatistic := false
 
 	var cmd = &cobra.Command{
 		Use:     "fi",
@@ -21,10 +22,11 @@ func newFile(c conf) *cobra.Command {
 			totalfilemod := module.NewAggregateFileModule(ctx)
 			foldersmod := module.NewFoldersModule(ctx, true)
 			extmod := module.NewExtensionModule(ctx, !showExtStatistic)
+			bendford := module.NewBendfordFileModule(ctx, showBendfordStatistic)
 
 			topfilesmod := module.NewTopFilesModule(ctx)
 
-			run(opt.path, c, totalfilemod, extmod, topfilesmod, detailfilemod, foldersmod, totalmod)
+			run(opt.path, c, totalfilemod, extmod, topfilesmod, bendford, detailfilemod, foldersmod, totalmod)
 
 			return nil
 		},
@@ -33,6 +35,7 @@ func newFile(c conf) *cobra.Command {
 	configure(cmd, &opt)
 
 	cmd.Flags().BoolVarP(&showExtStatistic, "ext", "e", false, "Show extensions statistic. By default false")
+	cmd.Flags().BoolVarP(&showBendfordStatistic, "bendford", "b", false, "Show files size bendford statistic. By default false")
 
 	return cmd
 }
