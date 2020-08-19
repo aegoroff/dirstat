@@ -2,7 +2,6 @@ package module
 
 import (
 	"dirstat/module/internal/sys"
-	"math"
 )
 
 type benfordFileWorker struct {
@@ -54,9 +53,10 @@ func (b *benfordFileRenderer) print(p printer) {
 			continue
 		}
 		percentOfCount := percent(float64(count), total)
-		diff := math.Abs(ideals[i-1] - percentOfCount)
-		deviation := diff / ideals[i-1]
 		ideal := int64((ideals[i-1] / 100) * total)
+
+		diff := count - ideal
+		deviation := float64(diff) / float64(ideal)
 
 		p.tprint("%v\t%v\t%.2f%%\t%v\t%.2f%%\t%.2f%%\n", i, count, percentOfCount, ideal, ideals[i-1], deviation*100)
 	}
