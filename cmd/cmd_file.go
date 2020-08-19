@@ -26,7 +26,7 @@ func newFile(c conf) *cobra.Command {
 
 			topfilesmod := module.NewTopFilesModule(ctx)
 
-			run(opt.path, c, totalfilemod, extmod, topfilesmod, benford, detailfilemod, foldersmod, totalmod)
+			run(opt.path, c, totalfilemod, benford, extmod, topfilesmod, detailfilemod, foldersmod, totalmod)
 
 			return nil
 		},
