@@ -22,11 +22,11 @@ func newFile(c conf) *cobra.Command {
 			totalfilemod := module.NewAggregateFileModule(ctx)
 			foldersmod := module.NewFoldersModule(ctx, true)
 			extmod := module.NewExtensionModule(ctx, !showExtStatistic)
-			bendford := module.NewBendfordFileModule(ctx, showBendfordStatistic)
+			benford := module.NewBenfordFileModule(ctx, showBendfordStatistic)
 
 			topfilesmod := module.NewTopFilesModule(ctx)
 
-			run(opt.path, c, totalfilemod, extmod, topfilesmod, bendford, detailfilemod, foldersmod, totalmod)
+			run(opt.path, c, totalfilemod, extmod, topfilesmod, benford, detailfilemod, foldersmod, totalmod)
 
 			return nil
 		},

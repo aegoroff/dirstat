@@ -4,7 +4,7 @@ import (
 	"dirstat/module/internal/sys"
 )
 
-type bendfordFileWorker struct {
+type benfordFileWorker struct {
 	voidFinalize
 	voidInit
 	*fileFilter
@@ -12,12 +12,12 @@ type bendfordFileWorker struct {
 	total        *totalInfo
 }
 
-type bendfordFileRenderer struct {
-	*bendfordFileWorker
+type benfordFileRenderer struct {
+	*benfordFileWorker
 }
 
-func newBendfordFileWorker(ctx *Context) *bendfordFileWorker {
-	w := bendfordFileWorker{
+func newBenfordFileWorker(ctx *Context) *benfordFileWorker {
+	w := benfordFileWorker{
 		distribution: []int64{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		total:        ctx.total,
 	}
@@ -25,11 +25,11 @@ func newBendfordFileWorker(ctx *Context) *bendfordFileWorker {
 	return &w
 }
 
-func newBendfordFileRenderer(work *bendfordFileWorker) renderer {
-	return &bendfordFileRenderer{work}
+func newBenfordFileRenderer(work *benfordFileWorker) renderer {
+	return &benfordFileRenderer{work}
 }
 
-func (b *bendfordFileWorker) onFile(f *sys.FileEntry) {
+func (b *benfordFileWorker) onFile(f *sys.FileEntry) {
 	s := f.Size
 	for s >= 10 {
 		s = s / 10
@@ -37,8 +37,8 @@ func (b *bendfordFileWorker) onFile(f *sys.FileEntry) {
 	b.distribution[s]++
 }
 
-func (b *bendfordFileRenderer) print(p printer) {
-	p.cprint("\n<gray>File sizes by first file's size digit distribution (bendford law):</>\n\n")
+func (b *benfordFileRenderer) print(p printer) {
+	p.cprint("\n<gray>File sizes by first file's size digit distribution (benford law):</>\n\n")
 
 	const format = "%v\t%v\t%v\n"
 	p.tprint(format, "Digit", "Count", "%")
