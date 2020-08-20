@@ -57,14 +57,14 @@ func Execute(path string, fs afero.Fs, w io.Writer, modules ...Module) {
 func NewFoldersModule(ctx *Context) Module {
 	work := newFoldersWorker(ctx)
 	rend := newFoldersRenderer(work)
-	return newModule(work, rend)
+	return newModule(rend, work)
 }
 
 // NewTopFilesModule creates new top files statistic module
 func NewTopFilesModule(ctx *Context) Module {
 	work := newTopFilesWorker(ctx.top, ctx.pd)
 	rend := newTopFilesRenderer(work)
-	m := newModule(work, rend)
+	m := newModule(rend, work)
 	return m
 }
 
@@ -76,34 +76,23 @@ func NewDetailFileModule(ctx *Context, enabledRanges []int) Module {
 	}
 	work := newDetailFileWorker(newRanges(), enabledRanges, ctx.pd)
 	rend := newDetailFileRenderer(work)
-	m := newModule(work, rend)
+	m := newModule(rend, work)
 	return m
-}
-
-// NewVoidModule creates module that do nothing
-func NewVoidModule() Module {
-	return &module{
-		[]worker{},
-		[]renderer{},
-	}
 }
 
 // NewBenfordFileModule creates new file size bendford statistic
 func NewBenfordFileModule(ctx *Context) Module {
 	work := newBenfordFileWorker(ctx)
 	rend := newBenfordFileRenderer(work)
-	m := newModule(work, rend)
+	m := newModule(rend, work)
 	return m
 }
 
 // NewExtensionModule creates new file extensions statistic module
 func NewExtensionModule(ctx *Context) Module {
 	rend := newExtRenderer(ctx)
-	m := module{
-		[]worker{},
-		[]renderer{rend},
-	}
-	return &m
+	m := newModule(rend)
+	return m
 }
 
 // NewAggregateFileModule creates new total file statistic module
@@ -111,7 +100,7 @@ func NewAggregateFileModule(ctx *Context) Module {
 	work := newAggregateFileWorker(newRanges())
 	rend := newAggregateFileRenderer(ctx, work)
 
-	m := newModule(work, rend)
+	m := newModule(rend, work)
 	return m
 }
 
@@ -120,7 +109,7 @@ func NewTotalModule(ctx *Context) Module {
 	work := newTotalWorker(ctx)
 	rend := newTotalRenderer(ctx)
 
-	m := newModule(work, rend)
+	m := newModule(rend, work)
 	return m
 }
 
@@ -145,12 +134,20 @@ type voidFinalize struct{}
 
 func (*voidFinalize) finalize() {}
 
-func newModule(w worker, r ...renderer) Module {
-	m := module{
-		[]worker{w},
+// NewVoidModule creates module that do nothing
+func NewVoidModule() Module {
+	return &module{
+		[]worker{},
 		[]renderer{},
 	}
-	m.rnd = append(m.rnd, r...)
+}
+
+func newModule(r renderer, w ...worker) Module {
+	m := module{
+		[]worker{},
+		[]renderer{r},
+	}
+	m.wks = append(m.wks, w...)
 	return &m
 }
 
