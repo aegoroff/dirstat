@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
+	"io"
 	"os"
 )
 
@@ -25,7 +27,7 @@ var top int
 var removeRoot bool
 
 // Execute starts package running
-func Execute(args ...string) {
+func Execute(fs afero.Fs, w io.Writer, args ...string) {
 	rootCmd := newRoot()
 
 	if args != nil && len(args) > 0 {
@@ -36,7 +38,7 @@ func Execute(args ...string) {
 	rootCmd.PersistentFlags().BoolVarP(&showMemory, "memory", "m", false, "Show memory statistic after run")
 	rootCmd.PersistentFlags().BoolVarP(&removeRoot, "removeroot", "o", false, "Remove root part from full path i.e. output relative paths")
 
-	conf := newAppConf()
+	conf := newAppConf(fs, w)
 
 	rootCmd.AddCommand(newAll(conf))
 	rootCmd.AddCommand(newFile(conf))

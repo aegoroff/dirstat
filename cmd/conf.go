@@ -4,7 +4,6 @@ import (
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"io"
-	"os"
 )
 
 type options struct {
@@ -33,10 +32,10 @@ func (a *appConf) w() io.Writer {
 	return a.writer
 }
 
-func newAppConf() conf {
+func newAppConf(fs afero.Fs, w io.Writer) conf {
 	c := appConf{
-		filesystem: afero.NewOsFs(),
-		writer:     os.Stdout,
+		filesystem: fs,
+		writer:     w,
 	}
 	return &c
 }

@@ -1,7 +1,11 @@
 package main
 
-import "dirstat/cmd"
+import (
+	"dirstat/cmd"
+	"github.com/spf13/afero"
+	"os"
+)
 
 func main() {
-	cmd.Execute()
+	cmd.Execute(afero.NewOsFs(), os.Stdout)
 }
