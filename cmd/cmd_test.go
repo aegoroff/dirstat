@@ -28,6 +28,7 @@ func Test_PositiveTests(t *testing.T) {
 		{[]string{"fi", "-p", "/", "-e"}},
 		{[]string{"fo", "-p", "/"}},
 		{[]string{"ver"}},
+		{[]string{}},
 	}
 
 	for _, test := range tests {
@@ -36,7 +37,6 @@ func Test_PositiveTests(t *testing.T) {
 		err := Execute(appFS, w, test.cmdline...)
 
 		// Assert
-		ass.Greater(w.Len(), 0)
 		ass.NoError(err)
 		fmt.Print(w.String())
 	}
