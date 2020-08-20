@@ -7,5 +7,7 @@ import (
 )
 
 func main() {
-	cmd.Execute(afero.NewOsFs(), os.Stdout)
+	if err := cmd.Execute(afero.NewOsFs(), os.Stdout); err != nil {
+		os.Exit(1)
+	}
 }

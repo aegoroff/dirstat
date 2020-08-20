@@ -17,8 +17,9 @@ func Test_RunAll(t *testing.T) {
 	w := bytes.NewBufferString("")
 
 	// Act
-	Execute(appFS, w, "a", "-p", "/")
+	err := Execute(appFS, w, "a", "-p", "/")
 
 	// Assert
 	ass.Greater(w.Len(), 0)
+	ass.NoError(err)
 }

@@ -4,7 +4,6 @@ import (
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"io"
-	"os"
 )
 
 func newRoot() *cobra.Command {
@@ -27,7 +26,7 @@ var top int
 var removeRoot bool
 
 // Execute starts package running
-func Execute(fs afero.Fs, w io.Writer, args ...string) {
+func Execute(fs afero.Fs, w io.Writer, args ...string) error {
 	rootCmd := newRoot()
 
 	if args != nil && len(args) > 0 {
@@ -46,7 +45,5 @@ func Execute(fs afero.Fs, w io.Writer, args ...string) {
 	rootCmd.AddCommand(newBenford(conf))
 	rootCmd.AddCommand(newVersion(conf.w()))
 
-	if err := rootCmd.Execute(); err != nil {
-		os.Exit(1)
-	}
+	return rootCmd.Execute()
 }
