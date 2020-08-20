@@ -20,9 +20,8 @@ func newAll(c conf) *cobra.Command {
 			totalfilemod := module.NewAggregateFileModule(ctx)
 			extmod := module.NewExtensionModule(ctx, false)
 			topfilesmod := module.NewTopFilesModule(ctx)
-			benford := module.NewBenfordFileModule(ctx, true)
 
-			run(opt.path, c, totalfilemod, benford, extmod, topfilesmod, foldersmod, detailfilemod, totalmod)
+			run(opt.path, c, totalfilemod, extmod, topfilesmod, foldersmod, detailfilemod, totalmod)
 
 			return nil
 		},

@@ -87,13 +87,7 @@ func NewDetailFileModule(ctx *Context, enabledRanges []int) Module {
 }
 
 // NewBenfordFileModule creates new file size bendford statistic
-func NewBenfordFileModule(ctx *Context, enabled bool) Module {
-	if !enabled {
-		return &module{
-			[]worker{},
-			[]renderer{},
-		}
-	}
+func NewBenfordFileModule(ctx *Context) Module {
 	work := newBenfordFileWorker(ctx)
 	rend := newBenfordFileRenderer(work)
 	m := newModule(work, rend)

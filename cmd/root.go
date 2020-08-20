@@ -41,6 +41,7 @@ func Execute(args ...string) {
 	rootCmd.AddCommand(newAll(conf))
 	rootCmd.AddCommand(newFile(conf))
 	rootCmd.AddCommand(newFolder(conf))
+	rootCmd.AddCommand(newBenford(conf))
 	rootCmd.AddCommand(newVersion(conf.w()))
 
 	if err := rootCmd.Execute(); err != nil {
