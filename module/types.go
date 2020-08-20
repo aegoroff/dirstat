@@ -42,6 +42,7 @@ type totalInfo struct {
 	FilesTotal    countSizeAggregate
 	CountFolders  int64
 	CountFileExts int
+	extensions    map[string]countSizeAggregate
 }
 
 type countSizeAggregate struct {

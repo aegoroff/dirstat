@@ -15,9 +15,9 @@ func newBenford(c conf) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := module.NewContext(top, removeRoot, opt.path)
 			benford := module.NewBenfordFileModule(ctx)
-			extmod := module.NewExtensionModule(ctx, true)
+			totalmod := module.NewTotalModule(ctx)
 
-			run(opt.path, c, benford, extmod)
+			run(opt.path, c, benford, totalmod)
 
 			return nil
 		},

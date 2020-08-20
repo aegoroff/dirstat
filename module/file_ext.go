@@ -1,54 +1,16 @@
 package module
 
 import (
-	"dirstat/module/internal/sys"
-	"path/filepath"
 	"sort"
 )
 
-type extWorker struct {
-	voidInit
-	*fileFilter
-	total      *totalInfo
-	aggregator map[string]countSizeAggregate
-}
-
 type extRenderer struct {
-	work *extWorker
-	top  int
+	total *totalInfo
+	top   int
 }
 
-func newExtWorker(ctx *Context) *extWorker {
-	w := extWorker{
-		total:      ctx.total,
-		aggregator: make(map[string]countSizeAggregate, 8192),
-	}
-
-	w.fileFilter = newFileFilter(w.onFile)
-
-	return &w
-}
-
-func newExtRenderer(work *extWorker, top int) renderer {
-	return &extRenderer{work: work, top: top}
-}
-
-// Worker methods
-
-func (m *extWorker) finalize() {
-	m.total.CountFileExts = len(m.aggregator)
-}
-
-func (m *extWorker) onFile(f *sys.FileEntry) {
-	// Accumulate file statistic
-	m.total.FilesTotal.Count++
-	m.total.FilesTotal.Size += uint64(f.Size)
-
-	ext := filepath.Ext(f.Path)
-	a := m.aggregator[ext]
-	a.Size += uint64(f.Size)
-	a.Count++
-	m.aggregator[ext] = a
+func newExtRenderer(ctx *Context) renderer {
+	return &extRenderer{total: ctx.total, top: ctx.top}
 }
 
 // Renderer method
@@ -63,21 +25,21 @@ func (e *extRenderer) print(p printer) {
 	})
 
 	sizePrint := fileExtPrint{
-		count:   func(f *file) int64 { return e.work.aggregator[f.path].Count },
+		count:   func(f *file) int64 { return e.total.extensions[f.path].Count },
 		size:    func(f *file) uint64 { return uint64(f.size) },
 		p:       p,
 		headfmt: "\n<gray>TOP %d file extensions by size:</>\n\n",
-		total:   e.work.total,
+		total:   e.total,
 	}
 
 	sizePrint.print(extBySize, e.top)
 
 	countPrint := fileExtPrint{
 		count:   func(f *file) int64 { return f.size },
-		size:    func(f *file) uint64 { return e.work.aggregator[f.path].Size },
+		size:    func(f *file) uint64 { return e.total.extensions[f.path].Size },
 		p:       p,
 		headfmt: "\n<gray>TOP %d file extensions by count:</>\n\n",
-		total:   e.work.total,
+		total:   e.total,
 	}
 
 	countPrint.print(extByCount, e.top)
@@ -118,9 +80,9 @@ func (fp *fileExtPrint) printTableHead(format string) {
 }
 
 func (e *extRenderer) evolventMap(mapper func(countSizeAggregate) int64) files {
-	var result = make(files, len(e.work.aggregator))
+	var result = make(files, len(e.total.extensions))
 	i := 0
-	for k, v := range e.work.aggregator {
+	for k, v := range e.total.extensions {
 		result[i] = &file{size: mapper(v), path: k}
 		i++
 	}

@@ -1,17 +1,55 @@
 package module
 
 import (
+	"dirstat/module/internal/sys"
 	"github.com/dustin/go-humanize"
 	"github.com/gookit/color"
+	"path/filepath"
 	"text/template"
 )
+
+type totalWorker struct {
+	voidInit
+	total *totalInfo
+}
 
 type totalRenderer struct {
 	total *totalInfo
 }
 
+func newTotalWorker(ctx *Context) *totalWorker {
+	w := totalWorker{
+		total: ctx.total,
+	}
+
+	return &w
+}
+
 func newTotalRenderer(ctx *Context) renderer {
 	return &totalRenderer{ctx.total}
+}
+
+// Worker methods
+
+func (m *totalWorker) finalize() {
+	m.total.CountFileExts = len(m.total.extensions)
+}
+
+func (m *totalWorker) handler(evt *sys.ScanEvent) {
+	if evt.Folder != nil {
+		m.total.CountFolders++
+	} else if evt.File != nil {
+		f := evt.File
+		// Accumulate file statistic
+		m.total.FilesTotal.Count++
+		m.total.FilesTotal.Size += uint64(f.Size)
+
+		ext := filepath.Ext(f.Path)
+		a := m.total.extensions[ext]
+		a.Size += uint64(f.Size)
+		a.Count++
+		m.total.extensions[ext] = a
+	}
 }
 
 // Renderer method

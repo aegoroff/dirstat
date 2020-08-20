@@ -19,12 +19,17 @@ func newFile(c conf) *cobra.Command {
 			totalmod := module.NewTotalModule(ctx)
 			detailfilemod := module.NewDetailFileModule(ctx, opt.vrange)
 			totalfilemod := module.NewAggregateFileModule(ctx)
-			foldersmod := module.NewFoldersModule(ctx, true)
-			extmod := module.NewExtensionModule(ctx, !showExtStatistic)
+			var extmod module.Module
+
+			if showExtStatistic {
+				extmod = module.NewExtensionModule(ctx)
+			} else {
+				extmod = module.NewVoidModule()
+			}
 
 			topfilesmod := module.NewTopFilesModule(ctx)
 
-			run(opt.path, c, totalfilemod, extmod, topfilesmod, detailfilemod, foldersmod, totalmod)
+			run(opt.path, c, totalfilemod, extmod, topfilesmod, detailfilemod, totalmod)
 
 			return nil
 		},

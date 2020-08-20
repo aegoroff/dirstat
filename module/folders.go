@@ -100,8 +100,6 @@ func (m *foldersWorker) handler(evt *sys.ScanEvent) {
 
 	fc := folderC{fn}
 	m.byCount.insert(&fc)
-
-	m.total.CountFolders++
 }
 
 // Renderer method

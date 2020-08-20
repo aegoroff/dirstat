@@ -15,7 +15,7 @@ type Context struct {
 
 // NewContext creates new module's context that needed to create new modules
 func NewContext(top int, rr bool, root string) *Context {
-	total := totalInfo{}
+	total := totalInfo{extensions: make(map[string]countSizeAggregate, 8192)}
 
 	ctx := Context{
 		total: &total,
@@ -54,11 +54,8 @@ func Execute(path string, fs afero.Fs, w io.Writer, modules ...Module) {
 }
 
 // NewFoldersModule creates new folders module
-func NewFoldersModule(ctx *Context, hideOutput bool) Module {
+func NewFoldersModule(ctx *Context) Module {
 	work := newFoldersWorker(ctx)
-	if hideOutput {
-		return newModule(work)
-	}
 	rend := newFoldersRenderer(work)
 	return newModule(work, rend)
 }
@@ -75,15 +72,20 @@ func NewTopFilesModule(ctx *Context) Module {
 func NewDetailFileModule(ctx *Context, enabledRanges []int) Module {
 	// Do nothing if verbose not enabled
 	if len(enabledRanges) == 0 {
-		return &module{
-			[]worker{},
-			[]renderer{},
-		}
+		return NewVoidModule()
 	}
 	work := newDetailFileWorker(newRanges(), enabledRanges, ctx.pd)
 	rend := newDetailFileRenderer(work)
 	m := newModule(work, rend)
 	return m
+}
+
+// NewVoidModule creates module that do nothing
+func NewVoidModule() Module {
+	return &module{
+		[]worker{},
+		[]renderer{},
+	}
 }
 
 // NewBenfordFileModule creates new file size bendford statistic
@@ -95,13 +97,13 @@ func NewBenfordFileModule(ctx *Context) Module {
 }
 
 // NewExtensionModule creates new file extensions statistic module
-func NewExtensionModule(ctx *Context, hideOutput bool) Module {
-	work := newExtWorker(ctx)
-	if hideOutput {
-		return newModule(work)
+func NewExtensionModule(ctx *Context) Module {
+	rend := newExtRenderer(ctx)
+	m := module{
+		[]worker{},
+		[]renderer{rend},
 	}
-	rend := newExtRenderer(work, ctx.top)
-	return newModule(work, rend)
+	return &m
 }
 
 // NewAggregateFileModule creates new total file statistic module
@@ -115,13 +117,11 @@ func NewAggregateFileModule(ctx *Context) Module {
 
 // NewTotalModule creates new total statistic module
 func NewTotalModule(ctx *Context) Module {
+	work := newTotalWorker(ctx)
 	rend := newTotalRenderer(ctx)
 
-	m := module{
-		[]worker{},
-		[]renderer{rend},
-	}
-	return &m
+	m := newModule(work, rend)
+	return m
 }
 
 type module struct {
