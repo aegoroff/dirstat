@@ -56,7 +56,12 @@ func (b *benfordFileRenderer) print(p printer) {
 		ideal := int64((ideals[i-1] / 100) * total)
 
 		diff := count - ideal
-		deviation := float64(diff) / float64(ideal)
+		var deviation float64
+		if ideal == 0 {
+			deviation = 0
+		} else {
+			deviation = float64(diff) / float64(ideal)
+		}
 
 		p.tprint("%v\t%v\t%.2f%%\t%v\t%.2f%%\t%.2f%%\n", i, count, percentOfCount, ideal, ideals[i-1], deviation*100)
 	}
