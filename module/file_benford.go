@@ -57,7 +57,9 @@ func (b *benfordFileRenderer) print(p printer) {
 
 		diff := count - ideal
 		var deviation float64
-		if ideal == 0 {
+		if diff == 0 {
+			deviation = 0
+		} else if ideal == 0 {
 			deviation = 1
 		} else {
 			deviation = float64(diff) / float64(ideal)
