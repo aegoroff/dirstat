@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -22,4 +23,5 @@ func Test_RunAll(t *testing.T) {
 	// Assert
 	ass.Greater(w.Len(), 0)
 	ass.NoError(err)
+	fmt.Print(w.String())
 }
