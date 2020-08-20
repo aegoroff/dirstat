@@ -38,7 +38,7 @@ func (b *benfordFileWorker) onFile(f *sys.FileEntry) {
 }
 
 func (b *benfordFileRenderer) print(p printer) {
-	p.cprint("<gray>The first file's size digit distribution of non zero files (benford law):</>\n\n")
+	p.cprint("\n<gray>The first file's size digit distribution of non zero files (benford law):</>\n\n")
 
 	const format = "%v\t%v\t%v\t%v\t%v\t%v\n"
 	p.tprint(format, "Digit", "Count", "%", "Benford ideal", "%", "Deviation")
