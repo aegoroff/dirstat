@@ -44,6 +44,7 @@ func (m *totalWorker) handler(evt *sys.ScanEvent) {
 		m.total.FilesTotal.Count++
 		m.total.FilesTotal.Size += uint64(f.Size)
 
+		// Accumulate file extensions statistic
 		ext := filepath.Ext(f.Path)
 		a := m.total.extensions[ext]
 		a.Size += uint64(f.Size)
