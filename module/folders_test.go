@@ -191,3 +191,41 @@ func TestFolder_Path_PathDecorating(t *testing.T) {
 	// Assert
 	ass.Equal("/local", result)
 }
+
+func Test_castSize_invalidCasting(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	f := folder{
+		path:  "/f1",
+		count: 3,
+		size:  100,
+		pd:    nil,
+	}
+	fc := folderC{f}
+
+	// Act
+	r, err := castSize(&fc)
+
+	// Assert
+	ass.Error(err)
+	ass.Nil(r)
+}
+
+func Test_castCount_invalidCasting(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	f := folder{
+		path:  "/f1",
+		count: 3,
+		size:  100,
+		pd:    nil,
+	}
+	fs := folderS{f}
+
+	// Act
+	r, err := castCount(&fs)
+
+	// Assert
+	ass.Error(err)
+	ass.Nil(r)
+}
