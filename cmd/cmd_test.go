@@ -51,3 +51,17 @@ func Test_PositiveTests(t *testing.T) {
 		fmt.Println(w.String())
 	}
 }
+
+func Test_NegativeCmdTest(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	appFS := afero.NewMemMapFs()
+	w := bytes.NewBufferString("")
+
+	// Act
+	err := Execute(appFS, w, "x")
+
+	// Assert
+	ass.Error(err)
+	fmt.Println(w.String())
+}
