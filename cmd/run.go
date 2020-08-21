@@ -40,12 +40,12 @@ func newTimeMeasureR(wrapped runner) runner {
 
 func newPathCorrectionR(wrapped runner) runner {
 	return func(path string, fs afero.Fs, w io.Writer, modules ...module.Module) {
-		if _, err := fs.Stat(path); os.IsNotExist(err) {
-			return
+		if (path)[len(path)-1] == ':' {
+			path = filepath.Join(path, string(os.PathSeparator))
 		}
 
-		if (path)[len(path)-1] == ':' {
-			path = filepath.Join(path, "\\")
+		if _, err := fs.Stat(path); os.IsNotExist(err) {
+			return
 		}
 
 		color.Fprintf(w, "Root: <red>%s</>\n\n", path)

@@ -37,6 +37,7 @@ func Test_PositiveTests(t *testing.T) {
 		{[]string{"fo", "-p", "/"}},
 		{[]string{"ver"}},
 		{[]string{}},
+		{[]string{"fi", "-p", ":"}},
 	}
 
 	for _, test := range tests {
