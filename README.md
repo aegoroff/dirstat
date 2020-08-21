@@ -19,8 +19,9 @@ Usage:
 Available Commands:
   a           Show all information about folder/volume
   b           Show the first digit distribution of files size (benford law validation)
-  fi          Show information about files within folder on volume only
-  fo          Show information about folders within folder on volume only
+  e           Show file extensions statistic
+  fi          Show information only about files
+  fo          Show information only about folders
   help        Help about any command
   version     Print the version number of dirstat
 

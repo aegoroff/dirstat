@@ -43,6 +43,7 @@ func Execute(fs afero.Fs, w io.Writer, args ...string) error {
 	rootCmd.AddCommand(newFile(conf))
 	rootCmd.AddCommand(newFolder(conf))
 	rootCmd.AddCommand(newBenford(conf))
+	rootCmd.AddCommand(newExt(conf))
 	rootCmd.AddCommand(newVersion(conf.w()))
 
 	return rootCmd.Execute()

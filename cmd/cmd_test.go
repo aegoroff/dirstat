@@ -33,7 +33,7 @@ func Test_PositiveTests(t *testing.T) {
 		{[]string{"a", "-p", "/f", "-o"}},
 		{[]string{"b", "-p", "/"}},
 		{[]string{"fi", "-p", "/"}},
-		{[]string{"fi", "-p", "/", "-e"}},
+		{[]string{"e", "-p", "/"}},
 		{[]string{"fo", "-p", "/"}},
 		{[]string{"ver"}},
 		{[]string{}},
