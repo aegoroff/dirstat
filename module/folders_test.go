@@ -153,3 +153,41 @@ func Test_ExecuteFoldersModule_WithOutput(t *testing.T) {
 	// Assert
 	ass.Greater(w.Len(), 0)
 }
+
+func TestFolder_Path(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	fo := folder{
+		path:  "/usr",
+		size:  0,
+		count: 0,
+		pd:    nil,
+	}
+
+	// Act
+	result := fo.Path()
+
+	// Assert
+	ass.Equal("/usr", result)
+}
+
+func TestFolder_Path_PathDecorating(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	pd := &pathDecorator{
+		removeRoot: true,
+		root:       "/usr",
+	}
+	fo := folder{
+		path:  "/usr/local",
+		size:  0,
+		count: 0,
+		pd:    pd,
+	}
+
+	// Act
+	result := fo.Path()
+
+	// Assert
+	ass.Equal("/local", result)
+}
