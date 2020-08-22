@@ -23,21 +23,22 @@ func Test_PositiveTests(t *testing.T) {
 	_ = afero.WriteFile(appFS, "/f/f6.htm", []byte("12345678910"), 0644)
 
 	var tests = []struct {
-		cmdline []string
+		cmdline     []string
+		mustcontain string
 	}{
-		{[]string{"a", "-p", "/"}},
-		{[]string{"a", "-p", "/", "-t", "3"}},
-		{[]string{"a", "-p", "/", "-r", "1"}},
-		{[]string{"a", "-p", "/f", "-r", "1", "-o"}},
-		{[]string{"a", "-p", "/", "-m"}},
-		{[]string{"a", "-p", "/f", "-o"}},
-		{[]string{"b", "-p", "/"}},
-		{[]string{"fi", "-p", "/"}},
-		{[]string{"e", "-p", "/"}},
-		{[]string{"fo", "-p", "/"}},
-		{[]string{"ver"}},
-		{[]string{}},
-		{[]string{"fi", "-p", ":"}},
+		{[]string{"a", "-p", "/"}, "Total files"},
+		{[]string{"a", "-p", "/", "-t", "3"}, "Total files"},
+		{[]string{"a", "-p", "/", "-r", "1"}, "Total files"},
+		{[]string{"a", "-p", "/f", "-r", "1", "-o"}, "Total files"},
+		{[]string{"a", "-p", "/", "-m"}, "Total files"},
+		{[]string{"a", "-p", "/f", "-o"}, "Total files"},
+		{[]string{"b", "-p", "/"}, "Total files"},
+		{[]string{"fi", "-p", "/"}, "Total files"},
+		{[]string{"e", "-p", "/"}, "Total files"},
+		{[]string{"fo", "-p", "/"}, "Total files"},
+		{[]string{"ver"}, "dirstat v"},
+		{[]string{}, ""},
+		{[]string{"fi", "-p", ":"}, ""},
 	}
 
 	for _, test := range tests {
@@ -46,10 +47,12 @@ func Test_PositiveTests(t *testing.T) {
 		err := Execute(appFS, w, test.cmdline...)
 
 		// Assert
+		out := w.String()
 		ass.NoError(err)
+		ass.Contains(out, test.mustcontain)
 		fmt.Println(strings.Join(test.cmdline, " "))
 		fmt.Println("----------------------------------------------")
-		fmt.Println(w.String())
+		fmt.Println(out)
 	}
 }
 
