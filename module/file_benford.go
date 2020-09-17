@@ -2,6 +2,8 @@ package module
 
 import (
 	"dirstat/module/internal/sys"
+	"fmt"
+	"github.com/guptarohit/asciigraph"
 )
 
 type benfordFileWorker struct {
@@ -48,12 +50,15 @@ func (b *benfordFileRenderer) print(p printer) {
 	ideals := []float64{30.1, 17.6, 12.5, 9.7, 7.9, 6.7, 5.8, 5.1, 4.6}
 
 	total := float64(b.total.FilesTotal.Count - b.distribution[0])
+	var percents []float64
 	for i, count := range b.distribution {
 		if i == 0 {
 			continue
 		}
+
 		percentOfCount := percent(float64(count), total)
 		ideal := int64((ideals[i-1] / 100) * total)
+		percents = append(percents, percentOfCount)
 
 		diff := count - ideal
 		var deviation float64
@@ -69,4 +74,7 @@ func (b *benfordFileRenderer) print(p printer) {
 	}
 
 	p.flush()
+	fmt.Println()
+	graph := asciigraph.Plot(percents, asciigraph.Height(10), asciigraph.Width(20))
+	fmt.Println(graph)
 }
