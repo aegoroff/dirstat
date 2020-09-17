@@ -10,6 +10,7 @@ import (
 
 type printer interface {
 	writer() io.Writer
+	twriter() *tabwriter.Writer
 	flush()
 
 	// tprint prints using tab writer
@@ -26,6 +27,10 @@ type prn struct {
 
 func (r *prn) writer() io.Writer {
 	return r.w
+}
+
+func (r *prn) twriter() *tabwriter.Writer {
+	return r.tw
 }
 
 func (r *prn) flush() {
