@@ -3,6 +3,7 @@ package module
 import (
 	"dirstat/module/internal/sys"
 	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/cheynewallace/tabby"
 )
 
 func newTopFilesWorker(top int, pd *pathDecorator) *topFilesWorker {
@@ -41,10 +42,8 @@ func (m *topFilesWorker) onFile(f *sys.FileEntry) {
 func (m *topFilesRenderer) print(p printer) {
 	p.cprint("\n<gray>TOP %d files by size:</>\n\n", m.tree.size)
 
-	const format = "%v\t%v\t%v\n"
-
-	p.tprint(format, " #", "File", "Size")
-	p.tprint(format, "--", "------", "----")
+	t := tabby.NewCustom(p.twriter())
+	t.AddHeader(" #", "File", "Size")
 
 	i := 1
 
@@ -56,10 +55,10 @@ func (m *topFilesRenderer) print(p printer) {
 			return false
 		}
 
-		p.tprint("%2d\t%v\t%v\n", i, file, human(file.size))
+		t.AddLine(ix2s(i), file, human(file.size))
 		i++
 		return true
 	})
 
-	p.flush()
+	t.Print()
 }

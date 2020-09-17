@@ -49,6 +49,10 @@ func human(n int64) string {
 	return humanize.IBytes(uint64(n))
 }
 
+func ix2s(i int) string {
+	return fmt.Sprintf("%2d", i)
+}
+
 func render(w io.Writer, renderers []renderer) {
 	p := newPrinter(w)
 

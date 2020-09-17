@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/aegoroff/godatastruct v0.4.0
+	github.com/cheynewallace/tabby v1.1.0
 	github.com/dustin/go-humanize v1.0.0
 	github.com/gookit/color v1.3.0
 	github.com/guptarohit/asciigraph v0.5.1
