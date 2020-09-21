@@ -2,8 +2,6 @@ package module
 
 import (
 	"dirstat/module/internal/sys"
-	"fmt"
-	"github.com/guptarohit/asciigraph"
 )
 
 type benfordFileWorker struct {
@@ -74,7 +72,4 @@ func (b *benfordFileRenderer) print(p printer) {
 	}
 
 	p.flush()
-	fmt.Println()
-	graph := asciigraph.Plot(percents, asciigraph.Height(10), asciigraph.Width(20))
-	fmt.Println(graph)
 }
