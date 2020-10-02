@@ -40,6 +40,9 @@ func newTimeMeasureR(wrapped runner) runner {
 
 func newPathCorrectionR(wrapped runner) runner {
 	return func(path string, fs afero.Fs, w io.Writer, modules ...module.Module) {
+		if len(path) == 0 {
+			return
+		}
 		if (path)[len(path)-1] == ':' {
 			path = filepath.Join(path, string(os.PathSeparator))
 		}
