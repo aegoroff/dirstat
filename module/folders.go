@@ -3,7 +3,11 @@ package module
 import (
 	"dirstat/module/internal/sys"
 	"errors"
+	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/dustin/go-humanize"
+	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/jedib0t/go-pretty/v6/text"
 )
 
 // Folder interface
@@ -137,8 +141,29 @@ func (f *foldersRenderer) print(p printer) {
 }
 
 func (f *foldersRenderer) printTop(ft *fixedTree, p printer, format string, cast folderCast) {
-	p.tprint(format, " #", "Folder", "Files", "%", "Size", "%")
-	p.tprint(format, "--", "------", "-----", "------", "----", "------")
+	tab := table.NewWriter()
+	tab.SetAllowedRowLength(0)
+	tab.SetOutputMirror(p.writer())
+	tab.SetStyle(table.StyleLight)
+	tab.Style().Options.SeparateColumns = true
+
+	tab.SetColumnConfigs([]table.ColumnConfig{
+		{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignRight},
+		{Number: 2, Align: text.AlignLeft, AlignHeader: text.AlignLeft, WidthMax: 100},
+		{Number: 3, Align: text.AlignLeft, AlignHeader: text.AlignLeft},
+		{Number: 4, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: percentTransformer},
+		{Number: 5, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: sizeTransformer},
+		{Number: 6, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: percentTransformer},
+	})
+
+	headers := table.Row{}
+	headers = append(headers, "#")
+	headers = append(headers, "Folder")
+	headers = append(headers, "Files")
+	headers = append(headers, "%")
+	headers = append(headers, "Size")
+	headers = append(headers, "%")
+	tab.AppendHeader(headers)
 
 	i := 1
 
@@ -148,19 +173,34 @@ func (f *foldersRenderer) printTop(ft *fixedTree, p printer, format string, cast
 			p.cprint("<red>%v</>", err)
 			return false
 		}
-		f.printTableRow(&i, fi, p)
+
+		count := fi.Count()
+		sz := uint64(fi.Size())
+		percentOfCount := f.total.countPercent(count)
+		percentOfSize := f.total.sizePercent(sz)
+
+		tab.AppendRow([]interface{}{
+			i,
+			fi.Path(),
+			count,
+			percentOfCount,
+			sz,
+			percentOfSize,
+		})
+
+		i++
 
 		return true
 	})
 
-	p.flush()
+	tab.Render()
 }
 
-func (f *foldersRenderer) printTableRow(i *int, fi folderI, p printer) {
-	count := fi.Count()
-	sz := uint64(fi.Size())
+func percentTransformer(val interface{}) string {
+	return fmt.Sprintf("%.2f%%", val)
+}
 
-	f.total.printCountAndSizeStatLine(p, *i, count, sz, fi.Path())
-
-	*i++
+func sizeTransformer(val interface{}) string {
+	sz := val.(uint64)
+	return humanize.IBytes(sz)
 }
