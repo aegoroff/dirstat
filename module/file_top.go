@@ -43,12 +43,7 @@ func (m *topFilesWorker) onFile(f *sys.FileEntry) {
 func (m *topFilesRenderer) print(p printer) {
 	p.cprint("\n<gray>TOP %d files by size:</>\n\n", m.tree.size)
 
-	tab := table.NewWriter()
-	tab.SetAllowedRowLength(0)
-	tab.SetOutputMirror(p.writer())
-	tab.SetStyle(table.StyleLight)
-	tab.Style().Options.SeparateColumns = true
-	tab.Style().Options.DrawBorder = true
+	tab := p.createTab()
 
 	tab.SetColumnConfigs([]table.ColumnConfig{
 		{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignRight},

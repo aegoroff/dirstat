@@ -3,11 +3,13 @@ package module
 import (
 	"github.com/dustin/go-humanize"
 	"github.com/gookit/color"
+	"github.com/jedib0t/go-pretty/v6/table"
 	"io"
 )
 
 type printer interface {
 	writer() io.Writer
+	createTab() table.Writer
 
 	// cprint prints data with suppport colorizing
 	cprint(format string, a ...interface{})
@@ -15,6 +17,16 @@ type printer interface {
 
 type prn struct {
 	w io.Writer
+}
+
+func (r *prn) createTab() table.Writer {
+	tab := table.NewWriter()
+	tab.SetAllowedRowLength(0)
+	tab.SetOutputMirror(r.w)
+	tab.SetStyle(table.StyleLight)
+	tab.Style().Options.SeparateColumns = true
+	tab.Style().Options.DrawBorder = true
+	return tab
 }
 
 func (r *prn) writer() io.Writer {

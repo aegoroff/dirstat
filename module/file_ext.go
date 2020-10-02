@@ -58,12 +58,7 @@ type fileExtPrint struct {
 func (fp *fileExtPrint) print(data files, top int) {
 	fp.p.cprint(fp.headfmt, top)
 
-	tab := table.NewWriter()
-	tab.SetAllowedRowLength(0)
-	tab.SetOutputMirror(fp.p.writer())
-	tab.SetStyle(table.StyleLight)
-	tab.Style().Options.SeparateColumns = true
-	tab.Style().Options.DrawBorder = true
+	tab := fp.p.createTab()
 
 	tab.SetColumnConfigs([]table.ColumnConfig{
 		{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignRight},

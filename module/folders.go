@@ -137,12 +137,7 @@ func (f *foldersRenderer) print(p printer) {
 }
 
 func (f *foldersRenderer) printTop(ft *fixedTree, p printer, cast folderCast) {
-	tab := table.NewWriter()
-	tab.SetAllowedRowLength(0)
-	tab.SetOutputMirror(p.writer())
-	tab.SetStyle(table.StyleLight)
-	tab.Style().Options.SeparateColumns = true
-	tab.Style().Options.DrawBorder = true
+	tab := p.createTab()
 
 	tab.SetColumnConfigs([]table.ColumnConfig{
 		{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignRight},

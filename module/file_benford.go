@@ -42,12 +42,7 @@ func (b *benfordFileWorker) onFile(f *sys.FileEntry) {
 func (b *benfordFileRenderer) print(p printer) {
 	p.cprint("\n<gray>The first file's size digit distribution of non zero files (benford law):</>\n\n")
 
-	tab := table.NewWriter()
-	tab.SetAllowedRowLength(0)
-	tab.SetOutputMirror(p.writer())
-	tab.SetStyle(table.StyleLight)
-	tab.Style().Options.SeparateColumns = true
-	tab.Style().Options.DrawBorder = true
+	tab := p.createTab()
 
 	tab.SetColumnConfigs([]table.ColumnConfig{
 		{Number: 1, Align: text.AlignLeft, AlignHeader: text.AlignLeft},
