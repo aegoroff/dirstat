@@ -38,6 +38,7 @@ func Test_PositiveTests(t *testing.T) {
 		{[]string{"fo", "-p", "/"}, "Total files"},
 		{[]string{"ver"}, "dirstat v"},
 		{[]string{}, ""},
+		{[]string{"a"}, ""},
 		{[]string{"fi", "-p", ":"}, ""},
 	}
 
