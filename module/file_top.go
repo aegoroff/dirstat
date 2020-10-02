@@ -3,7 +3,8 @@ package module
 import (
 	"dirstat/module/internal/sys"
 	"github.com/aegoroff/godatastruct/rbtree"
-	"github.com/cheynewallace/tabby"
+	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/jedib0t/go-pretty/v6/text"
 )
 
 func newTopFilesWorker(top int, pd *pathDecorator) *topFilesWorker {
@@ -42,8 +43,23 @@ func (m *topFilesWorker) onFile(f *sys.FileEntry) {
 func (m *topFilesRenderer) print(p printer) {
 	p.cprint("\n<gray>TOP %d files by size:</>\n\n", m.tree.size)
 
-	t := tabby.NewCustom(p.twriter())
-	t.AddHeader(" #", "File", "Size")
+	tab := table.NewWriter()
+	tab.SetAllowedRowLength(0)
+	tab.SetOutputMirror(p.writer())
+	tab.SetStyle(table.StyleLight)
+	tab.Style().Options.SeparateColumns = true
+
+	tab.SetColumnConfigs([]table.ColumnConfig{
+		{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignRight},
+		{Number: 2, Align: text.AlignLeft, AlignHeader: text.AlignLeft, WidthMax: 100},
+		{Number: 3, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: sizeTransformer},
+	})
+
+	headers := table.Row{}
+	headers = append(headers, "#")
+	headers = append(headers, "File")
+	headers = append(headers, "Size")
+	tab.AppendHeader(headers)
 
 	i := 1
 
@@ -55,10 +71,15 @@ func (m *topFilesRenderer) print(p printer) {
 			return false
 		}
 
-		t.AddLine(ix2s(i), file, human(file.size))
+		tab.AppendRow([]interface{}{
+			i,
+			file,
+			uint64(file.size),
+		})
+
 		i++
 		return true
 	})
 
-	t.Print()
+	tab.Render()
 }

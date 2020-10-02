@@ -3,9 +3,7 @@ package module
 import (
 	"dirstat/module/internal/sys"
 	"errors"
-	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
-	"github.com/dustin/go-humanize"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 )
@@ -194,13 +192,4 @@ func (f *foldersRenderer) printTop(ft *fixedTree, p printer, format string, cast
 	})
 
 	tab.Render()
-}
-
-func percentTransformer(val interface{}) string {
-	return fmt.Sprintf("%.2f%%", val)
-}
-
-func sizeTransformer(val interface{}) string {
-	sz := val.(uint64)
-	return humanize.IBytes(sz)
 }
