@@ -127,18 +127,16 @@ func castCount(c rbtree.Comparable) (folderI, error) {
 }
 
 func (f *foldersRenderer) print(p printer) {
-	const format = "%v\t%v\t%v\t%v\t%v\t%v\n"
-
 	p.cprint("\n<gray>TOP %d folders by size:</>\n\n", f.bySize.size)
 
-	f.printTop(f.bySize, p, format, castSize)
+	f.printTop(f.bySize, p, castSize)
 
 	p.cprint("\n<gray>TOP %d folders by count:</>\n\n", f.byCount.size)
 
-	f.printTop(f.byCount, p, format, castCount)
+	f.printTop(f.byCount, p, castCount)
 }
 
-func (f *foldersRenderer) printTop(ft *fixedTree, p printer, format string, cast folderCast) {
+func (f *foldersRenderer) printTop(ft *fixedTree, p printer, cast folderCast) {
 	tab := table.NewWriter()
 	tab.SetAllowedRowLength(0)
 	tab.SetOutputMirror(p.writer())
