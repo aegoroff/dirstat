@@ -48,6 +48,7 @@ func (m *topFilesRenderer) print(p printer) {
 	tab.SetOutputMirror(p.writer())
 	tab.SetStyle(table.StyleLight)
 	tab.Style().Options.SeparateColumns = true
+	tab.Style().Options.DrawBorder = true
 
 	tab.SetColumnConfigs([]table.ColumnConfig{
 		{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignRight},

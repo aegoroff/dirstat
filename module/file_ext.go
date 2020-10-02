@@ -1,6 +1,8 @@
 package module
 
 import (
+	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/jedib0t/go-pretty/v6/text"
 	"sort"
 )
 
@@ -54,11 +56,32 @@ type fileExtPrint struct {
 }
 
 func (fp *fileExtPrint) print(data files, top int) {
-	const format = "%v\t%v\t%v\t%v\t%v\t%v\n"
-
 	fp.p.cprint(fp.headfmt, top)
 
-	fp.printTableHead(format)
+	tab := table.NewWriter()
+	tab.SetAllowedRowLength(0)
+	tab.SetOutputMirror(fp.p.writer())
+	tab.SetStyle(table.StyleLight)
+	tab.Style().Options.SeparateColumns = true
+	tab.Style().Options.DrawBorder = true
+
+	tab.SetColumnConfigs([]table.ColumnConfig{
+		{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignRight},
+		{Number: 2, Align: text.AlignLeft, AlignHeader: text.AlignLeft, WidthMax: 100},
+		{Number: 3, Align: text.AlignLeft, AlignHeader: text.AlignLeft},
+		{Number: 4, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: percentTransformer},
+		{Number: 5, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: sizeTransformer},
+		{Number: 6, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: percentTransformer},
+	})
+
+	headers := table.Row{}
+	headers = append(headers, "#")
+	headers = append(headers, "Extension")
+	headers = append(headers, "Count")
+	headers = append(headers, "%")
+	headers = append(headers, "Size")
+	headers = append(headers, "%")
+	tab.AppendHeader(headers)
 
 	sort.Sort(sort.Reverse(data))
 
@@ -68,15 +91,20 @@ func (fp *fileExtPrint) print(data files, top int) {
 		count := fp.count(data[i])
 		sz := fp.size(data[i])
 
-		fp.total.printCountAndSizeStatLine(fp.p, i+1, count, sz, h)
+		percentOfCount := fp.total.countPercent(count)
+		percentOfSize := fp.total.sizePercent(sz)
+
+		tab.AppendRow([]interface{}{
+			i + 1,
+			h,
+			count,
+			percentOfCount,
+			sz,
+			percentOfSize,
+		})
 	}
 
-	fp.p.flush()
-}
-
-func (fp *fileExtPrint) printTableHead(format string) {
-	fp.p.tprint(format, " #", "Extension", "Count", "%", "Size", "%")
-	fp.p.tprint(format, "--", "---------", "-----", "------", "----", "------")
+	tab.Render()
 }
 
 func (e *extRenderer) evolventMap(mapper func(countSizeAggregate) int64) files {

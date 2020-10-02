@@ -2,6 +2,8 @@ package module
 
 import (
 	"dirstat/module/internal/sys"
+	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/jedib0t/go-pretty/v6/text"
 )
 
 type benfordFileWorker struct {
@@ -40,9 +42,30 @@ func (b *benfordFileWorker) onFile(f *sys.FileEntry) {
 func (b *benfordFileRenderer) print(p printer) {
 	p.cprint("\n<gray>The first file's size digit distribution of non zero files (benford law):</>\n\n")
 
-	const format = "%v\t%v\t%v\t%v\t%v\t%v\n"
-	p.tprint(format, "Digit", "Count", "%", "Benford ideal", "%", "Deviation")
-	p.tprint(format, "-----", "-----", "------", "-------------", "---------", "---------")
+	tab := table.NewWriter()
+	tab.SetAllowedRowLength(0)
+	tab.SetOutputMirror(p.writer())
+	tab.SetStyle(table.StyleLight)
+	tab.Style().Options.SeparateColumns = true
+	tab.Style().Options.DrawBorder = true
+
+	tab.SetColumnConfigs([]table.ColumnConfig{
+		{Number: 1, Align: text.AlignLeft, AlignHeader: text.AlignLeft},
+		{Number: 2, Align: text.AlignLeft, AlignHeader: text.AlignLeft},
+		{Number: 3, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: percentTransformer},
+		{Number: 4, Align: text.AlignLeft, AlignHeader: text.AlignLeft},
+		{Number: 5, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: percentTransformer},
+		{Number: 6, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: percentTransformer},
+	})
+
+	headers := table.Row{}
+	headers = append(headers, "Digit")
+	headers = append(headers, "Count")
+	headers = append(headers, "%")
+	headers = append(headers, "Benford ideal")
+	headers = append(headers, "%")
+	headers = append(headers, "Deviation")
+	tab.AppendHeader(headers)
 
 	// IDEAL percents
 	ideals := []float64{30.1, 17.6, 12.5, 9.7, 7.9, 6.7, 5.8, 5.1, 4.6}
@@ -68,8 +91,16 @@ func (b *benfordFileRenderer) print(p printer) {
 			deviation = float64(diff) / float64(ideal)
 		}
 
-		p.tprint("%v\t%v\t%.2f%%\t%v\t%.2f%%\t%.2f%%\n", i, count, percentOfCount, ideal, ideals[i-1], deviation*100)
+		tab.AppendRow([]interface{}{
+			i,
+			count,
+			percentOfCount,
+			ideal,
+			ideals[i-1],
+			deviation * 100,
+		})
+
 	}
 
-	p.flush()
+	tab.Render()
 }

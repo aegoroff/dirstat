@@ -3,7 +3,6 @@ package module
 import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
-	"github.com/dustin/go-humanize"
 	"time"
 )
 
@@ -65,13 +64,6 @@ func (t *totalInfo) sizePercent(size uint64) float64 {
 
 func percent(value float64, total float64) float64 {
 	return (value / total) * 100
-}
-
-func (t *totalInfo) printCountAndSizeStatLine(p printer, ix int, count int64, sz uint64, title string) {
-	percentOfCount := t.countPercent(count)
-	percentOfSize := t.sizePercent(sz)
-
-	p.tprint("%s\t%v\t%v\t%.2f%%\t%v\t%.2f%%\n", ix2s(ix), title, count, percentOfCount, humanize.IBytes(sz), percentOfSize)
 }
 
 func newFixedTree(sz int) *fixedTree {
