@@ -60,7 +60,6 @@ brews:
       email: "egoroff@gmail.com"
     homepage: "https://github.com/aegoroff/dirstat"
     description: "A small tool that shows selected folder or drive (on Windows) usage statistic"
-    skip_upload: true
 
 signs:
   - artifacts: checksum
