@@ -1,0 +1,73 @@
+env:
+  - GO111MODULE=on
+before:
+  hooks:
+    - go mod download
+builds:
+  - id: "x64"
+    binary: dirstat
+    ldflags: -s -w -X dirstat/cmd.Version={{ .Version }}
+    goos:
+      - linux
+      - freebsd
+      - windows
+      - openbsd
+      - solaris
+      - netbsd
+      - darwin
+    goarch:
+      - amd64
+
+  - id: "386"
+    binary: dirstat
+    ldflags: -s -w -X dirstat/cmd.Version={{ .Version }}
+    goos:
+      - linux
+      - windows
+      - freebsd
+      - openbsd
+      - netbsd
+    goarch:
+      - 386
+
+  - id: "arm"
+    binary: dirstat
+    ldflags: -s -w -X dirstat/cmd.Version={{ .Version }}
+    goos:
+      - linux
+    goarch:
+      - arm
+      - arm64
+
+archives:
+  - id: default
+    builds:
+      - x64
+      - arm
+      - 386
+
+brews:
+-
+    tap:
+      owner: egoroff
+      name: dirstat
+    commit_author:
+      name: "Alexander Egorov"
+      email: "egoroff@gmail.com"
+    homepage: "https://github.com/aegoroff/dirstat"
+    description: "A small tool that shows selected folder or drive (on Windows) usage statistic"
+    skip_upload: true
+
+signs:
+  - artifacts: checksum
+
+checksum:
+  name_template: "checksums.txt"
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
