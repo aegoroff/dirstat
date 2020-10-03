@@ -35,9 +35,12 @@ builds:
     ldflags: -s -w -X dirstat/cmd.Version={{ .Version }}
     goos:
       - linux
+      - freebsd
     goarch:
       - arm
       - arm64
+    goarm:
+      - 7
 
 archives:
   - id: default
@@ -48,6 +51,7 @@ archives:
 
 brews:
 -
+    goarm: 7
     tap:
       owner: egoroff
       name: dirstat
@@ -64,7 +68,7 @@ signs:
 checksum:
   name_template: "checksums.txt"
 snapshot:
-  name_template: "{{ .Tag }}-next"
+  name_template: "{{ .Tag }}"
 changelog:
   sort: asc
   filters:
