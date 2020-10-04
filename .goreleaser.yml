@@ -53,8 +53,8 @@ brews:
 -
     goarm: 7
     tap:
-      owner: egoroff
-      name: dirstat
+      owner: aegoroff
+      name: homebrew-tap
     commit_author:
       name: "Alexander Egorov"
       email: "egoroff@gmail.com"
