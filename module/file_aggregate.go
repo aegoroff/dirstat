@@ -69,14 +69,7 @@ func (m *aggregateFileRenderer) print(p printer) {
 		{Number: 6, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: percentTransformer},
 	})
 
-	headers := table.Row{}
-	headers = append(headers, "#")
-	headers = append(headers, "File size")
-	headers = append(headers, "Amount")
-	headers = append(headers, "%")
-	headers = append(headers, "Size")
-	headers = append(headers, "%")
-	tab.AppendHeader(headers)
+	appendHeaders([]string{"#", "File size", "Amount", "%", "Size", "%"}, tab)
 
 	heads := m.work.fileRanges.heads(false)
 	for i, r := range m.work.fileRanges {

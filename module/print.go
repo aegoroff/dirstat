@@ -37,6 +37,14 @@ func (r *prn) cprint(format string, a ...interface{}) {
 	color.Fprintf(r.w, format, a...)
 }
 
+func appendHeaders(heads []string, tab table.Writer) {
+	headers := table.Row{}
+	for _, head := range heads {
+		headers = append(headers, head)
+	}
+	tab.AppendHeader(headers)
+}
+
 func human(n int64) string {
 	return humanize.IBytes(uint64(n))
 }

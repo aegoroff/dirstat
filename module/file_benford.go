@@ -53,14 +53,7 @@ func (b *benfordFileRenderer) print(p printer) {
 		{Number: 6, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: percentTransformer},
 	})
 
-	headers := table.Row{}
-	headers = append(headers, "Digit")
-	headers = append(headers, "Count")
-	headers = append(headers, "%")
-	headers = append(headers, "Benford ideal")
-	headers = append(headers, "%")
-	headers = append(headers, "Deviation")
-	tab.AppendHeader(headers)
+	appendHeaders([]string{"Digit", "Count", "%", "Benford ideal", "%", "Deviation"}, tab)
 
 	// IDEAL percents
 	ideals := []float64{30.1, 17.6, 12.5, 9.7, 7.9, 6.7, 5.8, 5.1, 4.6}
