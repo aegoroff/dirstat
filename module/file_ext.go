@@ -69,8 +69,7 @@ func (fp *fileExtPrint) print(data files, top int) {
 		{Number: 6, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: percentTransformer},
 	})
 
-	heads := []string{"#", "Extension", "Count", "%", "Size", "%"}
-	appendHeaders(heads, tab)
+	appendHeaders([]string{"#", "Extension", "Count", "%", "Size", "%"}, tab)
 
 	sort.Sort(sort.Reverse(data))
 

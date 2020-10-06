@@ -148,8 +148,7 @@ func (f *foldersRenderer) printTop(ft *fixedTree, p printer, cast folderCast) {
 		{Number: 6, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: percentTransformer},
 	})
 
-	heads := []string{"#", "Folder", "Files", "%", "Size", "%"}
-	appendHeaders(heads, tab)
+	appendHeaders([]string{"#", "Folder", "Files", "%", "Size", "%"}, tab)
 
 	i := 1
 

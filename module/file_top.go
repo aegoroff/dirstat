@@ -51,8 +51,7 @@ func (m *topFilesRenderer) print(p printer) {
 		{Number: 3, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: sizeTransformer},
 	})
 
-	heads := []string{"#", "File", "Size"}
-	appendHeaders(heads, tab)
+	appendHeaders([]string{"#", "File", "Size"}, tab)
 
 	i := 1
 
