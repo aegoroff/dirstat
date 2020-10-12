@@ -50,5 +50,7 @@ func confRange(cmd *cobra.Command, rn *[]int) {
 }
 
 func configurePath(cmd *cobra.Command, path *string) {
-	cmd.Flags().StringVarP(path, "path", "p", "", "REQUIRED. Directory path to show info.")
+	const param = "path"
+	cmd.Flags().StringVarP(path, param, "p", "", "REQUIRED. Directory path to show info.")
+	_ = cmd.MarkFlagRequired(param)
 }

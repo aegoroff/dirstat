@@ -38,7 +38,6 @@ func Test_PositiveTests(t *testing.T) {
 		{[]string{"fo", "-p", "/"}, "Total files"},
 		{[]string{"ver"}, "dirstat v"},
 		{[]string{}, ""},
-		{[]string{"a"}, ""},
 		{[]string{"fi", "-p", ":"}, ""},
 	}
 
@@ -58,15 +57,28 @@ func Test_PositiveTests(t *testing.T) {
 }
 
 func Test_NegativeCmdTest(t *testing.T) {
-	// Arrange
-	ass := assert.New(t)
-	appFS := afero.NewMemMapFs()
-	w := bytes.NewBufferString("")
+	var tests = []struct {
+		cmdline []string
+	}{
+		{[]string{"a"}},
+		{[]string{"b"}},
+		{[]string{"fi"}},
+		{[]string{"fo"}},
+		{[]string{"e"}},
+		{[]string{"x"}},
+	}
 
-	// Act
-	err := Execute(appFS, w, "x")
+	for _, test := range tests {
+		// Arrange
+		ass := assert.New(t)
+		appFS := afero.NewMemMapFs()
+		w := bytes.NewBufferString("")
 
-	// Assert
-	ass.Error(err)
-	fmt.Println(w.String())
+		// Act
+		err := Execute(appFS, w, test.cmdline...)
+
+		// Assert
+		ass.Error(err)
+		fmt.Println(w.String())
+	}
 }
