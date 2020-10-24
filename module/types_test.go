@@ -17,6 +17,7 @@ func TestRange_Contains(t *testing.T) {
 		val    int64
 		result bool
 	}{
+		{-1, false},
 		{1, true},
 		{100, true},
 		{50, true},
