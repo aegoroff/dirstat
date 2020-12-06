@@ -87,7 +87,7 @@ func (t *fixedTree) insert(c rbtree.Comparable) {
 }
 
 // descend walks tree in descending order
-func (t *fixedTree) descend(callback rbtree.NodeValidator) {
+func (t *fixedTree) descend(callback rbtree.NodeEvaluator) {
 	rbtree.NewDescend(t.tree).Iterate(callback)
 }
 
