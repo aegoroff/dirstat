@@ -43,11 +43,10 @@ func Test_bySizeFoldersTest(t *testing.T) {
 	tree.insert(&fs1)
 	tree.insert(&fs2)
 	tree.insert(&fs3)
-	it := rbtree.NewDescend(tree.tree)
 
 	// Assert
 	var r []string
-	it.Iterate(func(n rbtree.Node) bool {
+	tree.descend(func(n rbtree.Node) bool {
 		r = append(r, n.Key().String())
 		return true
 	})
@@ -89,11 +88,10 @@ func Test_byCountFoldersTest(t *testing.T) {
 	tree.insert(&fc1)
 	tree.insert(&fc2)
 	tree.insert(&fc3)
-	it := rbtree.NewDescend(tree.tree)
 
 	// Assert
 	var r []string
-	it.Iterate(func(n rbtree.Node) bool {
+	tree.descend(func(n rbtree.Node) bool {
 		r = append(r, n.Key().String())
 		return true
 	})

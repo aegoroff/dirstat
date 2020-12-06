@@ -86,6 +86,11 @@ func (t *fixedTree) insert(c rbtree.Comparable) {
 	}
 }
 
+// descend walks tree in descending order
+func (t *fixedTree) descend(callback rbtree.NodeValidator) {
+	rbtree.NewDescend(t.tree).Iterate(callback)
+}
+
 func (r ranges) heads(addNum bool) []string {
 	var heads []string
 	for i, r := range r {
