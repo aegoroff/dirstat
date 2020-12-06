@@ -93,6 +93,7 @@ func Test_insertToFixedTree(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	tree := newFixedTree(3)
+	it := rbtree.NewDescend(tree.tree)
 
 	// Act
 	for i := 0; i < 5; i++ {
@@ -103,7 +104,7 @@ func Test_insertToFixedTree(t *testing.T) {
 	// Assert
 	ass.Equal(int64(3), tree.tree.Len())
 	var r []string
-	tree.tree.Descend(func(n rbtree.Node) bool {
+	it.Iterate(func(n rbtree.Node) bool {
 		r = append(r, n.Key().String())
 		return true
 	})

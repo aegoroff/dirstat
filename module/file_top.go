@@ -55,7 +55,9 @@ func (m *topFilesRenderer) print(p printer) {
 
 	i := 1
 
-	m.tree.tree.Descend(func(n rbtree.Node) bool {
+	it := rbtree.NewDescend(m.tree.tree)
+
+	it.Iterate(func(n rbtree.Node) bool {
 		file, ok := n.Key().(*file)
 
 		if !ok {
