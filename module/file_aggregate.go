@@ -71,7 +71,7 @@ func (m *aggregateFileRenderer) print(p printer) {
 
 	appendHeaders([]string{"#", "File size", "Amount", "%", "Size", "%"}, tab)
 
-	heads := m.work.fileRanges.heads(false)
+	heads := m.work.fileRanges.heads(transparentDecorator)
 	for i, r := range m.work.fileRanges {
 		count := m.work.aggregate[r].TotalFilesCount
 		sz := m.work.aggregate[r].TotalFilesSize

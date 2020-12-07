@@ -71,16 +71,16 @@ func Test_heads(t *testing.T) {
 	rs := newRanges()
 
 	var tests = []struct {
-		addNum bool
-		match  string
+		d     headDecorator
+		match string
 	}{
-		{true, "^\\s{0,1}\\d{1,2}\\..+"},
-		{false, "^\\w.+"},
+		{numPrefixDecorator, "^\\s{0,1}\\d{1,2}\\..+"},
+		{transparentDecorator, "^\\w.+"},
 	}
 
 	for _, test := range tests {
 		// Act
-		ss := rs.heads(test.addNum)
+		ss := rs.heads(test.d)
 
 		// Assert
 		for _, s := range ss {

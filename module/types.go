@@ -91,14 +91,21 @@ func (t *fixedTree) descend(callback rbtree.NodeEvaluator) {
 	rbtree.NewDescend(t.tree).Iterate(callback)
 }
 
-func (r ranges) heads(addNum bool) []string {
+type headDecorator func(ix int, h string) string
+
+func transparentDecorator(_ int, h string) string {
+	return h
+}
+
+func numPrefixDecorator(ix int, h string) string {
+	return fmt.Sprintf("%2d. %s", ix+1, h)
+}
+
+func (r ranges) heads(hd headDecorator) []string {
 	var heads []string
 	for i, r := range r {
 		h := fmt.Sprintf("Between %s and %s", human(r.Min), human(r.Max))
-		if addNum {
-			h = fmt.Sprintf("%2d. %s", i+1, h)
-		}
-		heads = append(heads, h)
+		heads = append(heads, hd(i, h))
 	}
 	return heads
 }
