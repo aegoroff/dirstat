@@ -8,7 +8,7 @@ import (
 )
 
 // Version defines program version
-var Version = "0.10.2"
+var Version = "0.10.5"
 
 func newVersion(w io.Writer) *cobra.Command {
 	var cmd = &cobra.Command{
