@@ -222,3 +222,20 @@ func Test_castCount_invalidCasting(t *testing.T) {
 	ass.Error(err)
 	ass.Nil(r)
 }
+
+func Test_printTop_invalidCastingError(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	ft := newFixedTree(3)
+	ft.insert(rbtree.NewInt(1))
+	ft.insert(rbtree.NewInt(2))
+	ft.insert(rbtree.NewInt(3))
+	fr := foldersRenderer{}
+	w := bytes.NewBufferString("")
+
+	// Act
+	fr.printTop(ft, newPrinter(w), castSize)
+
+	// Assert
+	ass.Contains(w.String(), "invalid casting: expected *folderS key type but it wasn`t")
+}
