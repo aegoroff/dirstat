@@ -1,13 +1,15 @@
 package module
 
-type pathDecorator struct {
-	removeRoot bool
-	root       string
+type decorator interface {
+	decorate(s string) string
 }
 
-func (p *pathDecorator) decorate(full string) string {
-	if p.removeRoot {
-		return full[len(p.root):]
-	}
-	return full
+type nonDestructiveDecorator struct{}
+
+type removeRootDecorator struct {
+	root string
 }
+
+func (p *removeRootDecorator) decorate(s string) string { return s[len(p.root):] }
+
+func (p *nonDestructiveDecorator) decorate(s string) string { return s }

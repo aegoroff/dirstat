@@ -14,10 +14,7 @@ func Test_bySizeFoldersTest(t *testing.T) {
 	ass := assert.New(t)
 	tree := newFixedTree(2)
 
-	pd := pathDecorator{
-		removeRoot: false,
-		root:       "/",
-	}
+	pd := nonDestructiveDecorator{}
 	f1 := folder{
 		path:  "/f1",
 		count: 3,
@@ -59,10 +56,7 @@ func Test_byCountFoldersTest(t *testing.T) {
 	ass := assert.New(t)
 	tree := newFixedTree(2)
 
-	pd := pathDecorator{
-		removeRoot: false,
-		root:       "/",
-	}
+	pd := nonDestructiveDecorator{}
 	f1 := folder{
 		path:  "/f1",
 		count: 3,
@@ -174,9 +168,8 @@ func TestFolder_Path(t *testing.T) {
 func TestFolder_Path_PathDecorating(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
-	pd := &pathDecorator{
-		removeRoot: true,
-		root:       "/usr",
+	pd := &removeRootDecorator{
+		root: "/usr",
 	}
 	fo := folder{
 		path:  "/usr/local",

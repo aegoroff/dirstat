@@ -95,9 +95,8 @@ func TestFile_String(t *testing.T) {
 
 func TestFile_String_PathDecorating(t *testing.T) {
 	// Arrange
-	pd := pathDecorator{
-		removeRoot: true,
-		root:       "/usr",
+	pd := removeRootDecorator{
+		root: "/usr",
 	}
 	ass := assert.New(t)
 	f := &file{

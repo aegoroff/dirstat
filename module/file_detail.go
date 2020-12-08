@@ -12,14 +12,14 @@ type detailFileWorker struct {
 	enabledRanges    []int
 	enabledRangesMap map[int]bool
 	fileRanges       ranges
-	pd               *pathDecorator
+	pd               decorator
 }
 
 type detailFileRenderer struct {
 	*detailFileWorker
 }
 
-func newDetailFileWorker(rs ranges, enabledRanges []int, pd *pathDecorator) *detailFileWorker {
+func newDetailFileWorker(rs ranges, enabledRanges []int, pd decorator) *detailFileWorker {
 	w := detailFileWorker{
 		enabledRanges: enabledRanges,
 		distribution:  make(map[Range]files, len(rs)),

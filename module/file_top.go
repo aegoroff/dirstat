@@ -7,7 +7,7 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 )
 
-func newTopFilesWorker(top int, pd *pathDecorator) *topFilesWorker {
+func newTopFilesWorker(top int, pd decorator) *topFilesWorker {
 	return &topFilesWorker{tree: newFixedTree(top), pd: pd}
 }
 
@@ -24,7 +24,7 @@ type topFilesWorker struct {
 	voidFinalize
 	*fileFilter
 	tree *fixedTree
-	pd   *pathDecorator
+	pd   decorator
 }
 
 type topFilesRenderer struct {

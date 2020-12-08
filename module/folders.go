@@ -21,7 +21,7 @@ type folder struct {
 	path  string
 	size  int64
 	count int64
-	pd    *pathDecorator
+	pd    decorator
 }
 
 // Count sortable folder
@@ -62,7 +62,7 @@ type foldersWorker struct {
 	total   *totalInfo
 	bySize  *fixedTree
 	byCount *fixedTree
-	pd      *pathDecorator
+	pd      decorator
 }
 
 type foldersRenderer struct {

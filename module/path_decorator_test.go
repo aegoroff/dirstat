@@ -6,28 +6,27 @@ import (
 )
 
 func Test_PathDecorator(t *testing.T) {
+	const root = "/usr"
+
 	var tests = []struct {
-		root   string
-		rr     bool
+		name   string
+		d      decorator
 		result string
 	}{
-		{"/usr", true, "/local"},
-		{"/usr", false, "/usr/local"},
+		{"remove root", &removeRootDecorator{root: root}, "/local"},
+		{"dont change", &nonDestructiveDecorator{}, "/usr/local"},
 	}
 
 	for _, test := range tests {
-		// Arrange
-		ass := assert.New(t)
+		t.Run(test.name, func(t *testing.T) {
+			// Arrange
+			ass := assert.New(t)
 
-		pd := pathDecorator{
-			removeRoot: test.rr,
-			root:       test.root,
-		}
+			// Act
+			decorated := test.d.decorate(root + "/local")
 
-		// Act
-		decorated := pd.decorate(test.root + "/local")
-
-		// Assert
-		ass.Equal(test.result, decorated)
+			// Assert
+			ass.Equal(test.result, decorated)
+		})
 	}
 }

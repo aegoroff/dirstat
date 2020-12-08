@@ -5,7 +5,7 @@ import "dirstat/module/internal/sys"
 type file struct {
 	path string
 	size int64
-	pd   *pathDecorator
+	pd   decorator
 }
 
 type files []*file
