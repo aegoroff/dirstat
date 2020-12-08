@@ -23,62 +23,69 @@ func Test_PositiveTests(t *testing.T) {
 	_ = afero.WriteFile(appFS, "/f/f6.htm", []byte("12345678910"), 0644)
 
 	var tests = []struct {
+		name        string
 		cmdline     []string
 		mustcontain string
 	}{
-		{[]string{"a", "-p", "/"}, "Total files"},
-		{[]string{"a", "-p", "/", "-t", "3"}, "Total files"},
-		{[]string{"a", "-p", "/", "-r", "1"}, "Total files"},
-		{[]string{"a", "-p", "/f", "-r", "1", "-o"}, "Total files"},
-		{[]string{"a", "-p", "/", "-m"}, "Total files"},
-		{[]string{"a", "-p", "/f", "-o"}, "Total files"},
-		{[]string{"b", "-p", "/"}, "Total files"},
-		{[]string{"fi", "-p", "/"}, "Total files"},
-		{[]string{"e", "-p", "/"}, "Total files"},
-		{[]string{"fo", "-p", "/"}, "Total files"},
-		{[]string{"ver"}, "dirstat v"},
-		{[]string{}, ""},
-		{[]string{"fi", "-p", ":"}, ""},
+		{"a -p /", []string{"a", "-p", "/"}, "Total files"},
+		{"a -p / -t 3", []string{"a", "-p", "/", "-t", "3"}, "Total files"},
+		{"a -p / -r 1", []string{"a", "-p", "/", "-r", "1"}, "Total files"},
+		{"a -p /f -r 1 -o", []string{"a", "-p", "/f", "-r", "1", "-o"}, "Total files"},
+		{"a -p / -m", []string{"a", "-p", "/", "-m"}, "Total files"},
+		{"a -p /f -o", []string{"a", "-p", "/f", "-o"}, "Total files"},
+		{"b -p /", []string{"b", "-p", "/"}, "Total files"},
+		{"fi -p /", []string{"fi", "-p", "/"}, "Total files"},
+		{"e -p /", []string{"e", "-p", "/"}, "Total files"},
+		{"fo -p /", []string{"fo", "-p", "/"}, "Total files"},
+		{"ver", []string{"ver"}, "dirstat v"},
+		{"nothing", []string{}, ""},
+		{"fi -p :", []string{"fi", "-p", ":"}, ""},
+		{"fi -p nothing", []string{"fi", "-p", ""}, ""},
 	}
 
 	for _, test := range tests {
-		w := bytes.NewBufferString("")
-		// Act
-		err := Execute(appFS, w, test.cmdline...)
+		t.Run(test.name, func(t *testing.T) {
+			w := bytes.NewBufferString("")
+			// Act
+			err := Execute(appFS, w, test.cmdline...)
 
-		// Assert
-		out := w.String()
-		ass.NoError(err)
-		ass.Contains(out, test.mustcontain)
-		fmt.Println(strings.Join(test.cmdline, " "))
-		fmt.Println("----------------------------------------------")
-		fmt.Println(out)
+			// Assert
+			out := w.String()
+			ass.NoError(err)
+			ass.Contains(out, test.mustcontain)
+			fmt.Println(strings.Join(test.cmdline, " "))
+			fmt.Println("----------------------------------------------")
+			fmt.Println(out)
+		})
 	}
 }
 
 func Test_NegativeCmdTest(t *testing.T) {
 	var tests = []struct {
+		name    string
 		cmdline []string
 	}{
-		{[]string{"a"}},
-		{[]string{"b"}},
-		{[]string{"fi"}},
-		{[]string{"fo"}},
-		{[]string{"e"}},
-		{[]string{"x"}},
+		{"a", []string{"a"}},
+		{"b", []string{"b"}},
+		{"fi", []string{"fi"}},
+		{"fo", []string{"fo"}},
+		{"e", []string{"e"}},
+		{"x", []string{"x"}},
 	}
 
 	for _, test := range tests {
-		// Arrange
-		ass := assert.New(t)
-		appFS := afero.NewMemMapFs()
-		w := bytes.NewBufferString("")
+		t.Run(test.name, func(t *testing.T) {
+			// Arrange
+			ass := assert.New(t)
+			appFS := afero.NewMemMapFs()
+			w := bytes.NewBufferString("")
 
-		// Act
-		err := Execute(appFS, w, test.cmdline...)
+			// Act
+			err := Execute(appFS, w, test.cmdline...)
 
-		// Assert
-		ass.Error(err)
-		fmt.Println(w.String())
+			// Assert
+			ass.Error(err)
+			fmt.Println(w.String())
+		})
 	}
 }
