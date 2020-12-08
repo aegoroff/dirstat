@@ -42,31 +42,11 @@ after_test:
 artifacts:
   - path: dirstat_windows_amd64.exe
     name: binary
-  - path: dirstat_windows_386.exe
-    name: binary
   - path: dirstat_linux_amd64
-    name: binary
-  - path: dirstat_linux_386
     name: binary
   - path: dirstat_linux_arm
     name: binary
   - path: dirstat_linux_arm64
     name: binary
   - path: dirstat_darwin_amd64
-    name: binary
-  - path: dirstat_freebsd_amd64
-    name: binary
-  - path: dirstat_freebsd_386
-    name: binary
-  - path: dirstat_freebsd_arm
-    name: binary
-  - path: dirstat_netbsd_amd64
-    name: binary
-  - path: dirstat_netbsd_386
-    name: binary
-  - path: dirstat_openbsd_amd64
-    name: binary
-  - path: dirstat_openbsd_386
-    name: binary
-  - path: dirstat_solaris_amd64
     name: binary
