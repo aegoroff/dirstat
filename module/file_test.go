@@ -30,7 +30,7 @@ func TestFile_EqualTo(t *testing.T) {
 		f2 := &file{
 			path: "/f",
 			size: test.size2,
-			pd:   nil,
+			pd:   &nonDestructiveDecorator{},
 		}
 
 		// Act
@@ -61,12 +61,12 @@ func TestFile_LessThan(t *testing.T) {
 		f1 := &file{
 			path: "/",
 			size: test.size1,
-			pd:   nil,
+			pd:   &nonDestructiveDecorator{},
 		}
 		f2 := &file{
 			path: "/f",
 			size: test.size2,
-			pd:   nil,
+			pd:   &nonDestructiveDecorator{},
 		}
 
 		// Act
@@ -83,7 +83,7 @@ func TestFile_String(t *testing.T) {
 	f := &file{
 		path: "/",
 		size: 0,
-		pd:   nil,
+		pd:   &nonDestructiveDecorator{},
 	}
 
 	// Act

@@ -155,7 +155,7 @@ func TestFolder_Path(t *testing.T) {
 		path:  "/usr",
 		size:  0,
 		count: 0,
-		pd:    nil,
+		pd:    &nonDestructiveDecorator{},
 	}
 
 	// Act
