@@ -12,4 +12,4 @@ type removeRootDecorator struct {
 
 func (p *removeRootDecorator) decorate(s string) string { return s[len(p.root):] }
 
-func (p *nonDestructiveDecorator) decorate(s string) string { return s }
+func (*nonDestructiveDecorator) decorate(s string) string { return s }
