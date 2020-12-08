@@ -87,7 +87,6 @@ func (b *benfordFileRenderer) print(p printer) {
 			ideals[i-1],
 			deviation * 100,
 		})
-
 	}
 
 	tab.Render()
