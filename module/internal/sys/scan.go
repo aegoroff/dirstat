@@ -123,10 +123,6 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- *filesystemIte
 
 			entries := dirents(d, fs, concurrencyRestrict)
 
-			if entries == nil {
-				return
-			}
-
 			// Folder stat
 			var count int64
 			var size int64
@@ -188,13 +184,13 @@ func dirents(path string, fs afero.Fs, restrict chan struct{}) []*filesysEntry {
 	defer func() { <-restrict }()
 	f, err := fs.Open(path)
 	if err != nil {
-		return nil
+		return []*filesysEntry{}
 	}
 	defer Close(f)
 
 	entries, err := f.Readdir(-1)
 	if err != nil {
-		return nil
+		return []*filesysEntry{}
 	}
 
 	result := make([]*filesysEntry, 0, len(entries))
