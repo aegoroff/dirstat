@@ -1,6 +1,8 @@
 package module
 
 import (
+	"bytes"
+	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -110,4 +112,23 @@ func TestFile_String_PathDecorating(t *testing.T) {
 
 	// Assert
 	ass.Equal("/local", result)
+}
+
+func Test_printTopFile_invalidCastingError(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	ft := newFixedTree(3)
+	ft.insert(rbtree.NewInt(1))
+	ft.insert(rbtree.NewInt(2))
+	ft.insert(rbtree.NewInt(3))
+	fr := topFilesRenderer{&topFilesWorker{
+		tree: ft,
+	}}
+	w := bytes.NewBufferString("")
+
+	// Act
+	fr.print(newPrinter(w))
+
+	// Assert
+	ass.Contains(w.String(), "Invalid casting: expected *file key type but it wasn`t")
 }
