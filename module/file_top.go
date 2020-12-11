@@ -56,7 +56,7 @@ func (m *topFilesRenderer) print(p printer) {
 	i := 1
 
 	m.tree.descend(func(n rbtree.Node) bool {
-		file, ok := n.(rbtree.Comparable).(*file)
+		file, ok := n.Key().(*file)
 
 		if !ok {
 			p.cprint("<red>Invalid casting: expected *file key type but it wasn`t</>")
