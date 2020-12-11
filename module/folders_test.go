@@ -44,7 +44,7 @@ func Test_bySizeFoldersTest(t *testing.T) {
 	// Assert
 	var r []string
 	tree.descend(func(n rbtree.Node) bool {
-		r = append(r, n.Key().String())
+		r = append(r, n.String())
 		return true
 	})
 
@@ -86,7 +86,7 @@ func Test_byCountFoldersTest(t *testing.T) {
 	// Assert
 	var r []string
 	tree.descend(func(n rbtree.Node) bool {
-		r = append(r, n.Key().String())
+		r = append(r, n.String())
 		return true
 	})
 

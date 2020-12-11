@@ -43,13 +43,13 @@ func (f *folder) Path() string   { return f.pd.decorate(f.path) }
 
 // Count sortable folder methods
 
-func (fc *folderC) LessThan(y interface{}) bool { return fc.count < y.(*folderC).count }
-func (fc *folderC) EqualTo(y interface{}) bool  { return fc.count == y.(*folderC).count }
+func (fc *folderC) LessThan(y rbtree.Comparable) bool { return fc.count < y.(*folderC).count }
+func (fc *folderC) EqualTo(y rbtree.Comparable) bool  { return fc.count == y.(*folderC).count }
 
 // Size sortable folder methods
 
-func (fs *folderS) LessThan(y interface{}) bool { return fs.size < y.(*folderS).size }
-func (fs *folderS) EqualTo(y interface{}) bool  { return fs.size == y.(*folderS).size }
+func (fs *folderS) LessThan(y rbtree.Comparable) bool { return fs.size < y.(*folderS).size }
+func (fs *folderS) EqualTo(y rbtree.Comparable) bool  { return fs.size == y.(*folderS).size }
 
 type foldersWorker struct {
 	voidInit
@@ -148,7 +148,7 @@ func (f *foldersRenderer) printTop(ft *fixedTree, p printer, cast folderCast) {
 	i := 1
 
 	ft.descend(func(n rbtree.Node) bool {
-		fi, err := cast(n.Key())
+		fi, err := cast(n)
 		if err != nil {
 			p.cprint("<red>%v</>", err)
 			return false

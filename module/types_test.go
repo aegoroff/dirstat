@@ -104,7 +104,7 @@ func Test_insertToFixedTree(t *testing.T) {
 	ass.Equal(int64(3), tree.tree.Len())
 	var r []string
 	tree.descend(func(n rbtree.Node) bool {
-		r = append(r, n.Key().String())
+		r = append(r, n.String())
 		return true
 	})
 
