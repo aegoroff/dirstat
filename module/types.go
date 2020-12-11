@@ -77,9 +77,9 @@ func newFixedTree(sz int) *fixedTree {
 // Only <size> max nodes will be in the tree
 func (t *fixedTree) insert(c rbtree.Comparable) {
 	min := t.tree.Minimum()
-	if t.tree.Len() < int64(t.size) || min.LessThan(c) {
+	if t.tree.Len() < int64(t.size) || min.Key().LessThan(c) {
 		if t.tree.Len() == int64(t.size) {
-			t.tree.DeleteNode(min)
+			t.tree.DeleteNode(min.Key())
 		}
 
 		t.tree.Insert(c)
