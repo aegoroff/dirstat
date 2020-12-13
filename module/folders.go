@@ -148,7 +148,10 @@ func (f *foldersRenderer) printTop(ft rbtree.RbTree, p printer, cast folderCast)
 
 	i := 1
 
-	rbtree.NewDescend(ft).Foreach(func(n rbtree.Node) {
+	it := rbtree.NewDescend(ft).Iterator()
+
+	for it.Next() {
+		n := it.Current()
 		fi, err := cast(n.Key())
 		if err != nil {
 			p.cprint("<red>%v</>", err)
@@ -170,7 +173,7 @@ func (f *foldersRenderer) printTop(ft rbtree.RbTree, p printer, cast folderCast)
 		})
 
 		i++
-	})
+	}
 
 	tab.Render()
 }

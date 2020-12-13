@@ -56,7 +56,10 @@ func (m *topFilesRenderer) print(p printer) {
 
 	i := 1
 
-	rbtree.NewDescend(m.tree).Foreach(func(n rbtree.Node) {
+	it := rbtree.NewDescend(m.tree).Iterator()
+
+	for it.Next() {
+		n := it.Current()
 		file, ok := n.Key().(*file)
 
 		if !ok {
@@ -71,7 +74,7 @@ func (m *topFilesRenderer) print(p printer) {
 		})
 
 		i++
-	})
+	}
 
 	tab.Render()
 }
