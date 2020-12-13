@@ -4,6 +4,7 @@ import (
 	"dirstat/module/internal/sys"
 	"errors"
 	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/aegoroff/godatastruct/rbtree/special"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 )
@@ -55,8 +56,8 @@ type foldersWorker struct {
 	voidInit
 	voidFinalize
 	total   *totalInfo
-	bySize  *fixedTree
-	byCount *fixedTree
+	bySize  rbtree.RbTree
+	byCount rbtree.RbTree
 	pd      decorator
 }
 
@@ -67,8 +68,8 @@ type foldersRenderer struct {
 func newFoldersWorker(ctx *Context) *foldersWorker {
 	return &foldersWorker{
 		total:   ctx.total,
-		bySize:  newFixedTree(ctx.top),
-		byCount: newFixedTree(ctx.top),
+		bySize:  special.NewMaxTree(int64(ctx.top)),
+		byCount: special.NewMaxTree(int64(ctx.top)),
 		pd:      ctx.pd,
 	}
 }
@@ -93,10 +94,10 @@ func (m *foldersWorker) handler(evt *sys.ScanEvent) {
 	}
 
 	fs := folderS{fn}
-	m.bySize.insert(&fs)
+	m.bySize.Insert(&fs)
 
 	fc := folderC{fn}
-	m.byCount.insert(&fc)
+	m.byCount.Insert(&fc)
 }
 
 // Renderer method
@@ -122,16 +123,16 @@ func castCount(c rbtree.Comparable) (folderI, error) {
 }
 
 func (f *foldersRenderer) print(p printer) {
-	p.cprint("\n<gray>TOP %d folders by size:</>\n\n", f.bySize.size)
+	p.cprint("\n<gray>TOP %d folders by size:</>\n\n", f.bySize.Len())
 
 	f.printTop(f.bySize, p, castSize)
 
-	p.cprint("\n<gray>TOP %d folders by count:</>\n\n", f.byCount.size)
+	p.cprint("\n<gray>TOP %d folders by count:</>\n\n", f.byCount.Len())
 
 	f.printTop(f.byCount, p, castCount)
 }
 
-func (f *foldersRenderer) printTop(ft *fixedTree, p printer, cast folderCast) {
+func (f *foldersRenderer) printTop(ft rbtree.RbTree, p printer, cast folderCast) {
 	tab := p.createTab()
 
 	tab.SetColumnConfigs([]table.ColumnConfig{
@@ -147,11 +148,11 @@ func (f *foldersRenderer) printTop(ft *fixedTree, p printer, cast folderCast) {
 
 	i := 1
 
-	ft.descend(func(n rbtree.Node) bool {
+	rbtree.NewDescend(ft).Foreach(func(n rbtree.Node) {
 		fi, err := cast(n.Key())
 		if err != nil {
 			p.cprint("<red>%v</>", err)
-			return false
+			return
 		}
 
 		count := fi.Count()
@@ -169,8 +170,6 @@ func (f *foldersRenderer) printTop(ft *fixedTree, p printer, cast folderCast) {
 		})
 
 		i++
-
-		return true
 	})
 
 	tab.Render()

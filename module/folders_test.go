@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"dirstat/module/internal/sys"
 	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/aegoroff/godatastruct/rbtree/special"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -12,7 +13,7 @@ import (
 func Test_bySizeFoldersTest(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
-	tree := newFixedTree(2)
+	tree := special.NewMaxTree(2)
 
 	pd := nonDestructiveDecorator{}
 	f1 := folder{
@@ -37,15 +38,14 @@ func Test_bySizeFoldersTest(t *testing.T) {
 	}
 	fs3 := folderS{f3}
 
-	tree.insert(&fs1)
-	tree.insert(&fs2)
-	tree.insert(&fs3)
+	tree.Insert(&fs1)
+	tree.Insert(&fs2)
+	tree.Insert(&fs3)
 
 	// Assert
 	var r []string
-	tree.descend(func(n rbtree.Node) bool {
+	rbtree.NewDescend(tree).Foreach(func(n rbtree.Node) {
 		r = append(r, n.String())
-		return true
 	})
 
 	ass.ElementsMatch([]string{"/f3", "/f2"}, r)
@@ -54,7 +54,7 @@ func Test_bySizeFoldersTest(t *testing.T) {
 func Test_byCountFoldersTest(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
-	tree := newFixedTree(2)
+	tree := special.NewMaxTree(2)
 
 	pd := nonDestructiveDecorator{}
 	f1 := folder{
@@ -79,15 +79,14 @@ func Test_byCountFoldersTest(t *testing.T) {
 	}
 	fc3 := folderC{f3}
 
-	tree.insert(&fc1)
-	tree.insert(&fc2)
-	tree.insert(&fc3)
+	tree.Insert(&fc1)
+	tree.Insert(&fc2)
+	tree.Insert(&fc3)
 
 	// Assert
 	var r []string
-	tree.descend(func(n rbtree.Node) bool {
+	rbtree.NewDescend(tree).Foreach(func(n rbtree.Node) {
 		r = append(r, n.String())
-		return true
 	})
 
 	ass.ElementsMatch([]string{"/f1", "/f2"}, r)
@@ -109,8 +108,8 @@ func Test_folderHandler(t *testing.T) {
 	sys.Scan("/", appFS, handlers)
 
 	// Assert
-	ass.Equal(int64(2), worker.byCount.tree.Len())
-	ass.Equal(int64(2), worker.bySize.tree.Len())
+	ass.Equal(int64(2), worker.byCount.Len())
+	ass.Equal(int64(2), worker.bySize.Len())
 }
 
 func Test_folderHandler_EmptyFileSystem(t *testing.T) {
@@ -126,8 +125,8 @@ func Test_folderHandler_EmptyFileSystem(t *testing.T) {
 	sys.Scan("/", appFS, handlers)
 
 	// Assert
-	ass.Equal(int64(1), worker.byCount.tree.Len())
-	ass.Equal(int64(1), worker.bySize.tree.Len())
+	ass.Equal(int64(1), worker.byCount.Len())
+	ass.Equal(int64(1), worker.bySize.Len())
 }
 
 func Test_ExecuteFoldersModule_WithOutput(t *testing.T) {
@@ -226,10 +225,10 @@ func Test_castCount_invalidCasting(t *testing.T) {
 func Test_printTop_invalidCastingError(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
-	ft := newFixedTree(3)
-	ft.insert(rbtree.NewInt(1))
-	ft.insert(rbtree.NewInt(2))
-	ft.insert(rbtree.NewInt(3))
+	ft := special.NewMaxTree(3)
+	ft.Insert(rbtree.NewInt(1))
+	ft.Insert(rbtree.NewInt(2))
+	ft.Insert(rbtree.NewInt(3))
 	fr := foldersRenderer{}
 	w := bytes.NewBufferString("")
 

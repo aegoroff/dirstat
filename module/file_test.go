@@ -3,6 +3,7 @@ package module
 import (
 	"bytes"
 	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/aegoroff/godatastruct/rbtree/special"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -117,10 +118,10 @@ func TestFile_String_PathDecorating(t *testing.T) {
 func Test_printTopFile_invalidCastingError(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
-	ft := newFixedTree(3)
-	ft.insert(rbtree.NewInt(1))
-	ft.insert(rbtree.NewInt(2))
-	ft.insert(rbtree.NewInt(3))
+	ft := special.NewMaxTree(3)
+	ft.Insert(rbtree.NewInt(1))
+	ft.Insert(rbtree.NewInt(2))
+	ft.Insert(rbtree.NewInt(3))
 	fr := topFilesRenderer{&topFilesWorker{
 		tree: ft,
 	}}

@@ -3,12 +3,13 @@ package module
 import (
 	"dirstat/module/internal/sys"
 	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/aegoroff/godatastruct/rbtree/special"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 )
 
 func newTopFilesWorker(top int, pd decorator) *topFilesWorker {
-	return &topFilesWorker{tree: newFixedTree(top), pd: pd}
+	return &topFilesWorker{tree: special.NewMaxTree(int64(top)), pd: pd}
 }
 
 func newTopFilesRenderer(work *topFilesWorker) renderer {
@@ -23,7 +24,7 @@ type topFilesWorker struct {
 	voidInit
 	voidFinalize
 	*fileFilter
-	tree *fixedTree
+	tree rbtree.RbTree
 	pd   decorator
 }
 
@@ -35,13 +36,13 @@ type topFilesRenderer struct {
 
 func (m *topFilesWorker) onFile(f *sys.FileEntry) {
 	fc := file{size: f.Size, path: f.Path, pd: m.pd}
-	m.tree.insert(&fc)
+	m.tree.Insert(&fc)
 }
 
 // Renderer method
 
 func (m *topFilesRenderer) print(p printer) {
-	p.cprint("\n<gray>TOP %d files by size:</>\n\n", m.tree.size)
+	p.cprint("\n<gray>TOP %d files by size:</>\n\n", m.tree.Len())
 
 	tab := p.createTab()
 
@@ -55,12 +56,12 @@ func (m *topFilesRenderer) print(p printer) {
 
 	i := 1
 
-	m.tree.descend(func(n rbtree.Node) bool {
+	rbtree.NewDescend(m.tree).Foreach(func(n rbtree.Node) {
 		file, ok := n.Key().(*file)
 
 		if !ok {
 			p.cprint("<red>Invalid casting: expected *file key type but it wasn`t</>")
-			return false
+			return
 		}
 
 		tab.AppendRow([]interface{}{
@@ -70,7 +71,6 @@ func (m *topFilesRenderer) print(p printer) {
 		})
 
 		i++
-		return true
 	})
 
 	tab.Render()

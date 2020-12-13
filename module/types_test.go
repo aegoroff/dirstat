@@ -2,6 +2,7 @@ package module
 
 import (
 	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/aegoroff/godatastruct/rbtree/special"
 	"github.com/stretchr/testify/assert"
 	"strconv"
 	"testing"
@@ -92,20 +93,19 @@ func Test_heads(t *testing.T) {
 func Test_insertToFixedTree(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
-	tree := newFixedTree(3)
+	tree := special.NewMaxTree(3)
 
 	// Act
 	for i := 0; i < 5; i++ {
 		s := rbtree.NewString(strconv.Itoa(i))
-		tree.insert(s)
+		tree.Insert(s)
 	}
 
 	// Assert
-	ass.Equal(int64(3), tree.tree.Len())
+	ass.Equal(int64(3), tree.Len())
 	var r []string
-	tree.descend(func(n rbtree.Node) bool {
+	rbtree.NewDescend(tree).Foreach(func(n rbtree.Node) {
 		r = append(r, n.String())
-		return true
 	})
 
 	ass.ElementsMatch([]string{"4", "3", "2"}, r)
