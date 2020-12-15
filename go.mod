@@ -3,7 +3,7 @@ module dirstat
 go 1.15
 
 require (
-	github.com/aegoroff/godatastruct v0.9.2
+	github.com/aegoroff/godatastruct v0.9.3-0.20201215133948-d7437546456f
 	github.com/dustin/go-humanize v1.0.0
 	github.com/gookit/color v1.3.5
 	github.com/jedib0t/go-pretty/v6 v6.0.5
