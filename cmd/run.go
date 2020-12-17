@@ -19,8 +19,11 @@ func run(path string, c conf, modules ...module.Module) {
 	{
 		r = module.Execute
 		r = newTimeMeasureR(r)
-		r = newPrintMemoryR(r, *c.globals().showMemory)
 		r = newPathCorrectionR(r)
+	}
+
+	if *c.globals().showMemory {
+		r = newPrintMemoryR(r)
 	}
 
 	r(path, c.fs(), c.w(), modules...)
@@ -59,13 +62,10 @@ func newPathCorrectionR(wrapped runner) runner {
 
 // newPrintMemoryR outputs the current, total and OS memory being used. As well as the number
 // of garage collection cycles completed.
-func newPrintMemoryR(wrapped runner, showMemory bool) runner {
+func newPrintMemoryR(wrapped runner) runner {
 	return func(path string, fs afero.Fs, w io.Writer, modules ...module.Module) {
 		wrapped(path, fs, w, modules...)
 
-		if !showMemory {
-			return
-		}
 		var m runtime.MemStats
 		runtime.ReadMemStats(&m)
 		// For info on each, see: https://golang.org/pkg/runtime/#MemStats

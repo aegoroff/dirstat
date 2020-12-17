@@ -5,28 +5,42 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type allCmd struct {
+	baseCommand
+	vrange []int
+}
+
+func (a *allCmd) execute() error {
+	ctx := module.NewContext(a.top, a.removeRoot, a.path)
+
+	var modules []module.Module
+	modules = append(modules, module.NewAggregateFileModule(ctx))
+	modules = append(modules, module.NewBenfordFileModule(ctx))
+	modules = append(modules, module.NewExtensionModule(ctx))
+	modules = append(modules, module.NewTopFilesModule(ctx))
+	modules = append(modules, module.NewFoldersModule(ctx))
+	modules = append(modules, module.NewDetailFileModule(ctx, a.vrange))
+	modules = append(modules, module.NewTotalModule(ctx))
+
+	run(a.path, a.c, modules...)
+
+	return nil
+}
+
 func newAll(c conf) *cobra.Command {
 	opt := options{}
 
-	var cmd = &cobra.Command{
-		Use:     "a",
-		Aliases: []string{"all"},
-		Short:   "Show all information about folder/volume",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := module.NewContext(*c.globals().top, *c.globals().removeRoot, opt.path)
-			foldersmod := module.NewFoldersModule(ctx)
-			totalmod := module.NewTotalModule(ctx)
-			detailfilemod := module.NewDetailFileModule(ctx, opt.vrange)
-			totalfilemod := module.NewAggregateFileModule(ctx)
-			extmod := module.NewExtensionModule(ctx)
-			topfilesmod := module.NewTopFilesModule(ctx)
-			benford := module.NewBenfordFileModule(ctx)
-
-			run(opt.path, c, totalfilemod, benford, extmod, topfilesmod, foldersmod, detailfilemod, totalmod)
-
-			return nil
+	cc := cobraCreator{
+		createCmd: func() command {
+			cmd := allCmd{
+				baseCommand: newBaseCmd(c, opt.path),
+				vrange:      opt.vrange,
+			}
+			return &cmd
 		},
 	}
+
+	cmd := cc.newCobraCommand("a", "all", "Show all information about folder/volume")
 
 	configure(cmd, &opt)
 
