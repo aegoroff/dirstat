@@ -13,7 +13,7 @@ func newAll(c conf) *cobra.Command {
 		Aliases: []string{"all"},
 		Short:   "Show all information about folder/volume",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := module.NewContext(top, removeRoot, opt.path)
+			ctx := module.NewContext(*c.globals().top, *c.globals().removeRoot, opt.path)
 			foldersmod := module.NewFoldersModule(ctx)
 			totalmod := module.NewTotalModule(ctx)
 			detailfilemod := module.NewDetailFileModule(ctx, opt.vrange)

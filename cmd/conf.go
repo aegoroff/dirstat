@@ -17,11 +17,20 @@ type conf interface {
 
 	// w defines app output
 	w() io.Writer
+
+	globals() *globals
 }
 
 type appConf struct {
 	filesystem afero.Fs
 	writer     io.Writer
+	g          *globals
+}
+
+type globals struct {
+	top        *int
+	showMemory *bool
+	removeRoot *bool
 }
 
 func (a *appConf) fs() afero.Fs {
@@ -32,10 +41,15 @@ func (a *appConf) w() io.Writer {
 	return a.writer
 }
 
-func newAppConf(fs afero.Fs, w io.Writer) conf {
+func (a *appConf) globals() *globals {
+	return a.g
+}
+
+func newAppConf(fs afero.Fs, w io.Writer, g *globals) conf {
 	c := appConf{
 		filesystem: fs,
 		writer:     w,
+		g:          g,
 	}
 	return &c
 }

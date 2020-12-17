@@ -13,7 +13,7 @@ func newBenford(c conf) *cobra.Command {
 		Aliases: []string{"benford"},
 		Short:   "Show the first digit distribution of files size (benford law validation)",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := module.NewContext(top, removeRoot, opt.path)
+			ctx := module.NewContext(*c.globals().top, *c.globals().removeRoot, opt.path)
 			benford := module.NewBenfordFileModule(ctx)
 			totalmod := module.NewTotalModule(ctx)
 

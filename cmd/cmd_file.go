@@ -13,7 +13,7 @@ func newFile(c conf) *cobra.Command {
 		Aliases: []string{"file"},
 		Short:   "Show information only about files",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := module.NewContext(top, removeRoot, opt.path)
+			ctx := module.NewContext(*c.globals().top, *c.globals().removeRoot, opt.path)
 			totalmod := module.NewTotalModule(ctx)
 			detailfilemod := module.NewDetailFileModule(ctx, opt.vrange)
 			totalfilemod := module.NewAggregateFileModule(ctx)

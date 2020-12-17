@@ -21,10 +21,6 @@ func init() {
 	cobra.MousetrapHelpText = ""
 }
 
-var showMemory bool
-var top int
-var removeRoot bool
-
 // Execute starts package running
 func Execute(fs afero.Fs, w io.Writer, args ...string) error {
 	rootCmd := newRoot()
@@ -33,11 +29,20 @@ func Execute(fs afero.Fs, w io.Writer, args ...string) error {
 		rootCmd.SetArgs(args)
 	}
 
+	var top int
+	var showMemory bool
+	var removeRoot bool
+
 	rootCmd.PersistentFlags().IntVarP(&top, "top", "t", 10, "The number of lines in top statistics.")
 	rootCmd.PersistentFlags().BoolVarP(&showMemory, "memory", "m", false, "Show memory statistic after run")
 	rootCmd.PersistentFlags().BoolVarP(&removeRoot, "removeroot", "o", false, "Remove root part from full path i.e. output relative paths")
 
-	conf := newAppConf(fs, w)
+	g := globals{
+		top:        &top,
+		showMemory: &showMemory,
+		removeRoot: &removeRoot,
+	}
+	conf := newAppConf(fs, w, &g)
 
 	rootCmd.AddCommand(newAll(conf))
 	rootCmd.AddCommand(newFile(conf))

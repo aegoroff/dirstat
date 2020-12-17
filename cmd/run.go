@@ -19,7 +19,7 @@ func run(path string, c conf, modules ...module.Module) {
 	{
 		r = module.Execute
 		r = newTimeMeasureR(r)
-		r = newPrintMemoryR(r)
+		r = newPrintMemoryR(r, *c.globals().showMemory)
 		r = newPathCorrectionR(r)
 	}
 
@@ -59,7 +59,7 @@ func newPathCorrectionR(wrapped runner) runner {
 
 // newPrintMemoryR outputs the current, total and OS memory being used. As well as the number
 // of garage collection cycles completed.
-func newPrintMemoryR(wrapped runner) runner {
+func newPrintMemoryR(wrapped runner, showMemory bool) runner {
 	return func(path string, fs afero.Fs, w io.Writer, modules ...module.Module) {
 		wrapped(path, fs, w, modules...)
 
