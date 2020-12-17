@@ -45,7 +45,7 @@ func Test_bySizeFoldersTest(t *testing.T) {
 	// Assert
 	var r []string
 	rbtree.NewDescend(tree).Foreach(func(n rbtree.Node) {
-		r = append(r, n.String())
+		r = append(r, n.Key().(folderI).String())
 	})
 
 	ass.ElementsMatch([]string{"/f3", "/f2"}, r)
@@ -86,7 +86,7 @@ func Test_byCountFoldersTest(t *testing.T) {
 	// Assert
 	var r []string
 	rbtree.NewDescend(tree).Foreach(func(n rbtree.Node) {
-		r = append(r, n.String())
+		r = append(r, n.Key().(folderI).String())
 	})
 
 	ass.ElementsMatch([]string{"/f1", "/f2"}, r)
