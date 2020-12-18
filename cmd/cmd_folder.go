@@ -12,7 +12,7 @@ type folderCmd struct {
 func (f *folderCmd) execute() error {
 	ctx := module.NewContext(f.top, f.removeRoot, f.path)
 
-	f.run(module.NewFoldersModule(ctx), module.NewTotalModule(ctx))
+	f.run(module.NewFoldersModule(ctx, 0), module.NewTotalModule(ctx, 1))
 
 	return nil
 }

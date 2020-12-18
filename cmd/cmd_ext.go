@@ -12,7 +12,7 @@ type extCmd struct {
 func (e *extCmd) execute() error {
 	ctx := module.NewContext(e.top, e.removeRoot, e.path)
 
-	e.run(module.NewExtensionModule(ctx), module.NewTotalModule(ctx))
+	e.run(module.NewExtensionModule(ctx, 0), module.NewTotalModule(ctx, 1))
 
 	return nil
 }

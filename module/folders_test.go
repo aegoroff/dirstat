@@ -137,7 +137,7 @@ func Test_ExecuteFoldersModule_WithOutput(t *testing.T) {
 	_ = afero.WriteFile(appFS, "/f/f.txt", []byte("123"), 0644)
 	_ = afero.WriteFile(appFS, "/f/s/f.txt", []byte("1234"), 0644)
 	ctx := NewContext(2, false, "/")
-	m := NewFoldersModule(ctx)
+	m := NewFoldersModule(ctx, 0)
 	w := bytes.NewBufferString("")
 
 	// Act

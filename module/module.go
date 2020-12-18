@@ -59,60 +59,60 @@ func Execute(path string, fs afero.Fs, w io.Writer, modules ...Module) {
 }
 
 // NewFoldersModule creates new folders module
-func NewFoldersModule(ctx *Context) Module {
+func NewFoldersModule(ctx *Context, order int) Module {
 	work := newFoldersWorker(ctx)
-	rend := newFoldersRenderer(work, 4)
+	rend := newFoldersRenderer(work, order)
 	return newModule(rend, work)
 }
 
 // NewTopFilesModule creates new top files statistic module
-func NewTopFilesModule(ctx *Context) Module {
+func NewTopFilesModule(ctx *Context, order int) Module {
 	work := newTopFilesWorker(ctx.top, ctx.pd)
-	rend := newTopFilesRenderer(work, 3)
+	rend := newTopFilesRenderer(work, order)
 	m := newModule(rend, work)
 	return m
 }
 
 // NewDetailFileModule creates new file statistic by file size range module
-func NewDetailFileModule(ctx *Context, enabledRanges []int) Module {
+func NewDetailFileModule(ctx *Context, order int, enabledRanges []int) Module {
 	// Do nothing if verbose not enabled
 	if len(enabledRanges) == 0 {
 		return NewVoidModule()
 	}
 	work := newDetailFileWorker(newRanges(), enabledRanges, ctx.pd)
-	rend := newDetailFileRenderer(work, 5)
+	rend := newDetailFileRenderer(work, order)
 	m := newModule(rend, work)
 	return m
 }
 
 // NewBenfordFileModule creates new file size bendford statistic
-func NewBenfordFileModule(ctx *Context) Module {
+func NewBenfordFileModule(ctx *Context, order int) Module {
 	work := newBenfordFileWorker(ctx)
-	rend := newBenfordFileRenderer(work, 1)
+	rend := newBenfordFileRenderer(work, order)
 	m := newModule(rend, work)
 	return m
 }
 
 // NewExtensionModule creates new file extensions statistic module
-func NewExtensionModule(ctx *Context) Module {
-	rend := newExtRenderer(ctx, 2)
+func NewExtensionModule(ctx *Context, order int) Module {
+	rend := newExtRenderer(ctx, order)
 	m := newModule(rend)
 	return m
 }
 
 // NewAggregateFileModule creates new total file statistic module
-func NewAggregateFileModule(ctx *Context) Module {
+func NewAggregateFileModule(ctx *Context, order int) Module {
 	work := newAggregateFileWorker(newRanges())
-	rend := newAggregateFileRenderer(ctx, work, 0)
+	rend := newAggregateFileRenderer(ctx, work, order)
 
 	m := newModule(rend, work)
 	return m
 }
 
 // NewTotalModule creates new total statistic module
-func NewTotalModule(ctx *Context) Module {
+func NewTotalModule(ctx *Context, order int) Module {
 	work := newTotalWorker(ctx)
-	rend := newTotalRenderer(ctx, 6)
+	rend := newTotalRenderer(ctx, order)
 
 	m := newModule(rend, work)
 	return m
