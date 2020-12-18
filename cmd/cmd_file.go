@@ -5,26 +5,39 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type fileCmd struct {
+	baseCommand
+	vrange []int
+}
+
+func (f *fileCmd) execute() error {
+	ctx := module.NewContext(f.top, f.removeRoot, f.path)
+
+	var modules []module.Module
+	modules = append(modules, module.NewAggregateFileModule(ctx))
+	modules = append(modules, module.NewTopFilesModule(ctx))
+	modules = append(modules, module.NewDetailFileModule(ctx, f.vrange))
+	modules = append(modules, module.NewTotalModule(ctx))
+
+	run(f.path, f.c, modules...)
+
+	return nil
+}
+
 func newFile(c conf) *cobra.Command {
 	opt := options{}
 
-	var cmd = &cobra.Command{
-		Use:     "fi",
-		Aliases: []string{"file"},
-		Short:   "Show information only about files",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := module.NewContext(*c.globals().top, *c.globals().removeRoot, opt.path)
-			totalmod := module.NewTotalModule(ctx)
-			detailfilemod := module.NewDetailFileModule(ctx, opt.vrange)
-			totalfilemod := module.NewAggregateFileModule(ctx)
-
-			topfilesmod := module.NewTopFilesModule(ctx)
-
-			run(opt.path, c, totalfilemod, topfilesmod, detailfilemod, totalmod)
-
-			return nil
+	cc := cobraCreator{
+		createCmd: func() command {
+			cmd := fileCmd{
+				baseCommand: newBaseCmd(c, opt.path),
+				vrange:      opt.vrange,
+			}
+			return &cmd
 		},
 	}
+
+	cmd := cc.newCobraCommand("fi", "file", "Show information only about files")
 
 	configure(cmd, &opt)
 

@@ -5,25 +5,33 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type extCmd struct {
+	baseCommand
+}
+
+func (e *extCmd) execute() error {
+	ctx := module.NewContext(e.top, e.removeRoot, e.path)
+
+	run(e.path, e.c, module.NewExtensionModule(ctx), module.NewTotalModule(ctx))
+
+	return nil
+}
+
 func newExt(c conf) *cobra.Command {
-	opt := options{}
+	var path string
 
-	var cmd = &cobra.Command{
-		Use:     "e",
-		Aliases: []string{"ext"},
-		Short:   "Show file extensions statistic",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := module.NewContext(*c.globals().top, *c.globals().removeRoot, opt.path)
-			totalmod := module.NewTotalModule(ctx)
-			extmod := module.NewExtensionModule(ctx)
-
-			run(opt.path, c, extmod, totalmod)
-
-			return nil
+	cc := cobraCreator{
+		createCmd: func() command {
+			cmd := extCmd{
+				baseCommand: newBaseCmd(c, path),
+			}
+			return &cmd
 		},
 	}
 
-	configure(cmd, &opt)
+	cmd := cc.newCobraCommand("e", "ext", "Show file extensions statistic")
+
+	configurePath(cmd, &path)
 
 	return cmd
 }
