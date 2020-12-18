@@ -22,10 +22,9 @@ func newFolder(c conf) *cobra.Command {
 
 	cc := cobraCreator{
 		createCmd: func() command {
-			cmd := folderCmd{
+			return &folderCmd{
 				baseCommand: newBaseCmd(c, path),
 			}
-			return &cmd
 		},
 	}
 

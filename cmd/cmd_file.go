@@ -29,11 +29,10 @@ func newFile(c conf) *cobra.Command {
 
 	cc := cobraCreator{
 		createCmd: func() command {
-			cmd := fileCmd{
+			return &fileCmd{
 				baseCommand: newBaseCmd(c, opt.path),
 				vrange:      opt.vrange,
 			}
-			return &cmd
 		},
 	}
 

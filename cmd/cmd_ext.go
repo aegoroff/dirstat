@@ -22,10 +22,9 @@ func newExt(c conf) *cobra.Command {
 
 	cc := cobraCreator{
 		createCmd: func() command {
-			cmd := extCmd{
+			return &extCmd{
 				baseCommand: newBaseCmd(c, path),
 			}
-			return &cmd
 		},
 	}
 

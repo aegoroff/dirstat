@@ -32,11 +32,10 @@ func newAll(c conf) *cobra.Command {
 
 	cc := cobraCreator{
 		createCmd: func() command {
-			cmd := allCmd{
+			return &allCmd{
 				baseCommand: newBaseCmd(c, opt.path),
 				vrange:      opt.vrange,
 			}
-			return &cmd
 		},
 	}
 

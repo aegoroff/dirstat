@@ -22,10 +22,9 @@ func newBenford(c conf) *cobra.Command {
 
 	cc := cobraCreator{
 		createCmd: func() command {
-			cmd := benfordCmd{
+			return &benfordCmd{
 				baseCommand: newBaseCmd(c, path),
 			}
-			return &cmd
 		},
 	}
 
