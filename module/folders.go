@@ -65,6 +65,7 @@ type foldersWorker struct {
 
 type foldersRenderer struct {
 	*foldersWorker
+	*baseRenderer
 }
 
 func newFoldersWorker(ctx *Context) *foldersWorker {
@@ -76,8 +77,11 @@ func newFoldersWorker(ctx *Context) *foldersWorker {
 	}
 }
 
-func newFoldersRenderer(work *foldersWorker) renderer {
-	return &foldersRenderer{foldersWorker: work}
+func newFoldersRenderer(work *foldersWorker, order int) renderer {
+	return &foldersRenderer{
+		foldersWorker: work,
+		baseRenderer:  newBaseRenderer(order),
+	}
 }
 
 // Worker methods

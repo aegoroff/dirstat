@@ -12,8 +12,11 @@ func newTopFilesWorker(top int, pd decorator) *topFilesWorker {
 	return &topFilesWorker{tree: special.NewMaxTree(int64(top)), pd: pd}
 }
 
-func newTopFilesRenderer(work *topFilesWorker) renderer {
-	w := topFilesRenderer{topFilesWorker: work}
+func newTopFilesRenderer(work *topFilesWorker, order int) renderer {
+	w := topFilesRenderer{
+		topFilesWorker: work,
+		baseRenderer:   newBaseRenderer(order),
+	}
 
 	w.fileFilter = newFileFilter(w.onFile)
 
@@ -30,6 +33,7 @@ type topFilesWorker struct {
 
 type topFilesRenderer struct {
 	*topFilesWorker
+	*baseRenderer
 }
 
 // Worker methods

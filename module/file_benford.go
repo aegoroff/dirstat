@@ -16,6 +16,7 @@ type benfordFileWorker struct {
 
 type benfordFileRenderer struct {
 	*benfordFileWorker
+	*baseRenderer
 }
 
 func newBenfordFileWorker(ctx *Context) *benfordFileWorker {
@@ -27,8 +28,11 @@ func newBenfordFileWorker(ctx *Context) *benfordFileWorker {
 	return &w
 }
 
-func newBenfordFileRenderer(work *benfordFileWorker) renderer {
-	return &benfordFileRenderer{work}
+func newBenfordFileRenderer(work *benfordFileWorker, order int) renderer {
+	return &benfordFileRenderer{
+		baseRenderer:      newBaseRenderer(order),
+		benfordFileWorker: work,
+	}
 }
 
 func (b *benfordFileWorker) onFile(f *sys.FileEntry) {

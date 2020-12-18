@@ -14,6 +14,7 @@ type totalWorker struct {
 }
 
 type totalRenderer struct {
+	*baseRenderer
 	total *totalInfo
 }
 
@@ -25,8 +26,11 @@ func newTotalWorker(ctx *Context) *totalWorker {
 	return &w
 }
 
-func newTotalRenderer(ctx *Context) renderer {
-	return &totalRenderer{ctx.total}
+func newTotalRenderer(ctx *Context, order int) renderer {
+	return &totalRenderer{
+		baseRenderer: newBaseRenderer(order),
+		total:        ctx.total,
+	}
 }
 
 // Worker methods

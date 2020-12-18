@@ -15,6 +15,7 @@ type aggregateFileWorker struct {
 }
 
 type aggregateFileRenderer struct {
+	*baseRenderer
 	work  *aggregateFileWorker
 	total *totalInfo
 }
@@ -30,10 +31,11 @@ func newAggregateFileWorker(rs ranges) *aggregateFileWorker {
 	return &w
 }
 
-func newAggregateFileRenderer(ctx *Context, w *aggregateFileWorker) *aggregateFileRenderer {
+func newAggregateFileRenderer(ctx *Context, w *aggregateFileWorker, order int) *aggregateFileRenderer {
 	return &aggregateFileRenderer{
-		total: ctx.total,
-		work:  w,
+		baseRenderer: newBaseRenderer(order),
+		total:        ctx.total,
+		work:         w,
 	}
 }
 

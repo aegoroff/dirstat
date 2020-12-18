@@ -30,4 +30,5 @@ type finalizer interface {
 
 type renderer interface {
 	print(p printer)
+	order() int
 }

@@ -61,14 +61,14 @@ func Execute(path string, fs afero.Fs, w io.Writer, modules ...Module) {
 // NewFoldersModule creates new folders module
 func NewFoldersModule(ctx *Context) Module {
 	work := newFoldersWorker(ctx)
-	rend := newFoldersRenderer(work)
+	rend := newFoldersRenderer(work, 4)
 	return newModule(rend, work)
 }
 
 // NewTopFilesModule creates new top files statistic module
 func NewTopFilesModule(ctx *Context) Module {
 	work := newTopFilesWorker(ctx.top, ctx.pd)
-	rend := newTopFilesRenderer(work)
+	rend := newTopFilesRenderer(work, 3)
 	m := newModule(rend, work)
 	return m
 }
@@ -80,7 +80,7 @@ func NewDetailFileModule(ctx *Context, enabledRanges []int) Module {
 		return NewVoidModule()
 	}
 	work := newDetailFileWorker(newRanges(), enabledRanges, ctx.pd)
-	rend := newDetailFileRenderer(work)
+	rend := newDetailFileRenderer(work, 5)
 	m := newModule(rend, work)
 	return m
 }
@@ -88,14 +88,14 @@ func NewDetailFileModule(ctx *Context, enabledRanges []int) Module {
 // NewBenfordFileModule creates new file size bendford statistic
 func NewBenfordFileModule(ctx *Context) Module {
 	work := newBenfordFileWorker(ctx)
-	rend := newBenfordFileRenderer(work)
+	rend := newBenfordFileRenderer(work, 1)
 	m := newModule(rend, work)
 	return m
 }
 
 // NewExtensionModule creates new file extensions statistic module
 func NewExtensionModule(ctx *Context) Module {
-	rend := newExtRenderer(ctx)
+	rend := newExtRenderer(ctx, 2)
 	m := newModule(rend)
 	return m
 }
@@ -103,7 +103,7 @@ func NewExtensionModule(ctx *Context) Module {
 // NewAggregateFileModule creates new total file statistic module
 func NewAggregateFileModule(ctx *Context) Module {
 	work := newAggregateFileWorker(newRanges())
-	rend := newAggregateFileRenderer(ctx, work)
+	rend := newAggregateFileRenderer(ctx, work, 0)
 
 	m := newModule(rend, work)
 	return m
@@ -112,7 +112,7 @@ func NewAggregateFileModule(ctx *Context) Module {
 // NewTotalModule creates new total statistic module
 func NewTotalModule(ctx *Context) Module {
 	work := newTotalWorker(ctx)
-	rend := newTotalRenderer(ctx)
+	rend := newTotalRenderer(ctx, 6)
 
 	m := newModule(rend, work)
 	return m
@@ -170,4 +170,16 @@ func newRanges() ranges {
 		{Min: 10 * tbyte, Max: pbyte},
 	}
 	return rs
+}
+
+type baseRenderer struct {
+	ord int
+}
+
+func newBaseRenderer(order int) *baseRenderer {
+	return &baseRenderer{ord: order}
+}
+
+func (br *baseRenderer) order() int {
+	return br.ord
 }

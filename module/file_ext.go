@@ -7,12 +7,17 @@ import (
 )
 
 type extRenderer struct {
+	*baseRenderer
 	total *totalInfo
 	top   int
 }
 
-func newExtRenderer(ctx *Context) renderer {
-	return &extRenderer{total: ctx.total, top: ctx.top}
+func newExtRenderer(ctx *Context, order int) renderer {
+	return &extRenderer{
+		baseRenderer: newBaseRenderer(order),
+		total:        ctx.total,
+		top:          ctx.top,
+	}
 }
 
 // Renderer method

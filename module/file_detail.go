@@ -17,6 +17,7 @@ type detailFileWorker struct {
 
 type detailFileRenderer struct {
 	*detailFileWorker
+	*baseRenderer
 }
 
 func newDetailFileWorker(rs ranges, enabledRanges []int, pd decorator) *detailFileWorker {
@@ -32,8 +33,11 @@ func newDetailFileWorker(rs ranges, enabledRanges []int, pd decorator) *detailFi
 	return &w
 }
 
-func newDetailFileRenderer(work *detailFileWorker) renderer {
-	return &detailFileRenderer{work}
+func newDetailFileRenderer(work *detailFileWorker, order int) renderer {
+	return &detailFileRenderer{
+		detailFileWorker: work,
+		baseRenderer:     newBaseRenderer(order),
+	}
 }
 
 // Worker methods

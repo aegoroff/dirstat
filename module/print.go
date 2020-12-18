@@ -5,6 +5,7 @@ import (
 	"github.com/gookit/color"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"io"
+	"sort"
 )
 
 type printer interface {
@@ -51,6 +52,10 @@ func human(n int64) string {
 
 func render(w io.Writer, renderers []renderer) {
 	p := newPrinter(w)
+
+	sort.Slice(renderers, func(i, j int) bool {
+		return renderers[i].order() < renderers[j].order()
+	})
 
 	for _, r := range renderers {
 		r.print(p)

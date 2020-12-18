@@ -122,7 +122,7 @@ func Test_printTopFile_invalidCastingError(t *testing.T) {
 	ft.Insert(rbtree.NewInt(1))
 	ft.Insert(rbtree.NewInt(2))
 	ft.Insert(rbtree.NewInt(3))
-	fr := topFilesRenderer{&topFilesWorker{
+	fr := topFilesRenderer{topFilesWorker: &topFilesWorker{
 		tree: ft,
 	}}
 	w := bytes.NewBufferString("")
