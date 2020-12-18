@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"dirstat/module"
 	"github.com/spf13/cobra"
 )
 
@@ -24,6 +25,23 @@ func newBaseCmd(c conf, path string) baseCommand {
 		removeRoot: *c.globals().removeRoot,
 		path:       path,
 	}
+}
+
+func (b *baseCommand) run(modules ...module.Module) {
+	var r runner
+	{
+		r = module.Execute
+		r = newTimeMeasureR(r)
+		r = newPathCorrectionR(r)
+	}
+
+	c := b.c
+
+	if *c.globals().showMemory {
+		r = newPrintMemoryR(r)
+	}
+
+	r(b.path, c.fs(), c.w(), modules...)
 }
 
 type cobraCreator struct {

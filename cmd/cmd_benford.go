@@ -12,7 +12,7 @@ type benfordCmd struct {
 func (b *benfordCmd) execute() error {
 	ctx := module.NewContext(b.top, b.removeRoot, b.path)
 
-	run(b.path, b.c, module.NewBenfordFileModule(ctx), module.NewTotalModule(ctx))
+	b.run(module.NewBenfordFileModule(ctx), module.NewTotalModule(ctx))
 
 	return nil
 }

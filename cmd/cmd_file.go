@@ -19,7 +19,7 @@ func (f *fileCmd) execute() error {
 	modules = append(modules, module.NewDetailFileModule(ctx, f.vrange))
 	modules = append(modules, module.NewTotalModule(ctx))
 
-	run(f.path, f.c, modules...)
+	f.run(modules...)
 
 	return nil
 }

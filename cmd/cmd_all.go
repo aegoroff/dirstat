@@ -22,7 +22,7 @@ func (a *allCmd) execute() error {
 	modules = append(modules, module.NewDetailFileModule(ctx, a.vrange))
 	modules = append(modules, module.NewTotalModule(ctx))
 
-	run(a.path, a.c, modules...)
+	a.run(modules...)
 
 	return nil
 }

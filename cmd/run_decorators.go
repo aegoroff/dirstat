@@ -14,21 +14,6 @@ import (
 
 type runner func(path string, fs afero.Fs, w io.Writer, modules ...module.Module)
 
-func run(path string, c conf, modules ...module.Module) {
-	var r runner
-	{
-		r = module.Execute
-		r = newTimeMeasureR(r)
-		r = newPathCorrectionR(r)
-	}
-
-	if *c.globals().showMemory {
-		r = newPrintMemoryR(r)
-	}
-
-	r(path, c.fs(), c.w(), modules...)
-}
-
 func newTimeMeasureR(wrapped runner) runner {
 	return func(path string, fs afero.Fs, w io.Writer, modules ...module.Module) {
 		start := time.Now()
