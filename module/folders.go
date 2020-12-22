@@ -157,8 +157,7 @@ func (f *foldersRenderer) printTop(ft rbtree.RbTree, p printer, cast folderCast)
 	it := rbtree.NewDescend(ft).Iterator()
 
 	for it.Next() {
-		n := it.Current()
-		fi, err := cast(n.Key())
+		fi, err := cast(it.Current())
 		if err != nil {
 			p.cprint("<red>%v</>", err)
 			return

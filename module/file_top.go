@@ -64,7 +64,7 @@ func (m *topFilesRenderer) print(p printer) {
 
 	for it.Next() {
 		n := it.Current()
-		file, ok := n.Key().(*file)
+		file, ok := n.(*file)
 
 		if !ok {
 			p.cprint("<red>Invalid casting: expected *file key type but it wasn`t</>")
