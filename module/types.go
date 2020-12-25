@@ -71,10 +71,10 @@ func numPrefixDecorator(ix int, h string) string {
 }
 
 func (r ranges) heads(hd headDecorator) []string {
-	var heads []string
+	heads := make([]string, len(r))
 	for i, r := range r {
 		h := fmt.Sprintf("Between %s and %s", human(r.Min), human(r.Max))
-		heads = append(heads, hd(i, h))
+		heads[i] = hd(i, h)
 	}
 	return heads
 }

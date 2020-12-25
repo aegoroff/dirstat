@@ -43,10 +43,10 @@ func Execute(path string, fs afero.Fs, w io.Writer, modules ...Module) {
 		workers = append(workers, m.workers()...)
 	}
 
-	var handlers []sys.ScanHandler
-	for _, wo := range workers {
+	handlers := make([]sys.ScanHandler, len(workers))
+	for i, wo := range workers {
 		wo.init()
-		handlers = append(handlers, wo.handler)
+		handlers[i] = wo.handler
 	}
 
 	sys.Scan(path, fs, handlers)
