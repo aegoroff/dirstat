@@ -35,7 +35,7 @@ func Execute(path string, fs afero.Fs, w io.Writer, modules ...Module) {
 func NewFoldersModule(ctx *Context, order int) Module {
 	work := newFoldersWorker(ctx)
 	rend := newFoldersRenderer(work, order)
-	return newModule(rend, work)
+	return newModule(rend, newOnlyFoldersWorker(work))
 }
 
 // NewTopFilesModule creates new top files statistic module
@@ -87,10 +87,11 @@ func NewAggregateFileModule(ctx *Context, order int) Module {
 
 // NewTotalModule creates new total statistic module
 func NewTotalModule(ctx *Context, order int) Module {
-	work := newTotalWorker(ctx)
+	workFile := newTotalFileWorker(ctx)
+	workFold := newTotalFolderWorker(ctx)
 	rend := newTotalRenderer(ctx, order)
 
-	m := newModule(rend, work)
+	m := newModule(rend, newOnlyFilesWorker(workFile), newOnlyFoldersWorker(workFold))
 	return m
 }
 

@@ -8,8 +8,14 @@ import (
 	"text/template"
 )
 
-type totalWorker struct {
+type totalFileWorker struct {
 	voidInit
+	total *totalInfo
+}
+
+type totalFolderWorker struct {
+	voidInit
+	voidFinalize
 	total *totalInfo
 }
 
@@ -18,8 +24,16 @@ type totalRenderer struct {
 	total *totalInfo
 }
 
-func newTotalWorker(ctx *Context) *totalWorker {
-	w := totalWorker{
+func newTotalFileWorker(ctx *Context) worker {
+	w := totalFileWorker{
+		total: ctx.total,
+	}
+
+	return &w
+}
+
+func newTotalFolderWorker(ctx *Context) worker {
+	w := totalFolderWorker{
 		total: ctx.total,
 	}
 
@@ -35,26 +49,26 @@ func newTotalRenderer(ctx *Context, order int) renderer {
 
 // Worker methods
 
-func (m *totalWorker) finalize() {
+func (m *totalFileWorker) finalize() {
 	m.total.CountFileExts = len(m.total.extensions)
 }
 
-func (m *totalWorker) handler(evt *sys.ScanEvent) {
-	if evt.Folder != nil {
-		m.total.CountFolders++
-	} else if evt.File != nil {
-		f := evt.File
-		// Accumulate file statistic
-		m.total.FilesTotal.Count++
-		m.total.FilesTotal.Size += uint64(f.Size)
+func (m *totalFileWorker) handler(evt *sys.ScanEvent) {
+	f := evt.File
+	// Accumulate file statistic
+	m.total.FilesTotal.Count++
+	m.total.FilesTotal.Size += uint64(f.Size)
 
-		// Accumulate file extensions statistic
-		ext := filepath.Ext(f.Path)
-		a := m.total.extensions[ext]
-		a.Size += uint64(f.Size)
-		a.Count++
-		m.total.extensions[ext] = a
-	}
+	// Accumulate file extensions statistic
+	ext := filepath.Ext(f.Path)
+	a := m.total.extensions[ext]
+	a.Size += uint64(f.Size)
+	a.Count++
+	m.total.extensions[ext] = a
+}
+
+func (m *totalFolderWorker) handler(*sys.ScanEvent) {
+	m.total.CountFolders++
 }
 
 // Renderer method

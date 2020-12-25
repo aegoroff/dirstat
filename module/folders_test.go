@@ -102,7 +102,9 @@ func Test_folderHandler(t *testing.T) {
 	ctx := NewContext(2, false, "/")
 	worker := newFoldersWorker(ctx)
 	var handlers []sys.ScanHandler
-	handlers = append(handlers, worker.handler)
+
+	w := newOnlyFoldersWorker(worker)
+	handlers = append(handlers, w.handler)
 
 	// Act
 	sys.Scan("/", appFS, handlers)
@@ -119,7 +121,8 @@ func Test_folderHandler_EmptyFileSystem(t *testing.T) {
 	ctx := NewContext(2, false, "/")
 	worker := newFoldersWorker(ctx)
 	var handlers []sys.ScanHandler
-	handlers = append(handlers, worker.handler)
+	w := newOnlyFoldersWorker(worker)
+	handlers = append(handlers, w.handler)
 
 	// Act
 	sys.Scan("/", appFS, handlers)
