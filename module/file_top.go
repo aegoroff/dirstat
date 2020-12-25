@@ -9,7 +9,12 @@ import (
 )
 
 func newTopFilesWorker(top int, pd decorator) *topFilesWorker {
-	return &topFilesWorker{tree: special.NewMaxTree(int64(top)), pd: pd}
+	w := &topFilesWorker{
+		tree: special.NewMaxTree(int64(top)),
+		pd:   pd,
+	}
+	w.fileFilter = newFileFilter(w.onFile)
+	return w
 }
 
 func newTopFilesRenderer(work *topFilesWorker, order int) renderer {
@@ -17,8 +22,6 @@ func newTopFilesRenderer(work *topFilesWorker, order int) renderer {
 		topFilesWorker: work,
 		baseRenderer:   newBaseRenderer(order),
 	}
-
-	w.fileFilter = newFileFilter(w.onFile)
 
 	return &w
 }
