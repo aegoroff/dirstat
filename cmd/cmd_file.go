@@ -13,11 +13,12 @@ type fileCmd struct {
 func (f *fileCmd) execute() error {
 	ctx := module.NewContext(f.top, f.removeRoot, f.path)
 
-	var modules []module.Module
-	modules = append(modules, module.NewAggregateFileModule(ctx, 0))
-	modules = append(modules, module.NewTopFilesModule(ctx, 1))
-	modules = append(modules, module.NewDetailFileModule(ctx, 2, f.vrange))
-	modules = append(modules, module.NewTotalModule(ctx, 3))
+	modules := []module.Module{
+		module.NewAggregateFileModule(ctx, 0),
+		module.NewTopFilesModule(ctx, 1),
+		module.NewDetailFileModule(ctx, 2, f.vrange),
+		module.NewTotalModule(ctx, 3),
+	}
 
 	f.run(modules...)
 

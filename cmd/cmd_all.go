@@ -13,14 +13,15 @@ type allCmd struct {
 func (a *allCmd) execute() error {
 	ctx := module.NewContext(a.top, a.removeRoot, a.path)
 
-	var modules []module.Module
-	modules = append(modules, module.NewAggregateFileModule(ctx, 0))
-	modules = append(modules, module.NewBenfordFileModule(ctx, 1))
-	modules = append(modules, module.NewExtensionModule(ctx, 2))
-	modules = append(modules, module.NewTopFilesModule(ctx, 3))
-	modules = append(modules, module.NewFoldersModule(ctx, 4))
-	modules = append(modules, module.NewDetailFileModule(ctx, 5, a.vrange))
-	modules = append(modules, module.NewTotalModule(ctx, 6))
+	modules := []module.Module{
+		module.NewAggregateFileModule(ctx, 0),
+		module.NewBenfordFileModule(ctx, 1),
+		module.NewExtensionModule(ctx, 2),
+		module.NewTopFilesModule(ctx, 3),
+		module.NewFoldersModule(ctx, 4),
+		module.NewDetailFileModule(ctx, 5, a.vrange),
+		module.NewTotalModule(ctx, 6),
+	}
 
 	a.run(modules...)
 
