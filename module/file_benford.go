@@ -9,7 +9,6 @@ import (
 type benfordFileWorker struct {
 	voidFinalize
 	voidInit
-	*fileFilter
 	distribution []int64
 	total        *totalInfo
 }
@@ -24,7 +23,6 @@ func newBenfordFileWorker(ctx *Context) *benfordFileWorker {
 		distribution: []int64{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		total:        ctx.total,
 	}
-	w.fileFilter = newFileFilter(w.onFile)
 	return &w
 }
 
@@ -35,8 +33,8 @@ func newBenfordFileRenderer(work *benfordFileWorker, order int) renderer {
 	}
 }
 
-func (b *benfordFileWorker) onFile(f *sys.FileEntry) {
-	s := f.Size
+func (b *benfordFileWorker) handler(evt *sys.ScanEvent) {
+	s := evt.File.Size
 	for s >= 10 {
 		s = s / 10
 	}

@@ -69,7 +69,8 @@ func NewFoldersModule(ctx *Context, order int) Module {
 func NewTopFilesModule(ctx *Context, order int) Module {
 	work := newTopFilesWorker(ctx.top, ctx.pd)
 	rend := newTopFilesRenderer(work, order)
-	m := newModule(rend, work)
+
+	m := newModule(rend, newOnlyFilesWorker(work))
 	return m
 }
 
@@ -81,7 +82,8 @@ func NewDetailFileModule(ctx *Context, order int, enabledRanges []int) Module {
 	}
 	work := newDetailFileWorker(newRanges(), enabledRanges, ctx.pd)
 	rend := newDetailFileRenderer(work, order)
-	m := newModule(rend, work)
+
+	m := newModule(rend, newOnlyFilesWorker(work))
 	return m
 }
 
@@ -89,7 +91,8 @@ func NewDetailFileModule(ctx *Context, order int, enabledRanges []int) Module {
 func NewBenfordFileModule(ctx *Context, order int) Module {
 	work := newBenfordFileWorker(ctx)
 	rend := newBenfordFileRenderer(work, order)
-	m := newModule(rend, work)
+
+	m := newModule(rend, newOnlyFilesWorker(work))
 	return m
 }
 
@@ -105,7 +108,7 @@ func NewAggregateFileModule(ctx *Context, order int) Module {
 	work := newAggregateFileWorker(newRanges())
 	rend := newAggregateFileRenderer(ctx, work, order)
 
-	m := newModule(rend, work)
+	m := newModule(rend, newOnlyFilesWorker(work))
 	return m
 }
 
@@ -182,4 +185,28 @@ func newBaseRenderer(order int) *baseRenderer {
 
 func (br *baseRenderer) order() int {
 	return br.ord
+}
+
+type onlyFilesWorker struct {
+	w worker
+}
+
+func newOnlyFilesWorker(w worker) worker {
+	return &onlyFilesWorker{
+		w: w,
+	}
+}
+
+func (f *onlyFilesWorker) init() {
+	f.w.init()
+}
+
+func (f *onlyFilesWorker) finalize() {
+	f.w.finalize()
+}
+
+func (f *onlyFilesWorker) handler(evt *sys.ScanEvent) {
+	if evt.File != nil {
+		f.w.handler(evt)
+	}
 }

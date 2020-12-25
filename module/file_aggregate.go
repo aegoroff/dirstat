@@ -9,7 +9,6 @@ import (
 type aggregateFileWorker struct {
 	voidInit
 	voidFinalize
-	*fileFilter
 	aggregate  map[Range]fileStat
 	fileRanges ranges
 }
@@ -26,8 +25,6 @@ func newAggregateFileWorker(rs ranges) *aggregateFileWorker {
 		fileRanges: rs,
 	}
 
-	w.fileFilter = newFileFilter(w.onFile)
-
 	return &w
 }
 
@@ -39,7 +36,8 @@ func newAggregateFileRenderer(ctx *Context, w *aggregateFileWorker, order int) *
 	}
 }
 
-func (m *aggregateFileWorker) onFile(f *sys.FileEntry) {
+func (m *aggregateFileWorker) handler(evt *sys.ScanEvent) {
+	f := evt.File
 	unsignedSize := uint64(f.Size)
 
 	// Calculate files range statistic

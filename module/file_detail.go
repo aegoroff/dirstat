@@ -7,7 +7,6 @@ import (
 
 type detailFileWorker struct {
 	voidFinalize
-	*fileFilter
 	distribution     map[Range]files
 	enabledRanges    []int
 	enabledRangesMap map[int]bool
@@ -28,8 +27,6 @@ func newDetailFileWorker(rs ranges, enabledRanges []int, pd decorator) *detailFi
 		pd:            pd,
 	}
 
-	w.fileFilter = newFileFilter(w.onFile)
-
 	return &w
 }
 
@@ -49,7 +46,8 @@ func (m *detailFileWorker) init() {
 	}
 }
 
-func (m *detailFileWorker) onFile(f *sys.FileEntry) {
+func (m *detailFileWorker) handler(evt *sys.ScanEvent) {
+	f := evt.File
 	// Calculate files range statistic
 	for i, r := range m.fileRanges {
 		// Store each file info within range only if this this file size detail option set

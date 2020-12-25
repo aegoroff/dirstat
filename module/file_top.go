@@ -13,7 +13,6 @@ func newTopFilesWorker(top int, pd decorator) *topFilesWorker {
 		tree: special.NewMaxTree(int64(top)),
 		pd:   pd,
 	}
-	w.fileFilter = newFileFilter(w.onFile)
 	return w
 }
 
@@ -29,7 +28,6 @@ func newTopFilesRenderer(work *topFilesWorker, order int) renderer {
 type topFilesWorker struct {
 	voidInit
 	voidFinalize
-	*fileFilter
 	tree rbtree.RbTree
 	pd   decorator
 }
@@ -41,7 +39,8 @@ type topFilesRenderer struct {
 
 // Worker methods
 
-func (m *topFilesWorker) onFile(f *sys.FileEntry) {
+func (m *topFilesWorker) handler(evt *sys.ScanEvent) {
+	f := evt.File
 	fc := file{size: f.Size, path: f.Path, pd: m.pd}
 	m.tree.Insert(&fc)
 }
