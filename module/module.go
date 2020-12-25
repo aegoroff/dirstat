@@ -6,33 +6,6 @@ import (
 	"io"
 )
 
-// Context defines modules context
-type Context struct {
-	total *totalInfo
-	top   int
-	pd    decorator
-}
-
-// NewContext creates new module's context that needed to create new modules
-func NewContext(top int, rr bool, root string) *Context {
-	total := totalInfo{extensions: make(map[string]countSizeAggregate, 8192)}
-
-	var pd decorator
-
-	if rr {
-		pd = &removeRootDecorator{root: root}
-	} else {
-		pd = &nonDestructiveDecorator{}
-	}
-
-	ctx := Context{
-		total: &total,
-		top:   top,
-		pd:    pd,
-	}
-	return &ctx
-}
-
 // Execute runs modules over path specified
 func Execute(path string, fs afero.Fs, w io.Writer, modules ...Module) {
 	var renderers []renderer
@@ -134,14 +107,6 @@ func (m *module) renderers() []renderer {
 	return m.rnd
 }
 
-type voidInit struct{}
-
-func (*voidInit) init() {}
-
-type voidFinalize struct{}
-
-func (*voidFinalize) finalize() {}
-
 // NewVoidModule creates module that do nothing
 func NewVoidModule() Module {
 	return &module{
@@ -175,6 +140,14 @@ func newRanges() ranges {
 	return rs
 }
 
+type voidInit struct{}
+
+func (*voidInit) init() {}
+
+type voidFinalize struct{}
+
+func (*voidFinalize) finalize() {}
+
 type baseRenderer struct {
 	ord int
 }
@@ -185,28 +158,4 @@ func newBaseRenderer(order int) *baseRenderer {
 
 func (br *baseRenderer) order() int {
 	return br.ord
-}
-
-type onlyFilesWorker struct {
-	w worker
-}
-
-func newOnlyFilesWorker(w worker) worker {
-	return &onlyFilesWorker{
-		w: w,
-	}
-}
-
-func (f *onlyFilesWorker) init() {
-	f.w.init()
-}
-
-func (f *onlyFilesWorker) finalize() {
-	f.w.finalize()
-}
-
-func (f *onlyFilesWorker) handler(evt *sys.ScanEvent) {
-	if evt.File != nil {
-		f.w.handler(evt)
-	}
 }
