@@ -119,9 +119,9 @@ func Test_printTopFile_invalidCastingError(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	ft := special.NewMaxTree(3)
-	ft.Insert(rbtree.NewInt(1))
-	ft.Insert(rbtree.NewInt(2))
-	ft.Insert(rbtree.NewInt(3))
+	ft.Insert(rbtree.Int(1))
+	ft.Insert(rbtree.Int(2))
+	ft.Insert(rbtree.Int(3))
 	fr := topFilesRenderer{topFilesWorker: &topFilesWorker{
 		tree: ft,
 	}}
