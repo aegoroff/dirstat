@@ -51,7 +51,7 @@ func NewTopFilesModule(ctx *Context, order int) Module {
 func NewDetailFileModule(ctx *Context, order int, enabledRanges []int) Module {
 	// Do nothing if verbose not enabled
 	if len(enabledRanges) == 0 {
-		return NewVoidModule()
+		return newVoidModule()
 	}
 	work := newDetailFileWorker(newRanges(), enabledRanges, ctx.pd)
 	rend := newDetailFileRenderer(work, order)
@@ -107,8 +107,8 @@ func (m *module) renderers() []renderer {
 	return m.rnd
 }
 
-// NewVoidModule creates module that do nothing
-func NewVoidModule() Module {
+// newVoidModule creates module that do nothing
+func newVoidModule() Module {
 	return &module{
 		[]worker{},
 		[]renderer{},
