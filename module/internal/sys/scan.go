@@ -41,11 +41,11 @@ type FolderEntry struct {
 }
 
 type breadthFirst struct {
-	fs    afero.Fs
-	wg    *sync.WaitGroup
-	mu    *sync.RWMutex
-	queue *[]string
-	cr    chan struct{}
+	fs         afero.Fs
+	wg         sync.WaitGroup
+	mu         sync.RWMutex
+	queue      []string
+	restrictor chan struct{}
 }
 
 type filesystemItem struct {
@@ -112,49 +112,67 @@ func readFileSystemEvents(in <-chan *filesystemItem, out chan<- *ScanEvent) {
 
 func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- *filesystemItem) {
 	defer close(results)
-	var concurrencyRestrict = make(chan struct{}, 32)
-	defer close(concurrencyRestrict)
 
-	var wg sync.WaitGroup
-	var mu sync.RWMutex
-	queue := make([]string, 0)
+	bf := newBreadthFirst(fs, 32)
+	defer close(bf.restrictor)
 
-	queue = append(queue, path)
+	bf.push(path)
 
-	ql := len(queue)
-
-	bf := &breadthFirst{
-		fs:    fs,
-		wg:    &wg,
-		mu:    &mu,
-		queue: &queue,
-		cr:    concurrencyRestrict,
-	}
+	ql := len(bf.queue)
 
 	for ql > 0 {
-		// Peek
-		mu.RLock()
-		currentDir := queue[0]
-		mu.RUnlock()
+		currentDir := bf.peek()
 
-		wg.Add(1)
+		bf.wg.Add(1)
 		go bf.walk(currentDir, results)
 
-		// Pop
-		mu.Lock()
-		queue = queue[1:]
-		ql = len(queue)
-		mu.Unlock()
+		ql = bf.pop()
 
 		if ql == 0 {
 			// Waiting pending goroutines
-			wg.Wait()
+			bf.wait()
 
-			mu.RLock()
-			ql = len(queue)
-			mu.RUnlock()
+			ql = bf.len()
 		}
 	}
+}
+
+func newBreadthFirst(fs afero.Fs, parallel int) *breadthFirst {
+	bf := &breadthFirst{
+		fs:         fs,
+		queue:      make([]string, 0),
+		restrictor: make(chan struct{}, parallel),
+	}
+	return bf
+}
+
+func (bf *breadthFirst) peek() string {
+	bf.mu.RLock()
+	defer bf.mu.RUnlock()
+	return bf.queue[0]
+}
+
+func (bf *breadthFirst) pop() int {
+	bf.mu.Lock()
+	bf.mu.Unlock()
+	bf.queue = bf.queue[1:]
+	return len(bf.queue)
+}
+
+func (bf *breadthFirst) push(s string) {
+	bf.mu.Lock()
+	bf.queue = append(bf.queue, s)
+	bf.mu.Unlock()
+}
+
+func (bf *breadthFirst) len() int {
+	bf.mu.RLock()
+	defer bf.mu.RUnlock()
+	return len(bf.queue)
+}
+
+func (bf *breadthFirst) wait() {
+	bf.wg.Wait()
 }
 
 func (bf *breadthFirst) walk(d string, results chan<- *filesystemItem) {
@@ -169,12 +187,7 @@ func (bf *breadthFirst) walk(d string, results chan<- *filesystemItem) {
 	for _, entry := range entries {
 		// Queue subdirs to walk in a queue
 		if entry.isDir {
-			subdir := filepath.Join(d, entry.name)
-
-			// Push
-			bf.mu.Lock()
-			*bf.queue = append(*bf.queue, subdir)
-			bf.mu.Unlock()
+			bf.push(filepath.Join(d, entry.name))
 		} else {
 			// Send to channel
 			fileEvent := filesystemItem{
@@ -202,8 +215,8 @@ func (bf *breadthFirst) walk(d string, results chan<- *filesystemItem) {
 }
 
 func (bf *breadthFirst) dirents(path string) []*filesysEntry {
-	bf.cr <- struct{}{}
-	defer func() { <-bf.cr }()
+	bf.restrictor <- struct{}{}
+	defer func() { <-bf.restrictor }()
 	f, err := bf.fs.Open(path)
 	if err != nil {
 		return []*filesysEntry{}
