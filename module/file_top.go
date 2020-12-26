@@ -8,31 +8,40 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 )
 
-func newTopFilesHandler(top int, pd decorator) *topFilesHandler {
-	w := &topFilesHandler{
-		tree: special.NewMaxTree(int64(top)),
-		pd:   pd,
-	}
-	return w
-}
-
-func newTopFilesRenderer(work *topFilesHandler, order int) renderer {
-	w := topFilesRenderer{
-		topFilesHandler: work,
-		baseRenderer:    newBaseRenderer(order),
-	}
-
-	return &w
+type topFiles struct {
+	tree rbtree.RbTree
 }
 
 type topFilesHandler struct {
-	tree rbtree.RbTree
-	pd   decorator
+	*topFiles
+	pd decorator
 }
 
 type topFilesRenderer struct {
-	*topFilesHandler
+	*topFiles
 	*baseRenderer
+}
+
+func newTopFiles(top int) *topFiles {
+	return &topFiles{
+		tree: special.NewMaxTree(int64(top)),
+	}
+}
+
+func newTopFilesHandler(tf *topFiles, pd decorator) sys.Handler {
+	return &topFilesHandler{
+		topFiles: tf,
+		pd:       pd,
+	}
+}
+
+func newTopFilesRenderer(tf *topFiles, order int) renderer {
+	w := topFilesRenderer{
+		topFiles:     tf,
+		baseRenderer: newBaseRenderer(order),
+	}
+
+	return &w
 }
 
 // Worker method

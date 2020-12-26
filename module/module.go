@@ -41,8 +41,9 @@ func NewFoldersModule(ctx *Context, order int) Module {
 
 // NewTopFilesModule creates new top files statistic module
 func NewTopFilesModule(ctx *Context, order int) Module {
-	handler := newTopFilesHandler(ctx.top, ctx.pd)
-	rend := newTopFilesRenderer(handler, order)
+	tf := newTopFiles(ctx.top)
+	handler := newTopFilesHandler(tf, ctx.pd)
+	rend := newTopFilesRenderer(tf, order)
 
 	m := newModule(rend, newOnlyFilesHandler(handler))
 	return m
