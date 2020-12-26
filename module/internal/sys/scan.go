@@ -118,7 +118,7 @@ func walkBreadthFirst(path string, fs afero.Fs, results chan<- *filesystemItem) 
 	for bf.len() > 0 {
 		currentDir := bf.pop()
 
-		bf.wg.Add(1)
+		bf.addOne()
 		go bf.walk(currentDir, results)
 
 		if bf.len() == 0 {

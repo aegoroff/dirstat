@@ -44,6 +44,10 @@ func (bf *walker) len() int {
 	return len(bf.queue)
 }
 
+func (bf *walker) addOne() {
+	bf.wg.Add(1)
+}
+
 func (bf *walker) wait() {
 	bf.wg.Wait()
 }
