@@ -30,11 +30,10 @@ func (bf *walker) peek() string {
 	return bf.queue[0]
 }
 
-func (bf *walker) pop() int {
+func (bf *walker) pop() {
 	bf.mu.Lock()
 	bf.mu.Unlock()
 	bf.queue = bf.queue[1:]
-	return len(bf.queue)
 }
 
 func (bf *walker) push(s string) {

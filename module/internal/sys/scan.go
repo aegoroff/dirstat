@@ -115,21 +115,17 @@ func walkBreadthFirst(path string, fs afero.Fs, results chan<- *filesystemItem) 
 
 	bf.push(path)
 
-	ql := len(bf.queue)
-
-	for ql > 0 {
+	for bf.len() > 0 {
 		currentDir := bf.peek()
 
 		bf.wg.Add(1)
 		go bf.walk(currentDir, results)
 
-		ql = bf.pop()
+		bf.pop()
 
-		if ql == 0 {
+		if bf.len() == 0 {
 			// Waiting pending goroutines
 			bf.wait()
-
-			ql = bf.len()
 		}
 	}
 }
