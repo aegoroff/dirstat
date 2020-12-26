@@ -178,7 +178,7 @@ func (bf *breadthFirst) wait() {
 func (bf *breadthFirst) walk(d string, results chan<- *filesystemItem) {
 	defer bf.wg.Done()
 
-	entries := bf.dirents(d)
+	entries := bf.readdir(d)
 
 	// Folder stat
 	var count int64
@@ -214,7 +214,7 @@ func (bf *breadthFirst) walk(d string, results chan<- *filesystemItem) {
 	results <- &dirEvent
 }
 
-func (bf *breadthFirst) dirents(path string) []*filesysEntry {
+func (bf *breadthFirst) readdir(path string) []*filesysEntry {
 	bf.restrictor <- struct{}{}
 	defer func() { <-bf.restrictor }()
 	f, err := bf.fs.Open(path)
