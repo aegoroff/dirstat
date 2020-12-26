@@ -34,17 +34,17 @@ func Execute(path string, fs afero.Fs, w io.Writer, modules ...Module) {
 
 // NewFoldersModule creates new folders module
 func NewFoldersModule(ctx *Context, order int) Module {
-	work := newFoldersHandler(ctx)
-	rend := newFoldersRenderer(work, order)
-	return newModule(rend, newOnlyFoldersHandler(work))
+	handler := newFoldersHandler(ctx)
+	rend := newFoldersRenderer(handler, order)
+	return newModule(rend, newOnlyFoldersHandler(handler))
 }
 
 // NewTopFilesModule creates new top files statistic module
 func NewTopFilesModule(ctx *Context, order int) Module {
-	work := newTopFilesHandler(ctx.top, ctx.pd)
-	rend := newTopFilesRenderer(work, order)
+	handler := newTopFilesHandler(ctx.top, ctx.pd)
+	rend := newTopFilesRenderer(handler, order)
 
-	m := newModule(rend, newOnlyFilesHandler(work))
+	m := newModule(rend, newOnlyFilesHandler(handler))
 	return m
 }
 
@@ -54,19 +54,19 @@ func NewDetailFileModule(ctx *Context, order int, enabledRanges []int) Module {
 	if len(enabledRanges) == 0 {
 		return newVoidModule()
 	}
-	work := newDetailFileHandler(newRanges(), enabledRanges, ctx.pd)
-	rend := newDetailFileRenderer(work, order)
+	handler := newDetailFileHandler(newRanges(), enabledRanges, ctx.pd)
+	rend := newDetailFileRenderer(handler, order)
 
-	m := newModule(rend, newOnlyFilesHandler(work))
+	m := newModule(rend, newOnlyFilesHandler(handler))
 	return m
 }
 
 // NewBenfordFileModule creates new file size bendford statistic
 func NewBenfordFileModule(ctx *Context, order int) Module {
-	work := newBenfordFileHandler(ctx)
-	rend := newBenfordFileRenderer(work, order)
+	handler := newBenfordFileHandler(ctx)
+	rend := newBenfordFileRenderer(handler, order)
 
-	m := newModule(rend, newOnlyFilesHandler(work))
+	m := newModule(rend, newOnlyFilesHandler(handler))
 	return m
 }
 
@@ -79,30 +79,30 @@ func NewExtensionModule(ctx *Context, order int) Module {
 
 // NewAggregateFileModule creates new total file statistic module
 func NewAggregateFileModule(ctx *Context, order int) Module {
-	work := newAggregateFileHandler(newRanges())
-	rend := newAggregateFileRenderer(ctx, work, order)
+	handler := newAggregateFileHandler(newRanges())
+	rend := newAggregateFileRenderer(ctx, handler, order)
 
-	m := newModule(rend, newOnlyFilesHandler(work))
+	m := newModule(rend, newOnlyFilesHandler(handler))
 	return m
 }
 
 // NewTotalModule creates new total statistic module
 func NewTotalModule(ctx *Context, order int) Module {
-	workFile := newTotalFileWorker(ctx)
-	workFold := newTotalFolderWorker(ctx)
+	fi := newTotalFileHandler(ctx)
+	fo := newTotalFolderHandler(ctx)
 	rend := newTotalRenderer(ctx, order)
 
-	m := newModule(rend, newOnlyFilesHandler(workFile), newOnlyFoldersHandler(workFold))
+	m := newModule(rend, newOnlyFilesHandler(fi), newOnlyFoldersHandler(fo))
 	return m
 }
 
 type module struct {
-	wks []sys.Handler
-	rnd []renderer
+	hlers []sys.Handler
+	rnd   []renderer
 }
 
 func (m *module) handlers() []sys.Handler {
-	return m.wks
+	return m.hlers
 }
 
 func (m *module) renderers() []renderer {
@@ -117,12 +117,12 @@ func newVoidModule() Module {
 	}
 }
 
-func newModule(r renderer, w ...sys.Handler) Module {
+func newModule(r renderer, handlers ...sys.Handler) Module {
 	m := module{
 		[]sys.Handler{},
 		[]renderer{r},
 	}
-	m.wks = append(m.wks, w...)
+	m.hlers = append(m.hlers, handlers...)
 	return &m
 }
 

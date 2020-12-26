@@ -21,7 +21,7 @@ type totalRenderer struct {
 	total *totalInfo
 }
 
-func newTotalFileWorker(ctx *Context) sys.Handler {
+func newTotalFileHandler(ctx *Context) sys.Handler {
 	w := totalFileHandler{
 		total: ctx.total,
 	}
@@ -29,7 +29,7 @@ func newTotalFileWorker(ctx *Context) sys.Handler {
 	return &w
 }
 
-func newTotalFolderWorker(ctx *Context) sys.Handler {
+func newTotalFolderHandler(ctx *Context) sys.Handler {
 	w := totalFolderHandler{
 		total: ctx.total,
 	}
