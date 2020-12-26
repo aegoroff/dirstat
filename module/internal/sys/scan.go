@@ -111,7 +111,7 @@ func walkBreadthFirst(path string, fs afero.Fs, results chan<- *filesystemItem) 
 	defer close(results)
 
 	bf := newWalker(fs, 32)
-	defer close(bf.restrictor)
+	defer bf.closeRestrict()
 
 	bf.push(path)
 

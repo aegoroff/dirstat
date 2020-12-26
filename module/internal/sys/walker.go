@@ -92,9 +92,21 @@ func (bf *walker) walk(d string, results chan<- *filesystemItem) {
 	results <- &dirEvent
 }
 
-func (bf *walker) readdir(path string) []*filesysEntry {
+func (bf *walker) acquireRestrict() {
 	bf.restrictor <- struct{}{}
-	defer func() { <-bf.restrictor }()
+}
+
+func (bf *walker) releaseRestrict() {
+	<-bf.restrictor
+}
+
+func (bf *walker) closeRestrict() {
+	close(bf.restrictor)
+}
+
+func (bf *walker) readdir(path string) []*filesysEntry {
+	bf.acquireRestrict()
+	defer bf.releaseRestrict()
 	f, err := bf.fs.Open(path)
 	if err != nil {
 		return []*filesysEntry{}
