@@ -22,26 +22,10 @@ func newOnlyFoldersWorker(w worker) worker {
 	}
 }
 
-func (f *onlyFilesWorker) init() {
-	f.w.init()
-}
-
-func (f *onlyFilesWorker) finalize() {
-	f.w.finalize()
-}
-
 func (f *onlyFilesWorker) handler(evt *sys.ScanEvent) {
 	if evt.File != nil {
 		f.w.handler(evt)
 	}
-}
-
-func (f *onlyFoldersWorker) init() {
-	f.w.init()
-}
-
-func (f *onlyFoldersWorker) finalize() {
-	f.w.finalize()
 }
 
 func (f *onlyFoldersWorker) handler(evt *sys.ScanEvent) {

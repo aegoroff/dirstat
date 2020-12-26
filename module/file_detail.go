@@ -7,8 +7,6 @@ import (
 )
 
 type detailFileWorker struct {
-	voidFinalize
-	voidInit
 	distribution map[Range]files
 	enabled      c9s.IntHashSet
 	fileRanges   ranges
@@ -40,7 +38,7 @@ func newDetailFileRenderer(work *detailFileWorker, order int) renderer {
 	}
 }
 
-// Worker methods
+// Worker method
 
 func (m *detailFileWorker) handler(evt *sys.ScanEvent) {
 	f := evt.File
@@ -63,10 +61,6 @@ func (m *detailFileWorker) handler(evt *sys.ScanEvent) {
 // Renderer method
 
 func (m *detailFileRenderer) print(p printer) {
-	if m.enabled.Count() == 0 {
-		return
-	}
-
 	heads := m.fileRanges.heads(numPrefixDecorator)
 	p.cprint("\n<gray>Detailed files stat:</>\n")
 	for i, r := range m.fileRanges {

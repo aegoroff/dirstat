@@ -55,8 +55,6 @@ func (fs *folderS) LessThan(y rbtree.Comparable) bool { return fs.size < y.(*fol
 func (fs *folderS) EqualTo(y rbtree.Comparable) bool  { return fs.size == y.(*folderS).size }
 
 type foldersWorker struct {
-	voidInit
-	voidFinalize
 	total   *totalInfo
 	bySize  rbtree.RbTree
 	byCount rbtree.RbTree
@@ -84,7 +82,7 @@ func newFoldersRenderer(work *foldersWorker, order int) renderer {
 	}
 }
 
-// Worker methods
+// Worker method
 
 func (m *foldersWorker) handler(evt *sys.ScanEvent) {
 	fe := evt.Folder

@@ -9,13 +9,10 @@ import (
 )
 
 type totalFileWorker struct {
-	voidInit
 	total *totalInfo
 }
 
 type totalFolderWorker struct {
-	voidInit
-	voidFinalize
 	total *totalInfo
 }
 
@@ -49,10 +46,6 @@ func newTotalRenderer(ctx *Context, order int) renderer {
 
 // Worker methods
 
-func (m *totalFileWorker) finalize() {
-	m.total.CountFileExts = len(m.total.extensions)
-}
-
 func (m *totalFileWorker) handler(evt *sys.ScanEvent) {
 	f := evt.File
 	// Accumulate file statistic
@@ -74,6 +67,7 @@ func (m *totalFolderWorker) handler(*sys.ScanEvent) {
 // Renderer method
 
 func (m *totalRenderer) print(p printer) {
+	m.total.countExtensions()
 	const totalTemplate = `
 Total files:            {{.FilesTotal.Count}} ({{.FilesTotal.Size | toBytesString }})
 Total folders:          {{.CountFolders}}

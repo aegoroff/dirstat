@@ -7,8 +7,6 @@ import (
 )
 
 type benfordFileWorker struct {
-	voidFinalize
-	voidInit
 	distribution []int64
 	total        *totalInfo
 }

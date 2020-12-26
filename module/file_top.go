@@ -26,8 +26,6 @@ func newTopFilesRenderer(work *topFilesWorker, order int) renderer {
 }
 
 type topFilesWorker struct {
-	voidInit
-	voidFinalize
 	tree rbtree.RbTree
 	pd   decorator
 }
@@ -37,7 +35,7 @@ type topFilesRenderer struct {
 	*baseRenderer
 }
 
-// Worker methods
+// Worker method
 
 func (m *topFilesWorker) handler(evt *sys.ScanEvent) {
 	f := evt.File

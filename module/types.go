@@ -56,6 +56,10 @@ func (t *totalInfo) sizePercent(size uint64) float64 {
 	return percent(float64(size), float64(t.FilesTotal.Size))
 }
 
+func (t *totalInfo) countExtensions() {
+	t.CountFileExts = len(t.extensions)
+}
+
 func percent(value float64, total float64) float64 {
 	return (value / total) * 100
 }

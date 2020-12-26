@@ -18,15 +18,10 @@ func Execute(path string, fs afero.Fs, w io.Writer, modules ...Module) {
 
 	handlers := make([]sys.ScanHandler, len(workers))
 	for i, wo := range workers {
-		wo.init()
 		handlers[i] = wo.handler
 	}
 
 	sys.Scan(path, fs, handlers)
-
-	for _, wo := range workers {
-		wo.finalize()
-	}
 
 	render(w, renderers)
 }
@@ -140,14 +135,6 @@ func newRanges() ranges {
 	}
 	return rs
 }
-
-type voidInit struct{}
-
-func (*voidInit) init() {}
-
-type voidFinalize struct{}
-
-func (*voidFinalize) finalize() {}
 
 type baseRenderer struct {
 	ord int

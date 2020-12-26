@@ -7,8 +7,6 @@ import (
 )
 
 type aggregateFileWorker struct {
-	voidInit
-	voidFinalize
 	aggregate  map[Range]fileStat
 	fileRanges ranges
 }
@@ -35,6 +33,8 @@ func newAggregateFileRenderer(ctx *Context, w *aggregateFileWorker, order int) *
 		work:         w,
 	}
 }
+
+// Worker method
 
 func (m *aggregateFileWorker) handler(evt *sys.ScanEvent) {
 	f := evt.File

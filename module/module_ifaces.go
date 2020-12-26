@@ -11,21 +11,7 @@ type Module interface {
 }
 
 type worker interface {
-	initer
-	finalizer
-	handlerer
-}
-
-type handlerer interface {
 	handler(evt *sys.ScanEvent)
-}
-
-type initer interface {
-	init()
-}
-
-type finalizer interface {
-	finalize()
 }
 
 type renderer interface {
