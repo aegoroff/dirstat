@@ -54,8 +54,9 @@ func NewDetailFileModule(ctx *Context, order int, enabledRanges []int) Module {
 	if len(enabledRanges) == 0 {
 		return newVoidModule()
 	}
-	handler := newDetailFileHandler(newRanges(), enabledRanges, ctx.pd)
-	rend := newDetailFileRenderer(handler, order)
+	details := newDetailsFile(newRanges())
+	handler := newDetailFileHandler(details, enabledRanges, ctx.pd)
+	rend := newDetailFileRenderer(details, order)
 
 	m := newModule(rend, newOnlyFilesHandler(handler))
 	return m

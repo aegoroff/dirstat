@@ -6,35 +6,47 @@ import (
 	"sort"
 )
 
-type detailFileHandler struct {
+type detailsFile struct {
 	distribution map[Range]files
-	enabled      c9s.IntHashSet
 	fileRanges   ranges
-	pd           decorator
+}
+
+type detailFileHandler struct {
+	*detailsFile
+	enabled c9s.IntHashSet
+	pd      decorator
 }
 
 type detailFileRenderer struct {
-	*detailFileHandler
+	*detailsFile
 	*baseRenderer
 }
 
-func newDetailFileHandler(rs ranges, enabledRanges []int, pd decorator) *detailFileHandler {
-	er := make(c9s.IntHashSet)
-	er.AddRange(enabledRanges...)
-	w := detailFileHandler{
-		enabled:      er,
-		distribution: make(map[Range]files, len(rs)),
+func newDetailsFile(rs ranges) *detailsFile {
+	w := detailsFile{
 		fileRanges:   rs,
-		pd:           pd,
+		distribution: make(map[Range]files, len(rs)),
 	}
 
 	return &w
 }
 
-func newDetailFileRenderer(work *detailFileHandler, order int) renderer {
+func newDetailFileHandler(details *detailsFile, enabledRanges []int, pd decorator) sys.Handler {
+	er := make(c9s.IntHashSet)
+	er.AddRange(enabledRanges...)
+	w := detailFileHandler{
+		detailsFile: details,
+		enabled:     er,
+		pd:          pd,
+	}
+
+	return &w
+}
+
+func newDetailFileRenderer(details *detailsFile, order int) renderer {
 	return &detailFileRenderer{
-		detailFileHandler: work,
-		baseRenderer:      newBaseRenderer(order),
+		detailsFile:  details,
+		baseRenderer: newBaseRenderer(order),
 	}
 }
 
