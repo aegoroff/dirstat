@@ -40,6 +40,14 @@ type FolderEntry struct {
 	Count int64
 }
 
+type breadthFirst struct {
+	fs    afero.Fs
+	wg    *sync.WaitGroup
+	mu    *sync.RWMutex
+	queue *[]string
+	cr    chan struct{}
+}
+
 type filesystemItem struct {
 	dir   string
 	name  string
@@ -115,6 +123,14 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- *filesystemIte
 
 	ql := len(queue)
 
+	bf := &breadthFirst{
+		fs:    fs,
+		wg:    &wg,
+		mu:    &mu,
+		queue: &queue,
+		cr:    concurrencyRestrict,
+	}
+
 	for ql > 0 {
 		// Peek
 		mu.RLock()
@@ -122,49 +138,7 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- *filesystemIte
 		mu.RUnlock()
 
 		wg.Add(1)
-		go func(d string) {
-			defer wg.Done()
-
-			entries := dirents(d, fs, concurrencyRestrict)
-
-			// Folder stat
-			var count int64
-			var size int64
-
-			for _, entry := range entries {
-				// Queue subdirs to walk in a queue
-				if entry.isDir {
-					subdir := filepath.Join(d, entry.name)
-
-					// Push
-					mu.Lock()
-					queue = append(queue, subdir)
-					mu.Unlock()
-				} else {
-					// Send to channel
-					fileEvent := filesystemItem{
-						dir:   d,
-						name:  entry.name,
-						event: fsEventFile,
-						count: 1,
-						size:  entry.size,
-					}
-					results <- &fileEvent
-
-					// update folder stat
-					count++
-					size += entry.size
-				}
-			}
-
-			dirEvent := filesystemItem{
-				dir:   d,
-				event: fsEventDir,
-				count: count,
-				size:  size,
-			}
-			results <- &dirEvent
-		}(currentDir)
+		go bf.walk(currentDir, results)
 
 		// Pop
 		mu.Lock()
@@ -183,10 +157,54 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- *filesystemIte
 	}
 }
 
-func dirents(path string, fs afero.Fs, restrict chan struct{}) []*filesysEntry {
-	restrict <- struct{}{}
-	defer func() { <-restrict }()
-	f, err := fs.Open(path)
+func (bf *breadthFirst) walk(d string, results chan<- *filesystemItem) {
+	defer bf.wg.Done()
+
+	entries := bf.dirents(d)
+
+	// Folder stat
+	var count int64
+	var size int64
+
+	for _, entry := range entries {
+		// Queue subdirs to walk in a queue
+		if entry.isDir {
+			subdir := filepath.Join(d, entry.name)
+
+			// Push
+			bf.mu.Lock()
+			*bf.queue = append(*bf.queue, subdir)
+			bf.mu.Unlock()
+		} else {
+			// Send to channel
+			fileEvent := filesystemItem{
+				dir:   d,
+				name:  entry.name,
+				event: fsEventFile,
+				count: 1,
+				size:  entry.size,
+			}
+			results <- &fileEvent
+
+			// update folder stat
+			count++
+			size += entry.size
+		}
+	}
+
+	dirEvent := filesystemItem{
+		dir:   d,
+		event: fsEventDir,
+		count: count,
+		size:  size,
+	}
+	results <- &dirEvent
+}
+
+func (bf *breadthFirst) dirents(path string) []*filesysEntry {
+	bf.cr <- struct{}{}
+	defer func() { <-bf.cr }()
+	f, err := bf.fs.Open(path)
 	if err != nil {
 		return []*filesysEntry{}
 	}
