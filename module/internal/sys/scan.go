@@ -7,6 +7,12 @@ import (
 	"sync"
 )
 
+// Handler defines scanning handler interface that handles filesystem events
+type Handler interface {
+	// Handle handles filesystem event
+	Handle(evt *ScanEvent)
+}
+
 // ScanEvent defines scanning event structure
 // that can contain file or folder event information
 type ScanEvent struct {
@@ -34,9 +40,6 @@ type FolderEntry struct {
 	Count int64
 }
 
-// ScanHandler defines function prototype that handles each file event received
-type ScanHandler func(f *ScanEvent)
-
 type filesystemItem struct {
 	dir   string
 	name  string
@@ -60,7 +63,7 @@ const (
 
 // Scan do specified path scanning and executes folder handler on each folder
 // and all file handlers on each file
-func Scan(path string, fs afero.Fs, handlers []ScanHandler) {
+func Scan(path string, fs afero.Fs, handlers ...Handler) {
 	filesystemCh := make(chan *filesystemItem, 1024)
 	go walkDirBreadthFirst(path, fs, filesystemCh)
 
@@ -93,7 +96,7 @@ func Scan(path string, fs afero.Fs, handlers []ScanHandler) {
 	// Read all files from channel
 	for file := range scanChan {
 		for _, h := range handlers {
-			h(file)
+			h.Handle(file)
 		}
 	}
 }

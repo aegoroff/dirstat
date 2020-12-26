@@ -37,7 +37,7 @@ type topFilesRenderer struct {
 
 // Worker method
 
-func (m *topFilesWorker) handler(evt *sys.ScanEvent) {
+func (m *topFilesWorker) Handle(evt *sys.ScanEvent) {
 	f := evt.File
 	fc := file{size: f.Size, path: f.Path, pd: m.pd}
 	m.tree.Insert(&fc)

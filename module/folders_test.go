@@ -101,13 +101,10 @@ func Test_folderHandler(t *testing.T) {
 	_ = afero.WriteFile(appFS, "/f/s/f.txt", []byte("1234"), 0644)
 	ctx := NewContext(2, false, "/")
 	worker := newFoldersWorker(ctx)
-	var handlers []sys.ScanHandler
-
 	w := newOnlyFoldersWorker(worker)
-	handlers = append(handlers, w.handler)
 
 	// Act
-	sys.Scan("/", appFS, handlers)
+	sys.Scan("/", appFS, w)
 
 	// Assert
 	ass.Equal(int64(2), worker.byCount.Len())
@@ -120,12 +117,10 @@ func Test_folderHandler_EmptyFileSystem(t *testing.T) {
 	appFS := afero.NewMemMapFs()
 	ctx := NewContext(2, false, "/")
 	worker := newFoldersWorker(ctx)
-	var handlers []sys.ScanHandler
 	w := newOnlyFoldersWorker(worker)
-	handlers = append(handlers, w.handler)
 
 	// Act
-	sys.Scan("/", appFS, handlers)
+	sys.Scan("/", appFS, w)
 
 	// Assert
 	ass.Equal(int64(1), worker.byCount.Len())

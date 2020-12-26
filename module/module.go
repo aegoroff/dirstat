@@ -6,22 +6,28 @@ import (
 	"io"
 )
 
+// Module defines working modules interface
+type Module interface {
+	handlers() []sys.Handler
+	renderers() []renderer
+}
+
+type renderer interface {
+	print(p printer)
+	order() int
+}
+
 // Execute runs modules over path specified
 func Execute(path string, fs afero.Fs, w io.Writer, modules ...Module) {
 	var renderers []renderer
-	var workers []worker
+	var handlers []sys.Handler
 
 	for _, m := range modules {
 		renderers = append(renderers, m.renderers()...)
-		workers = append(workers, m.workers()...)
+		handlers = append(handlers, m.handlers()...)
 	}
 
-	handlers := make([]sys.ScanHandler, len(workers))
-	for i, wo := range workers {
-		handlers[i] = wo.handler
-	}
-
-	sys.Scan(path, fs, handlers)
+	sys.Scan(path, fs, handlers...)
 
 	render(w, renderers)
 }
@@ -91,11 +97,11 @@ func NewTotalModule(ctx *Context, order int) Module {
 }
 
 type module struct {
-	wks []worker
+	wks []sys.Handler
 	rnd []renderer
 }
 
-func (m *module) workers() []worker {
+func (m *module) handlers() []sys.Handler {
 	return m.wks
 }
 
@@ -106,14 +112,14 @@ func (m *module) renderers() []renderer {
 // newVoidModule creates module that do nothing
 func newVoidModule() Module {
 	return &module{
-		[]worker{},
+		[]sys.Handler{},
 		[]renderer{},
 	}
 }
 
-func newModule(r renderer, w ...worker) Module {
+func newModule(r renderer, w ...sys.Handler) Module {
 	m := module{
-		[]worker{},
+		[]sys.Handler{},
 		[]renderer{r},
 	}
 	m.wks = append(m.wks, w...)

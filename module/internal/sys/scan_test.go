@@ -7,6 +7,20 @@ import (
 	"testing"
 )
 
+type testHandler struct {
+	folders int
+	files   int
+}
+
+func (t *testHandler) Handle(evt *ScanEvent) {
+	if evt.File != nil {
+		t.files++
+	}
+	if evt.Folder != nil {
+		t.folders++
+	}
+}
+
 func Test_Scan(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
@@ -14,25 +28,15 @@ func Test_Scan(t *testing.T) {
 	_ = appFS.MkdirAll("/f/s", 0755)
 	_ = afero.WriteFile(appFS, "/f/f.txt", []byte("123"), 0644)
 	_ = afero.WriteFile(appFS, "/f/s/f.txt", []byte("1234"), 0644)
-	var folders int
-	var files int
-	h := func(f *ScanEvent) {
-		if f.File != nil {
-			files++
-		}
-		if f.Folder != nil {
-			folders++
-		}
-	}
-	var handlers []ScanHandler
-	handlers = append(handlers, h)
+
+	th := testHandler{}
 
 	// Act
-	Scan("/", appFS, handlers)
+	Scan("/", appFS, &th)
 
 	// Assert
-	ass.Equal(2, files)
-	ass.Equal(3, folders)
+	ass.Equal(2, th.files)
+	ass.Equal(3, th.folders)
 }
 
 type errCloser struct{}

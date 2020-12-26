@@ -31,7 +31,7 @@ func newBenfordFileRenderer(work *benfordFileWorker, order int) renderer {
 	}
 }
 
-func (b *benfordFileWorker) handler(evt *sys.ScanEvent) {
+func (b *benfordFileWorker) Handle(evt *sys.ScanEvent) {
 	s := evt.File.Size
 	for s >= 10 {
 		s = s / 10

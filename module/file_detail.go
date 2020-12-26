@@ -40,7 +40,7 @@ func newDetailFileRenderer(work *detailFileWorker, order int) renderer {
 
 // Worker method
 
-func (m *detailFileWorker) handler(evt *sys.ScanEvent) {
+func (m *detailFileWorker) Handle(evt *sys.ScanEvent) {
 	f := evt.File
 	// Calculate files range statistic
 	for i, r := range m.fileRanges {

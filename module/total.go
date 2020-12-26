@@ -21,7 +21,7 @@ type totalRenderer struct {
 	total *totalInfo
 }
 
-func newTotalFileWorker(ctx *Context) worker {
+func newTotalFileWorker(ctx *Context) sys.Handler {
 	w := totalFileWorker{
 		total: ctx.total,
 	}
@@ -29,7 +29,7 @@ func newTotalFileWorker(ctx *Context) worker {
 	return &w
 }
 
-func newTotalFolderWorker(ctx *Context) worker {
+func newTotalFolderWorker(ctx *Context) sys.Handler {
 	w := totalFolderWorker{
 		total: ctx.total,
 	}
@@ -46,7 +46,7 @@ func newTotalRenderer(ctx *Context, order int) renderer {
 
 // Worker methods
 
-func (m *totalFileWorker) handler(evt *sys.ScanEvent) {
+func (m *totalFileWorker) Handle(evt *sys.ScanEvent) {
 	f := evt.File
 	// Accumulate file statistic
 	m.total.FilesTotal.Count++
@@ -60,7 +60,7 @@ func (m *totalFileWorker) handler(evt *sys.ScanEvent) {
 	m.total.extensions[ext] = a
 }
 
-func (m *totalFolderWorker) handler(*sys.ScanEvent) {
+func (m *totalFolderWorker) Handle(*sys.ScanEvent) {
 	m.total.CountFolders++
 }
 
