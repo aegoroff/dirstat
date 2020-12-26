@@ -100,15 +100,16 @@ func Test_folderHandler(t *testing.T) {
 	_ = afero.WriteFile(appFS, "/f/f.txt", []byte("123"), 0644)
 	_ = afero.WriteFile(appFS, "/f/s/f.txt", []byte("1234"), 0644)
 	ctx := NewContext(2, false, "/")
-	worker := newFoldersHandler(ctx)
-	w := newOnlyFoldersHandler(worker)
+	fc := newFolders(ctx.top)
+	handler := newFoldersHandler(fc, ctx.pd)
+	onlyFiles := newOnlyFoldersHandler(handler)
 
 	// Act
-	sys.Scan("/", appFS, w)
+	sys.Scan("/", appFS, onlyFiles)
 
 	// Assert
-	ass.Equal(int64(2), worker.byCount.Len())
-	ass.Equal(int64(2), worker.bySize.Len())
+	ass.Equal(int64(2), fc.byCount.Len())
+	ass.Equal(int64(2), fc.bySize.Len())
 }
 
 func Test_folderHandler_EmptyFileSystem(t *testing.T) {
@@ -116,15 +117,16 @@ func Test_folderHandler_EmptyFileSystem(t *testing.T) {
 	ass := assert.New(t)
 	appFS := afero.NewMemMapFs()
 	ctx := NewContext(2, false, "/")
-	worker := newFoldersHandler(ctx)
-	w := newOnlyFoldersHandler(worker)
+	fc := newFolders(ctx.top)
+	handler := newFoldersHandler(fc, ctx.pd)
+	onlyFiles := newOnlyFoldersHandler(handler)
 
 	// Act
-	sys.Scan("/", appFS, w)
+	sys.Scan("/", appFS, onlyFiles)
 
 	// Assert
-	ass.Equal(int64(1), worker.byCount.Len())
-	ass.Equal(int64(1), worker.bySize.Len())
+	ass.Equal(int64(1), fc.byCount.Len())
+	ass.Equal(int64(1), fc.bySize.Len())
 }
 
 func Test_ExecuteFoldersModule_WithOutput(t *testing.T) {

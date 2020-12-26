@@ -34,8 +34,9 @@ func Execute(path string, fs afero.Fs, w io.Writer, modules ...Module) {
 
 // NewFoldersModule creates new folders module
 func NewFoldersModule(ctx *Context, order int) Module {
-	handler := newFoldersHandler(ctx)
-	rend := newFoldersRenderer(handler, order)
+	fc := newFolders(ctx.top)
+	handler := newFoldersHandler(fc, ctx.pd)
+	rend := newFoldersRenderer(fc, ctx, order)
 	return newModule(rend, newOnlyFoldersHandler(handler))
 }
 

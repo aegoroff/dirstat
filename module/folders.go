@@ -54,31 +54,41 @@ func (fc *folderC) EqualTo(y rbtree.Comparable) bool  { return fc.count == y.(*f
 func (fs *folderS) LessThan(y rbtree.Comparable) bool { return fs.size < y.(*folderS).size }
 func (fs *folderS) EqualTo(y rbtree.Comparable) bool  { return fs.size == y.(*folderS).size }
 
-type foldersHandler struct {
-	total   *totalInfo
+type folders struct {
 	bySize  rbtree.RbTree
 	byCount rbtree.RbTree
-	pd      decorator
+}
+
+type foldersHandler struct {
+	*folders
+	pd decorator
 }
 
 type foldersRenderer struct {
-	*foldersHandler
+	*folders
 	*baseRenderer
+	total *totalInfo
 }
 
-func newFoldersHandler(ctx *Context) *foldersHandler {
-	return &foldersHandler{
-		total:   ctx.total,
-		bySize:  special.NewMaxTree(int64(ctx.top)),
-		byCount: special.NewMaxTree(int64(ctx.top)),
-		pd:      ctx.pd,
+func newFolders(top int) *folders {
+	return &folders{
+		bySize:  special.NewMaxTree(int64(top)),
+		byCount: special.NewMaxTree(int64(top)),
 	}
 }
 
-func newFoldersRenderer(work *foldersHandler, order int) renderer {
+func newFoldersHandler(fc *folders, pd decorator) *foldersHandler {
+	return &foldersHandler{
+		folders: fc,
+		pd:      pd,
+	}
+}
+
+func newFoldersRenderer(f *folders, ctx *Context, order int) renderer {
 	return &foldersRenderer{
-		foldersHandler: work,
-		baseRenderer:   newBaseRenderer(order),
+		folders:      f,
+		total:        ctx.total,
+		baseRenderer: newBaseRenderer(order),
 	}
 }
 
