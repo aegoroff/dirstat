@@ -64,40 +64,41 @@ const (
 // Scan do specified path scanning and executes folder handler on each folder
 // and all file handlers on each file
 func Scan(path string, fs afero.Fs, handlers ...Handler) {
-	filesystemCh := make(chan *filesystemItem, 1024)
-	go walkDirBreadthFirst(path, fs, filesystemCh)
+	fsEvents := make(chan *filesystemItem, 1024)
+	go walkDirBreadthFirst(path, fs, fsEvents)
 
-	scanChan := make(chan *ScanEvent, 1024)
+	scanEvents := make(chan *ScanEvent, 1024)
 
-	// Reading filesystem events
-	go func() {
-		defer close(scanChan)
-		for item := range filesystemCh {
-			se := ScanEvent{}
-			if item.event == fsEventDir {
-				fe := FileEntry{
-					Size: item.size,
-					Path: item.dir,
-				}
-				se.Folder = &FolderEntry{
-					FileEntry: fe,
-					Count:     item.count,
-				}
-			} else {
-				se.File = &FileEntry{
-					Size: item.size,
-					Path: filepath.Join(item.dir, item.name),
-				}
-			}
-			scanChan <- &se
-		}
-	}()
+	go readFileSystemEvents(fsEvents, scanEvents)
 
 	// Read all files from channel
-	for file := range scanChan {
+	for file := range scanEvents {
 		for _, h := range handlers {
 			h.Handle(file)
 		}
+	}
+}
+
+func readFileSystemEvents(in <-chan *filesystemItem, out chan<- *ScanEvent) {
+	defer close(out)
+	for item := range in {
+		se := ScanEvent{}
+		if item.event == fsEventDir {
+			fe := FileEntry{
+				Size: item.size,
+				Path: item.dir,
+			}
+			se.Folder = &FolderEntry{
+				FileEntry: fe,
+				Count:     item.count,
+			}
+		} else {
+			se.File = &FileEntry{
+				Size: item.size,
+				Path: filepath.Join(item.dir, item.name),
+			}
+		}
+		out <- &se
 	}
 }
 
