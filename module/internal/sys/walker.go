@@ -24,16 +24,12 @@ func newWalker(fs afero.Fs, parallel int) *walker {
 	return bf
 }
 
-func (bf *walker) peek() string {
-	bf.mu.RLock()
-	defer bf.mu.RUnlock()
-	return bf.queue[0]
-}
-
-func (bf *walker) pop() {
+func (bf *walker) pop() string {
 	bf.mu.Lock()
 	bf.mu.Unlock()
+	top := bf.queue[0]
 	bf.queue = bf.queue[1:]
+	return top
 }
 
 func (bf *walker) push(s string) {
