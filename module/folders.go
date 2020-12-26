@@ -54,7 +54,7 @@ func (fc *folderC) EqualTo(y rbtree.Comparable) bool  { return fc.count == y.(*f
 func (fs *folderS) LessThan(y rbtree.Comparable) bool { return fs.size < y.(*folderS).size }
 func (fs *folderS) EqualTo(y rbtree.Comparable) bool  { return fs.size == y.(*folderS).size }
 
-type foldersWorker struct {
+type foldersHandler struct {
 	total   *totalInfo
 	bySize  rbtree.RbTree
 	byCount rbtree.RbTree
@@ -62,12 +62,12 @@ type foldersWorker struct {
 }
 
 type foldersRenderer struct {
-	*foldersWorker
+	*foldersHandler
 	*baseRenderer
 }
 
-func newFoldersWorker(ctx *Context) *foldersWorker {
-	return &foldersWorker{
+func newFoldersHandler(ctx *Context) *foldersHandler {
+	return &foldersHandler{
 		total:   ctx.total,
 		bySize:  special.NewMaxTree(int64(ctx.top)),
 		byCount: special.NewMaxTree(int64(ctx.top)),
@@ -75,16 +75,16 @@ func newFoldersWorker(ctx *Context) *foldersWorker {
 	}
 }
 
-func newFoldersRenderer(work *foldersWorker, order int) renderer {
+func newFoldersRenderer(work *foldersHandler, order int) renderer {
 	return &foldersRenderer{
-		foldersWorker: work,
-		baseRenderer:  newBaseRenderer(order),
+		foldersHandler: work,
+		baseRenderer:   newBaseRenderer(order),
 	}
 }
 
 // Worker method
 
-func (m *foldersWorker) Handle(evt *sys.ScanEvent) {
+func (m *foldersHandler) Handle(evt *sys.ScanEvent) {
 	fe := evt.Folder
 
 	fn := folder{

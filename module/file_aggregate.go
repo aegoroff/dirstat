@@ -6,19 +6,19 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 )
 
-type aggregateFileWorker struct {
+type aggregateFileHandler struct {
 	aggregate  map[Range]fileStat
 	fileRanges ranges
 }
 
 type aggregateFileRenderer struct {
 	*baseRenderer
-	work  *aggregateFileWorker
+	work  *aggregateFileHandler
 	total *totalInfo
 }
 
-func newAggregateFileWorker(rs ranges) *aggregateFileWorker {
-	w := aggregateFileWorker{
+func newAggregateFileHandler(rs ranges) *aggregateFileHandler {
+	w := aggregateFileHandler{
 		aggregate:  make(map[Range]fileStat, len(rs)),
 		fileRanges: rs,
 	}
@@ -26,7 +26,7 @@ func newAggregateFileWorker(rs ranges) *aggregateFileWorker {
 	return &w
 }
 
-func newAggregateFileRenderer(ctx *Context, w *aggregateFileWorker, order int) *aggregateFileRenderer {
+func newAggregateFileRenderer(ctx *Context, w *aggregateFileHandler, order int) *aggregateFileRenderer {
 	return &aggregateFileRenderer{
 		baseRenderer: newBaseRenderer(order),
 		total:        ctx.total,
@@ -36,7 +36,7 @@ func newAggregateFileRenderer(ctx *Context, w *aggregateFileWorker, order int) *
 
 // Worker method
 
-func (m *aggregateFileWorker) Handle(evt *sys.ScanEvent) {
+func (m *aggregateFileHandler) Handle(evt *sys.ScanEvent) {
 	f := evt.File
 	unsignedSize := uint64(f.Size)
 

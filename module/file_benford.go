@@ -6,32 +6,32 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 )
 
-type benfordFileWorker struct {
+type benfordFileHandler struct {
 	distribution []int64
 	total        *totalInfo
 }
 
 type benfordFileRenderer struct {
-	*benfordFileWorker
+	*benfordFileHandler
 	*baseRenderer
 }
 
-func newBenfordFileWorker(ctx *Context) *benfordFileWorker {
-	w := benfordFileWorker{
+func newBenfordFileHandler(ctx *Context) *benfordFileHandler {
+	w := benfordFileHandler{
 		distribution: []int64{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		total:        ctx.total,
 	}
 	return &w
 }
 
-func newBenfordFileRenderer(work *benfordFileWorker, order int) renderer {
+func newBenfordFileRenderer(work *benfordFileHandler, order int) renderer {
 	return &benfordFileRenderer{
-		baseRenderer:      newBaseRenderer(order),
-		benfordFileWorker: work,
+		baseRenderer:       newBaseRenderer(order),
+		benfordFileHandler: work,
 	}
 }
 
-func (b *benfordFileWorker) Handle(evt *sys.ScanEvent) {
+func (b *benfordFileHandler) Handle(evt *sys.ScanEvent) {
 	s := evt.File.Size
 	for s >= 10 {
 		s = s / 10

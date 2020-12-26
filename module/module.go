@@ -34,7 +34,7 @@ func Execute(path string, fs afero.Fs, w io.Writer, modules ...Module) {
 
 // NewFoldersModule creates new folders module
 func NewFoldersModule(ctx *Context, order int) Module {
-	work := newFoldersWorker(ctx)
+	work := newFoldersHandler(ctx)
 	rend := newFoldersRenderer(work, order)
 	return newModule(rend, newOnlyFoldersWorker(work))
 }
@@ -54,7 +54,7 @@ func NewDetailFileModule(ctx *Context, order int, enabledRanges []int) Module {
 	if len(enabledRanges) == 0 {
 		return newVoidModule()
 	}
-	work := newDetailFileWorker(newRanges(), enabledRanges, ctx.pd)
+	work := newDetailFileHandler(newRanges(), enabledRanges, ctx.pd)
 	rend := newDetailFileRenderer(work, order)
 
 	m := newModule(rend, newOnlyFilesWorker(work))
@@ -63,7 +63,7 @@ func NewDetailFileModule(ctx *Context, order int, enabledRanges []int) Module {
 
 // NewBenfordFileModule creates new file size bendford statistic
 func NewBenfordFileModule(ctx *Context, order int) Module {
-	work := newBenfordFileWorker(ctx)
+	work := newBenfordFileHandler(ctx)
 	rend := newBenfordFileRenderer(work, order)
 
 	m := newModule(rend, newOnlyFilesWorker(work))
@@ -79,7 +79,7 @@ func NewExtensionModule(ctx *Context, order int) Module {
 
 // NewAggregateFileModule creates new total file statistic module
 func NewAggregateFileModule(ctx *Context, order int) Module {
-	work := newAggregateFileWorker(newRanges())
+	work := newAggregateFileHandler(newRanges())
 	rend := newAggregateFileRenderer(ctx, work, order)
 
 	m := newModule(rend, newOnlyFilesWorker(work))

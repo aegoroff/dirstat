@@ -8,11 +8,11 @@ import (
 	"text/template"
 )
 
-type totalFileWorker struct {
+type totalFileHandler struct {
 	total *totalInfo
 }
 
-type totalFolderWorker struct {
+type totalFolderHandler struct {
 	total *totalInfo
 }
 
@@ -22,7 +22,7 @@ type totalRenderer struct {
 }
 
 func newTotalFileWorker(ctx *Context) sys.Handler {
-	w := totalFileWorker{
+	w := totalFileHandler{
 		total: ctx.total,
 	}
 
@@ -30,7 +30,7 @@ func newTotalFileWorker(ctx *Context) sys.Handler {
 }
 
 func newTotalFolderWorker(ctx *Context) sys.Handler {
-	w := totalFolderWorker{
+	w := totalFolderHandler{
 		total: ctx.total,
 	}
 
@@ -46,7 +46,7 @@ func newTotalRenderer(ctx *Context, order int) renderer {
 
 // Worker methods
 
-func (m *totalFileWorker) Handle(evt *sys.ScanEvent) {
+func (m *totalFileHandler) Handle(evt *sys.ScanEvent) {
 	f := evt.File
 	// Accumulate file statistic
 	m.total.FilesTotal.Count++
@@ -60,7 +60,7 @@ func (m *totalFileWorker) Handle(evt *sys.ScanEvent) {
 	m.total.extensions[ext] = a
 }
 
-func (m *totalFolderWorker) Handle(*sys.ScanEvent) {
+func (m *totalFolderHandler) Handle(*sys.ScanEvent) {
 	m.total.CountFolders++
 }
 

@@ -6,7 +6,7 @@ import (
 	"sort"
 )
 
-type detailFileWorker struct {
+type detailFileHandler struct {
 	distribution map[Range]files
 	enabled      c9s.IntHashSet
 	fileRanges   ranges
@@ -14,14 +14,14 @@ type detailFileWorker struct {
 }
 
 type detailFileRenderer struct {
-	*detailFileWorker
+	*detailFileHandler
 	*baseRenderer
 }
 
-func newDetailFileWorker(rs ranges, enabledRanges []int, pd decorator) *detailFileWorker {
+func newDetailFileHandler(rs ranges, enabledRanges []int, pd decorator) *detailFileHandler {
 	er := make(c9s.IntHashSet)
 	er.AddRange(enabledRanges...)
-	w := detailFileWorker{
+	w := detailFileHandler{
 		enabled:      er,
 		distribution: make(map[Range]files, len(rs)),
 		fileRanges:   rs,
@@ -31,16 +31,16 @@ func newDetailFileWorker(rs ranges, enabledRanges []int, pd decorator) *detailFi
 	return &w
 }
 
-func newDetailFileRenderer(work *detailFileWorker, order int) renderer {
+func newDetailFileRenderer(work *detailFileHandler, order int) renderer {
 	return &detailFileRenderer{
-		detailFileWorker: work,
-		baseRenderer:     newBaseRenderer(order),
+		detailFileHandler: work,
+		baseRenderer:      newBaseRenderer(order),
 	}
 }
 
 // Worker method
 
-func (m *detailFileWorker) Handle(evt *sys.ScanEvent) {
+func (m *detailFileHandler) Handle(evt *sys.ScanEvent) {
 	f := evt.File
 	// Calculate files range statistic
 	for i, r := range m.fileRanges {
