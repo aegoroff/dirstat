@@ -40,7 +40,7 @@ type FolderEntry struct {
 	Count int64
 }
 
-type breadthFirst struct {
+type walker struct {
 	fs         afero.Fs
 	wg         sync.WaitGroup
 	mu         sync.RWMutex
@@ -73,7 +73,7 @@ const (
 // and all file handlers on each file
 func Scan(path string, fs afero.Fs, handlers ...Handler) {
 	fsEvents := make(chan *filesystemItem, 1024)
-	go walkDirBreadthFirst(path, fs, fsEvents)
+	go walkBreadthFirst(path, fs, fsEvents)
 
 	scanEvents := make(chan *ScanEvent, 1024)
 
@@ -92,28 +92,35 @@ func readFileSystemEvents(in <-chan *filesystemItem, out chan<- *ScanEvent) {
 	for item := range in {
 		se := ScanEvent{}
 		if item.event == fsEventDir {
-			fe := FileEntry{
-				Size: item.size,
-				Path: item.dir,
-			}
-			se.Folder = &FolderEntry{
-				FileEntry: fe,
-				Count:     item.count,
-			}
+			se.Folder = newFolderEntry(item)
 		} else {
-			se.File = &FileEntry{
-				Size: item.size,
-				Path: filepath.Join(item.dir, item.name),
-			}
+			se.File = newFileEntry(item)
 		}
 		out <- &se
 	}
 }
 
-func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- *filesystemItem) {
+func newFileEntry(item *filesystemItem) *FileEntry {
+	return &FileEntry{
+		Size: item.size,
+		Path: filepath.Join(item.dir, item.name),
+	}
+}
+
+func newFolderEntry(item *filesystemItem) *FolderEntry {
+	return &FolderEntry{
+		FileEntry: FileEntry{
+			Size: item.size,
+			Path: item.dir,
+		},
+		Count: item.count,
+	}
+}
+
+func walkBreadthFirst(path string, fs afero.Fs, results chan<- *filesystemItem) {
 	defer close(results)
 
-	bf := newBreadthFirst(fs, 32)
+	bf := newWalker(fs, 32)
 	defer close(bf.restrictor)
 
 	bf.push(path)
@@ -137,8 +144,8 @@ func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- *filesystemIte
 	}
 }
 
-func newBreadthFirst(fs afero.Fs, parallel int) *breadthFirst {
-	bf := &breadthFirst{
+func newWalker(fs afero.Fs, parallel int) *walker {
+	bf := &walker{
 		fs:         fs,
 		queue:      make([]string, 0),
 		restrictor: make(chan struct{}, parallel),
@@ -146,36 +153,36 @@ func newBreadthFirst(fs afero.Fs, parallel int) *breadthFirst {
 	return bf
 }
 
-func (bf *breadthFirst) peek() string {
+func (bf *walker) peek() string {
 	bf.mu.RLock()
 	defer bf.mu.RUnlock()
 	return bf.queue[0]
 }
 
-func (bf *breadthFirst) pop() int {
+func (bf *walker) pop() int {
 	bf.mu.Lock()
 	bf.mu.Unlock()
 	bf.queue = bf.queue[1:]
 	return len(bf.queue)
 }
 
-func (bf *breadthFirst) push(s string) {
+func (bf *walker) push(s string) {
 	bf.mu.Lock()
 	bf.queue = append(bf.queue, s)
 	bf.mu.Unlock()
 }
 
-func (bf *breadthFirst) len() int {
+func (bf *walker) len() int {
 	bf.mu.RLock()
 	defer bf.mu.RUnlock()
 	return len(bf.queue)
 }
 
-func (bf *breadthFirst) wait() {
+func (bf *walker) wait() {
 	bf.wg.Wait()
 }
 
-func (bf *breadthFirst) walk(d string, results chan<- *filesystemItem) {
+func (bf *walker) walk(d string, results chan<- *filesystemItem) {
 	defer bf.wg.Done()
 
 	entries := bf.readdir(d)
@@ -214,7 +221,7 @@ func (bf *breadthFirst) walk(d string, results chan<- *filesystemItem) {
 	results <- &dirEvent
 }
 
-func (bf *breadthFirst) readdir(path string) []*filesysEntry {
+func (bf *walker) readdir(path string) []*filesysEntry {
 	bf.restrictor <- struct{}{}
 	defer func() { <-bf.restrictor }()
 	f, err := bf.fs.Open(path)
