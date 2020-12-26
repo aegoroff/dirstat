@@ -2,33 +2,33 @@ package module
 
 import "dirstat/module/internal/sys"
 
-type onlyFilesWorker struct {
+type onlyFilesHandler struct {
 	h sys.Handler
 }
 
-type onlyFoldersWorker struct {
+type onlyFoldersHandler struct {
 	h sys.Handler
 }
 
-func newOnlyFilesWorker(h sys.Handler) sys.Handler {
-	return &onlyFilesWorker{
+func newOnlyFilesHandler(h sys.Handler) sys.Handler {
+	return &onlyFilesHandler{
 		h: h,
 	}
 }
 
-func newOnlyFoldersWorker(h sys.Handler) sys.Handler {
-	return &onlyFoldersWorker{
+func newOnlyFoldersHandler(h sys.Handler) sys.Handler {
+	return &onlyFoldersHandler{
 		h: h,
 	}
 }
 
-func (f *onlyFilesWorker) Handle(evt *sys.ScanEvent) {
+func (f *onlyFilesHandler) Handle(evt *sys.ScanEvent) {
 	if evt.File != nil {
 		f.h.Handle(evt)
 	}
 }
 
-func (f *onlyFoldersWorker) Handle(evt *sys.ScanEvent) {
+func (f *onlyFoldersHandler) Handle(evt *sys.ScanEvent) {
 	if evt.Folder != nil {
 		f.h.Handle(evt)
 	}
