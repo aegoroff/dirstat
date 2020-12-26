@@ -64,8 +64,9 @@ func NewDetailFileModule(ctx *Context, order int, enabledRanges []int) Module {
 
 // NewBenfordFileModule creates new file size bendford statistic
 func NewBenfordFileModule(ctx *Context, order int) Module {
-	handler := newBenfordFileHandler(ctx)
-	rend := newBenfordFileRenderer(handler, order)
+	bf := newBenfordFile()
+	handler := newBenfordFileHandler(bf)
+	rend := newBenfordFileRenderer(ctx, bf, order)
 
 	m := newModule(rend, newOnlyFilesHandler(handler))
 	return m

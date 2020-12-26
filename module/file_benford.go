@@ -6,28 +6,35 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 )
 
-type benfordFileHandler struct {
+type benfordFile struct {
 	distribution []int64
-	total        *totalInfo
+}
+
+type benfordFileHandler struct {
+	*benfordFile
 }
 
 type benfordFileRenderer struct {
-	*benfordFileHandler
 	*baseRenderer
+	*benfordFile
+	total *totalInfo
 }
 
-func newBenfordFileHandler(ctx *Context) *benfordFileHandler {
-	w := benfordFileHandler{
+func newBenfordFile() *benfordFile {
+	return &benfordFile{
 		distribution: []int64{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		total:        ctx.total,
 	}
-	return &w
 }
 
-func newBenfordFileRenderer(work *benfordFileHandler, order int) renderer {
+func newBenfordFileHandler(bf *benfordFile) sys.Handler {
+	return &benfordFileHandler{bf}
+}
+
+func newBenfordFileRenderer(ctx *Context, bf *benfordFile, order int) renderer {
 	return &benfordFileRenderer{
-		baseRenderer:       newBaseRenderer(order),
-		benfordFileHandler: work,
+		baseRenderer: newBaseRenderer(order),
+		benfordFile:  bf,
+		total:        ctx.total,
 	}
 }
 
