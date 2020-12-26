@@ -77,7 +77,7 @@ func newFolders(top int) *folders {
 	}
 }
 
-func newFoldersHandler(fc *folders, pd decorator) *foldersHandler {
+func newFoldersHandler(fc *folders, pd decorator) sys.Handler {
 	return &foldersHandler{
 		folders: fc,
 		pd:      pd,
