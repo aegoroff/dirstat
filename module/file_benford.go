@@ -27,7 +27,7 @@ func newBenfordFile() *benfordFile {
 }
 
 func newBenfordFileHandler(bf *benfordFile) sys.Handler {
-	return &benfordFileHandler{bf}
+	return newOnlyFilesHandler(&benfordFileHandler{bf})
 }
 
 func newBenfordFileRenderer(ctx *Context, bf *benfordFile, order int) renderer {

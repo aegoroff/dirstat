@@ -78,10 +78,11 @@ func newFolders(top int) *folders {
 }
 
 func newFoldersHandler(fc *folders, pd decorator) sys.Handler {
-	return &foldersHandler{
+	h := &foldersHandler{
 		folders: fc,
 		pd:      pd,
 	}
+	return newOnlyFoldersHandler(h)
 }
 
 func newFoldersRenderer(f *folders, ctx *Context, order int) renderer {

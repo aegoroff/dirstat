@@ -28,8 +28,8 @@ func newAggregateFile(rs ranges) *aggregateFile {
 	}
 }
 
-func newAggregateFileHandler(af *aggregateFile) *aggregateFileHandler {
-	return &aggregateFileHandler{af}
+func newAggregateFileHandler(af *aggregateFile) sys.Handler {
+	return newOnlyFilesHandler(&aggregateFileHandler{af})
 }
 
 func newAggregateFileRenderer(ctx *Context, af *aggregateFile, order int) *aggregateFileRenderer {

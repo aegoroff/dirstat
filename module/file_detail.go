@@ -40,7 +40,7 @@ func newDetailFileHandler(details *detailsFile, enabledRanges []int, pd decorato
 		pd:          pd,
 	}
 
-	return &w
+	return newOnlyFilesHandler(&w)
 }
 
 func newDetailFileRenderer(details *detailsFile, order int) renderer {

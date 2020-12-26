@@ -37,7 +37,7 @@ func NewFoldersModule(ctx *Context, order int) Module {
 	fc := newFolders(ctx.top)
 	handler := newFoldersHandler(fc, ctx.pd)
 	rend := newFoldersRenderer(fc, ctx, order)
-	return newModule(rend, newOnlyFoldersHandler(handler))
+	return newModule(rend, handler)
 }
 
 // NewTopFilesModule creates new top files statistic module
@@ -46,7 +46,7 @@ func NewTopFilesModule(ctx *Context, order int) Module {
 	handler := newTopFilesHandler(tf, ctx.pd)
 	rend := newTopFilesRenderer(tf, order)
 
-	m := newModule(rend, newOnlyFilesHandler(handler))
+	m := newModule(rend, handler)
 	return m
 }
 
@@ -60,7 +60,7 @@ func NewDetailFileModule(ctx *Context, order int, enabledRanges []int) Module {
 	handler := newDetailFileHandler(details, enabledRanges, ctx.pd)
 	rend := newDetailFileRenderer(details, order)
 
-	m := newModule(rend, newOnlyFilesHandler(handler))
+	m := newModule(rend, handler)
 	return m
 }
 
@@ -70,7 +70,7 @@ func NewBenfordFileModule(ctx *Context, order int) Module {
 	handler := newBenfordFileHandler(bf)
 	rend := newBenfordFileRenderer(ctx, bf, order)
 
-	m := newModule(rend, newOnlyFilesHandler(handler))
+	m := newModule(rend, handler)
 	return m
 }
 
@@ -87,7 +87,7 @@ func NewAggregateFileModule(ctx *Context, order int) Module {
 	handler := newAggregateFileHandler(af)
 	rend := newAggregateFileRenderer(ctx, af, order)
 
-	m := newModule(rend, newOnlyFilesHandler(handler))
+	m := newModule(rend, handler)
 	return m
 }
 
@@ -97,7 +97,7 @@ func NewTotalModule(ctx *Context, order int) Module {
 	fo := newTotalFolderHandler(ctx)
 	rend := newTotalRenderer(ctx, order)
 
-	m := newModule(rend, newOnlyFilesHandler(fi), newOnlyFoldersHandler(fo))
+	m := newModule(rend, fi, fo)
 	return m
 }
 

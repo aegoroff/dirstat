@@ -29,10 +29,11 @@ func newTopFiles(top int) *topFiles {
 }
 
 func newTopFilesHandler(tf *topFiles, pd decorator) sys.Handler {
-	return &topFilesHandler{
+	h := &topFilesHandler{
 		topFiles: tf,
 		pd:       pd,
 	}
+	return newOnlyFilesHandler(h)
 }
 
 func newTopFilesRenderer(tf *topFiles, order int) renderer {

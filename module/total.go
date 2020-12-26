@@ -26,7 +26,7 @@ func newTotalFileHandler(ctx *Context) sys.Handler {
 		total: ctx.total,
 	}
 
-	return &w
+	return newOnlyFilesHandler(&w)
 }
 
 func newTotalFolderHandler(ctx *Context) sys.Handler {
@@ -34,7 +34,7 @@ func newTotalFolderHandler(ctx *Context) sys.Handler {
 		total: ctx.total,
 	}
 
-	return &w
+	return newOnlyFoldersHandler(&w)
 }
 
 func newTotalRenderer(ctx *Context, order int) renderer {
