@@ -6,31 +6,37 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 )
 
-type aggregateFileHandler struct {
+type aggregateFile struct {
 	aggregate  map[Range]fileStat
 	fileRanges ranges
 }
 
+type aggregateFileHandler struct {
+	*aggregateFile
+}
+
 type aggregateFileRenderer struct {
 	*baseRenderer
-	work  *aggregateFileHandler
+	*aggregateFile
 	total *totalInfo
 }
 
-func newAggregateFileHandler(rs ranges) *aggregateFileHandler {
-	w := aggregateFileHandler{
+func newAggregateFile(rs ranges) *aggregateFile {
+	return &aggregateFile{
 		aggregate:  make(map[Range]fileStat, len(rs)),
 		fileRanges: rs,
 	}
-
-	return &w
 }
 
-func newAggregateFileRenderer(ctx *Context, w *aggregateFileHandler, order int) *aggregateFileRenderer {
+func newAggregateFileHandler(af *aggregateFile) *aggregateFileHandler {
+	return &aggregateFileHandler{af}
+}
+
+func newAggregateFileRenderer(ctx *Context, af *aggregateFile, order int) *aggregateFileRenderer {
 	return &aggregateFileRenderer{
-		baseRenderer: newBaseRenderer(order),
-		total:        ctx.total,
-		work:         w,
+		baseRenderer:  newBaseRenderer(order),
+		total:         ctx.total,
+		aggregateFile: af,
 	}
 }
 
@@ -71,10 +77,10 @@ func (m *aggregateFileRenderer) print(p printer) {
 
 	appendHeaders([]string{"#", "File size", "Amount", "%", "Size", "%"}, tab)
 
-	heads := m.work.fileRanges.heads(transparentDecorator)
-	for i, r := range m.work.fileRanges {
-		count := m.work.aggregate[r].TotalFilesCount
-		sz := m.work.aggregate[r].TotalFilesSize
+	heads := m.fileRanges.heads(transparentDecorator)
+	for i, r := range m.fileRanges {
+		count := m.aggregate[r].TotalFilesCount
+		sz := m.aggregate[r].TotalFilesSize
 
 		percentOfCount := m.total.countPercent(count)
 		percentOfSize := m.total.sizePercent(sz)

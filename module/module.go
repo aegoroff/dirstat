@@ -81,8 +81,9 @@ func NewExtensionModule(ctx *Context, order int) Module {
 
 // NewAggregateFileModule creates new total file statistic module
 func NewAggregateFileModule(ctx *Context, order int) Module {
-	handler := newAggregateFileHandler(newRanges())
-	rend := newAggregateFileRenderer(ctx, handler, order)
+	af := newAggregateFile(newRanges())
+	handler := newAggregateFileHandler(af)
+	rend := newAggregateFileRenderer(ctx, af, order)
 
 	m := newModule(rend, newOnlyFilesHandler(handler))
 	return m
