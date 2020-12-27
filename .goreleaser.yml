@@ -58,6 +58,7 @@ brews:
     commit_author:
       name: "Alexander Egorov"
       email: "egoroff@gmail.com"
+    folder: Formula
     test: |
       assert_match version.to_s, shell_output("#{bin}/dirstat ver")
     homepage: "https://github.com/aegoroff/dirstat"
