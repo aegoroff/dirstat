@@ -1,7 +1,7 @@
 package module
 
 import (
-	"dirstat/module/internal/sys"
+	"github.com/aegoroff/dirstat/module/internal/sys"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 )

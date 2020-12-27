@@ -2,7 +2,7 @@ package module
 
 import (
 	"bytes"
-	"dirstat/module/internal/sys"
+	"github.com/aegoroff/dirstat/module/internal/sys"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/aegoroff/godatastruct/rbtree/special"
 	"github.com/spf13/afero"

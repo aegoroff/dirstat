@@ -1,7 +1,7 @@
 package module
 
 import (
-	"dirstat/module/internal/sys"
+	"github.com/aegoroff/dirstat/module/internal/sys"
 	"github.com/spf13/afero"
 	"io"
 )

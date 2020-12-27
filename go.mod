@@ -1,4 +1,4 @@
-module dirstat
+module github.com/aegoroff/dirstat
 
 go 1.15
 

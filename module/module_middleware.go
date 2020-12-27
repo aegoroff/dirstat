@@ -1,6 +1,6 @@
 package module
 
-import "dirstat/module/internal/sys"
+import "github.com/aegoroff/dirstat/module/internal/sys"
 
 type onlyFilesHandler struct {
 	h sys.Handler

@@ -1,7 +1,7 @@
 package module
 
 import (
-	"dirstat/module/internal/sys"
+	"github.com/aegoroff/dirstat/module/internal/sys"
 	"github.com/dustin/go-humanize"
 	"github.com/gookit/color"
 	"path/filepath"

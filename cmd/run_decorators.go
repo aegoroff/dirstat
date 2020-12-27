@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"dirstat/module"
+	"github.com/aegoroff/dirstat/module"
 	"github.com/dustin/go-humanize"
 	"github.com/gookit/color"
 	"github.com/spf13/afero"

@@ -1,9 +1,9 @@
 package module
 
 import (
-	"dirstat/module/internal/sys"
 	"errors"
 	"fmt"
+	"github.com/aegoroff/dirstat/module/internal/sys"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/aegoroff/godatastruct/rbtree/special"
 	"github.com/jedib0t/go-pretty/v6/table"
