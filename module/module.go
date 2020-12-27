@@ -1,14 +1,14 @@
 package module
 
 import (
-	"github.com/aegoroff/dirstat/module/internal/sys"
+	"github.com/aegoroff/dirstat/scan"
 	"github.com/spf13/afero"
 	"io"
 )
 
 // Module defines working modules interface
 type Module interface {
-	handlers() []sys.Handler
+	handlers() []scan.Handler
 	renderers() []renderer
 }
 
@@ -20,14 +20,14 @@ type renderer interface {
 // Execute runs modules over path specified
 func Execute(path string, fs afero.Fs, w io.Writer, modules ...Module) {
 	var renderers []renderer
-	var handlers []sys.Handler
+	var handlers []scan.Handler
 
 	for _, m := range modules {
 		renderers = append(renderers, m.renderers()...)
 		handlers = append(handlers, m.handlers()...)
 	}
 
-	sys.Scan(path, fs, handlers...)
+	scan.Scan(path, fs, handlers...)
 
 	render(w, renderers)
 }
@@ -102,11 +102,11 @@ func NewTotalModule(ctx *Context, order int) Module {
 }
 
 type module struct {
-	hlers []sys.Handler
+	hlers []scan.Handler
 	rnd   []renderer
 }
 
-func (m *module) handlers() []sys.Handler {
+func (m *module) handlers() []scan.Handler {
 	return m.hlers
 }
 
@@ -117,14 +117,14 @@ func (m *module) renderers() []renderer {
 // newVoidModule creates module that do nothing
 func newVoidModule() Module {
 	return &module{
-		[]sys.Handler{},
+		[]scan.Handler{},
 		[]renderer{},
 	}
 }
 
-func newModule(r renderer, handlers ...sys.Handler) Module {
+func newModule(r renderer, handlers ...scan.Handler) Module {
 	m := module{
-		[]sys.Handler{},
+		[]scan.Handler{},
 		[]renderer{r},
 	}
 	m.hlers = append(m.hlers, handlers...)

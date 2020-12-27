@@ -1,4 +1,4 @@
-package sys
+package scan
 
 import (
 	"github.com/spf13/afero"

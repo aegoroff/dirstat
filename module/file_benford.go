@@ -1,7 +1,7 @@
 package module
 
 import (
-	"github.com/aegoroff/dirstat/module/internal/sys"
+	"github.com/aegoroff/dirstat/scan"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 )
@@ -26,7 +26,7 @@ func newBenfordFile() *benfordFile {
 	}
 }
 
-func newBenfordFileHandler(bf *benfordFile) sys.Handler {
+func newBenfordFileHandler(bf *benfordFile) scan.Handler {
 	return newOnlyFilesHandler(&benfordFileHandler{bf})
 }
 
@@ -38,7 +38,7 @@ func newBenfordFileRenderer(ctx *Context, bf *benfordFile, order int) renderer {
 	}
 }
 
-func (b *benfordFileHandler) Handle(evt *sys.ScanEvent) {
+func (b *benfordFileHandler) Handle(evt *scan.ScanEvent) {
 	s := evt.File.Size
 	for s >= 10 {
 		s = s / 10

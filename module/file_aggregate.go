@@ -1,7 +1,7 @@
 package module
 
 import (
-	"github.com/aegoroff/dirstat/module/internal/sys"
+	"github.com/aegoroff/dirstat/scan"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 )
@@ -28,7 +28,7 @@ func newAggregateFile(rs ranges) *aggregateFile {
 	}
 }
 
-func newAggregateFileHandler(af *aggregateFile) sys.Handler {
+func newAggregateFileHandler(af *aggregateFile) scan.Handler {
 	return newOnlyFilesHandler(&aggregateFileHandler{af})
 }
 
@@ -42,7 +42,7 @@ func newAggregateFileRenderer(ctx *Context, af *aggregateFile, order int) *aggre
 
 // Worker method
 
-func (m *aggregateFileHandler) Handle(evt *sys.ScanEvent) {
+func (m *aggregateFileHandler) Handle(evt *scan.ScanEvent) {
 	f := evt.File
 	unsignedSize := uint64(f.Size)
 

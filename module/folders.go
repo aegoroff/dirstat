@@ -3,7 +3,7 @@ package module
 import (
 	"errors"
 	"fmt"
-	"github.com/aegoroff/dirstat/module/internal/sys"
+	"github.com/aegoroff/dirstat/scan"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/aegoroff/godatastruct/rbtree/special"
 	"github.com/jedib0t/go-pretty/v6/table"
@@ -77,7 +77,7 @@ func newFolders(top int) *folders {
 	}
 }
 
-func newFoldersHandler(fc *folders, pd decorator) sys.Handler {
+func newFoldersHandler(fc *folders, pd decorator) scan.Handler {
 	h := &foldersHandler{
 		folders: fc,
 		pd:      pd,
@@ -95,7 +95,7 @@ func newFoldersRenderer(f *folders, ctx *Context, order int) renderer {
 
 // Worker method
 
-func (m *foldersHandler) Handle(evt *sys.ScanEvent) {
+func (m *foldersHandler) Handle(evt *scan.ScanEvent) {
 	fe := evt.Folder
 
 	fn := folder{

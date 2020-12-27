@@ -1,7 +1,7 @@
 package module
 
 import (
-	"github.com/aegoroff/dirstat/module/internal/sys"
+	"github.com/aegoroff/dirstat/scan"
 	"github.com/dustin/go-humanize"
 	"github.com/gookit/color"
 	"path/filepath"
@@ -21,7 +21,7 @@ type totalRenderer struct {
 	total *totalInfo
 }
 
-func newTotalFileHandler(ctx *Context) sys.Handler {
+func newTotalFileHandler(ctx *Context) scan.Handler {
 	w := totalFileHandler{
 		total: ctx.total,
 	}
@@ -29,7 +29,7 @@ func newTotalFileHandler(ctx *Context) sys.Handler {
 	return newOnlyFilesHandler(&w)
 }
 
-func newTotalFolderHandler(ctx *Context) sys.Handler {
+func newTotalFolderHandler(ctx *Context) scan.Handler {
 	w := totalFolderHandler{
 		total: ctx.total,
 	}
@@ -46,7 +46,7 @@ func newTotalRenderer(ctx *Context, order int) renderer {
 
 // Worker methods
 
-func (m *totalFileHandler) Handle(evt *sys.ScanEvent) {
+func (m *totalFileHandler) Handle(evt *scan.ScanEvent) {
 	f := evt.File
 	// Accumulate file statistic
 	m.total.FilesTotal.Count++
@@ -60,7 +60,7 @@ func (m *totalFileHandler) Handle(evt *sys.ScanEvent) {
 	m.total.extensions[ext] = a
 }
 
-func (m *totalFolderHandler) Handle(*sys.ScanEvent) {
+func (m *totalFolderHandler) Handle(*scan.ScanEvent) {
 	m.total.CountFolders++
 }
 

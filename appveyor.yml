@@ -32,7 +32,7 @@ build_script:
   - gox -osarch="linux/amd64 linux/arm linux/arm64 darwin/amd64 windows/amd64" -ldflags "-s -w -X dirstat/cmd.Version=%APPVEYOR_BUILD_VERSION%" dirstat
 
 test_script:
-  - go test -coverprofile=coverage.txt -coverpkg dirstat/cmd,dirstat/module/internal/sys,dirstat/module -covermode=atomic dirstat/...
+  - go test -coverprofile=coverage.txt -coverpkg github.com/aegoroff/dirstat/cmd,github.com/aegoroff/dirstat/scan,github.com/aegoroff/dirstat/module -covermode=atomic dirstat/...
 
 after_test:
   - ps: |

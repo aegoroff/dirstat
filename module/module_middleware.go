@@ -1,34 +1,34 @@
 package module
 
-import "github.com/aegoroff/dirstat/module/internal/sys"
+import "github.com/aegoroff/dirstat/scan"
 
 type onlyFilesHandler struct {
-	h sys.Handler
+	h scan.Handler
 }
 
 type onlyFoldersHandler struct {
-	h sys.Handler
+	h scan.Handler
 }
 
-func newOnlyFilesHandler(h sys.Handler) sys.Handler {
+func newOnlyFilesHandler(h scan.Handler) scan.Handler {
 	return &onlyFilesHandler{
 		h: h,
 	}
 }
 
-func newOnlyFoldersHandler(h sys.Handler) sys.Handler {
+func newOnlyFoldersHandler(h scan.Handler) scan.Handler {
 	return &onlyFoldersHandler{
 		h: h,
 	}
 }
 
-func (f *onlyFilesHandler) Handle(evt *sys.ScanEvent) {
+func (f *onlyFilesHandler) Handle(evt *scan.ScanEvent) {
 	if evt.File != nil {
 		f.h.Handle(evt)
 	}
 }
 
-func (f *onlyFoldersHandler) Handle(evt *sys.ScanEvent) {
+func (f *onlyFoldersHandler) Handle(evt *scan.ScanEvent) {
 	if evt.Folder != nil {
 		f.h.Handle(evt)
 	}

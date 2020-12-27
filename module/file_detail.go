@@ -1,7 +1,7 @@
 package module
 
 import (
-	"github.com/aegoroff/dirstat/module/internal/sys"
+	"github.com/aegoroff/dirstat/scan"
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"sort"
 )
@@ -31,7 +31,7 @@ func newDetailsFile(rs ranges) *detailsFile {
 	return &w
 }
 
-func newDetailFileHandler(details *detailsFile, enabledRanges []int, pd decorator) sys.Handler {
+func newDetailFileHandler(details *detailsFile, enabledRanges []int, pd decorator) scan.Handler {
 	er := make(c9s.IntHashSet)
 	er.AddRange(enabledRanges...)
 	w := detailFileHandler{
@@ -52,7 +52,7 @@ func newDetailFileRenderer(details *detailsFile, order int) renderer {
 
 // Worker method
 
-func (m *detailFileHandler) Handle(evt *sys.ScanEvent) {
+func (m *detailFileHandler) Handle(evt *scan.ScanEvent) {
 	f := evt.File
 	// Calculate files range statistic
 	for i, r := range m.fileRanges {

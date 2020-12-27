@@ -1,7 +1,7 @@
 package module
 
 import (
-	"github.com/aegoroff/dirstat/module/internal/sys"
+	"github.com/aegoroff/dirstat/scan"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/aegoroff/godatastruct/rbtree/special"
 	"github.com/jedib0t/go-pretty/v6/table"
@@ -28,7 +28,7 @@ func newTopFiles(top int) *topFiles {
 	}
 }
 
-func newTopFilesHandler(tf *topFiles, pd decorator) sys.Handler {
+func newTopFilesHandler(tf *topFiles, pd decorator) scan.Handler {
 	h := &topFilesHandler{
 		topFiles: tf,
 		pd:       pd,
@@ -47,7 +47,7 @@ func newTopFilesRenderer(tf *topFiles, order int) renderer {
 
 // Worker method
 
-func (m *topFilesHandler) Handle(evt *sys.ScanEvent) {
+func (m *topFilesHandler) Handle(evt *scan.ScanEvent) {
 	f := evt.File
 	fc := file{size: f.Size, path: f.Path, pd: m.pd}
 	m.tree.Insert(&fc)

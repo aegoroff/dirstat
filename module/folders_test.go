@@ -2,7 +2,7 @@ package module
 
 import (
 	"bytes"
-	"github.com/aegoroff/dirstat/module/internal/sys"
+	"github.com/aegoroff/dirstat/scan"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/aegoroff/godatastruct/rbtree/special"
 	"github.com/spf13/afero"
@@ -105,7 +105,7 @@ func Test_folderHandler(t *testing.T) {
 	onlyFiles := newOnlyFoldersHandler(handler)
 
 	// Act
-	sys.Scan("/", appFS, onlyFiles)
+	scan.Scan("/", appFS, onlyFiles)
 
 	// Assert
 	ass.Equal(int64(2), fc.byCount.Len())
@@ -122,7 +122,7 @@ func Test_folderHandler_EmptyFileSystem(t *testing.T) {
 	onlyFiles := newOnlyFoldersHandler(handler)
 
 	// Act
-	sys.Scan("/", appFS, onlyFiles)
+	scan.Scan("/", appFS, onlyFiles)
 
 	// Assert
 	ass.Equal(int64(1), fc.byCount.Len())
