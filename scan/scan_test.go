@@ -1,7 +1,6 @@
 package scan
 
 import (
-	"errors"
 	"fmt"
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/afero"
@@ -111,20 +110,4 @@ func Test_Scan_ManyData(t *testing.T) {
 			fmt.Printf("%s :%d\n", k, v)
 		}
 	}
-}
-
-type errCloser struct{}
-
-func (e *errCloser) Close() error {
-	return errors.New("new error")
-}
-
-func Test_Close_ThatReturnsError(t *testing.T) {
-	// Arrange
-	ec := &errCloser{}
-
-	// Act
-	Close(ec)
-
-	// Assert
 }
