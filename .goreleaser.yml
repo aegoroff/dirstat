@@ -54,13 +54,12 @@ brews:
     goarm: 7
     tap:
       owner: aegoroff
-      name: homebrew-core
+      name: homebrew-tap
     commit_author:
       name: "Alexander Egorov"
       email: "egoroff@gmail.com"
-    folder: Formula
     test: |
-      assert_match version.to_s, shell_output("#{bin}/dirstat ver")
+      system "#{bin}/dirstat"
     homepage: "https://github.com/aegoroff/dirstat"
     description: "Small tool that shows selected folder or drive (on Windows) usage statistic"
     license: "Apache-2.0"
