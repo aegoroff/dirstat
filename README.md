@@ -7,6 +7,29 @@ Small tool that shows selected folder or drive (on Windows) usage statistic.
 The tool shows file and folder statistic like the number of files or folders, top 10 files and folders by size,
 file statistics by extension and by file size range.
 
+## Install the pre-compiled binary
+
+**homebrew** (only on macOS and Linux for now):
+
+Add my tap (do it once):
+```sh
+brew tap aegoroff/tap
+```
+And the install dirstat:
+```sh
+brew install dirstat
+```
+Update dirstat if already installed:
+```sh
+brew upgrade dirstat
+```
+
+**manually**:
+
+Download the pre-compiled binaries from the [releases page][releases] and
+copy to the desired location.
+
+
 Syntax:
 ------
 ```
