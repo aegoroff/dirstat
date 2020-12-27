@@ -26,7 +26,7 @@ brew upgrade dirstat
 
 **manually**:
 
-Download the pre-compiled binaries from the [releases page][releases] and
+Download the pre-compiled binaries from the [releases](https://github.com/aegoroff/dirstat/releases) and
 copy to the desired location.
 
 
