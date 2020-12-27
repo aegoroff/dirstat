@@ -58,6 +58,8 @@ brews:
     commit_author:
       name: "Alexander Egorov"
       email: "egoroff@gmail.com"
+    test: |
+      system "#{bin}/dirstat ver"
     homepage: "https://github.com/aegoroff/dirstat"
     description: "Small tool that shows selected folder or drive (on Windows) usage statistic"
 
