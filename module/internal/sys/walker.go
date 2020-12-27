@@ -26,7 +26,7 @@ func newWalker(fs afero.Fs, parallel int) *walker {
 
 func (bf *walker) pop() string {
 	bf.mu.Lock()
-	bf.mu.Unlock()
+	defer bf.mu.Unlock()
 	top := bf.queue[0]
 	bf.queue = bf.queue[1:]
 	return top
@@ -42,14 +42,6 @@ func (bf *walker) len() int {
 	bf.mu.RLock()
 	defer bf.mu.RUnlock()
 	return len(bf.queue)
-}
-
-func (bf *walker) addOne() {
-	bf.wg.Add(1)
-}
-
-func (bf *walker) wait() {
-	bf.wg.Wait()
 }
 
 func (bf *walker) walk(d string, results chan<- *filesystemItem) {
@@ -103,8 +95,16 @@ func (bf *walker) closeRestrict() {
 	close(bf.restrictor)
 }
 
-func (bf *walker) readdir(path string) []*filesysEntry {
+func (bf *walker) addOne() {
+	bf.wg.Add(1)
 	bf.acquireRestrict()
+}
+
+func (bf *walker) wait() {
+	bf.wg.Wait()
+}
+
+func (bf *walker) readdir(path string) []*filesysEntry {
 	defer bf.releaseRestrict()
 	f, err := bf.fs.Open(path)
 	if err != nil {
