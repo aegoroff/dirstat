@@ -37,7 +37,7 @@ func Test_PositiveTests(t *testing.T) {
 		{"fi -p /", []string{"fi", "-p", "/"}, "Total files"},
 		{"e -p /", []string{"e", "-p", "/"}, "Total files"},
 		{"fo -p /", []string{"fo", "-p", "/"}, "Total files"},
-		{"ver", []string{"ver"}, "dirstat v"},
+		{"ver", []string{"ver"}, Version},
 		{"nothing", []string{}, ""},
 		{"fi -p :", []string{"fi", "-p", ":"}, ""},
 		{"fi -p nothing", []string{"fi", "-p", ""}, ""},

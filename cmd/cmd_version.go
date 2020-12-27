@@ -17,7 +17,7 @@ func newVersion(w io.Writer) *cobra.Command {
 		Short:   "Print the version number of dirstat",
 		Long:    `All software has versions. This is dirstat's`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_, err := fmt.Fprintf(w, "dirstat %s\n", Version)
+			_, err := fmt.Fprintf(w, "%s\n", Version)
 			return err
 		},
 	}
