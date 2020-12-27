@@ -15,7 +15,7 @@ Add my tap (do it once):
 ```sh
 brew tap aegoroff/tap
 ```
-And the install dirstat:
+And then install dirstat:
 ```sh
 brew install dirstat
 ```
