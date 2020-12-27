@@ -62,6 +62,7 @@ brews:
       system "#{bin}/dirstat ver"
     homepage: "https://github.com/aegoroff/dirstat"
     description: "Small tool that shows selected folder or drive (on Windows) usage statistic"
+    license: "Apache-2.0"
 
 signs:
   - artifacts: checksum
