@@ -1,10 +1,12 @@
 package scan
 
 import (
+	"errors"
 	"fmt"
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
+	"os"
 	"path/filepath"
 	"testing"
 )
@@ -122,4 +124,63 @@ func Test_Scan_ManyData(t *testing.T) {
 			fmt.Printf("%s :%d\n", k, v)
 		}
 	}
+}
+
+func Test_Scan_OpenErrorsHandling(t *testing.T) {
+	oefs := &testFs{
+		err: errors.New("new error"),
+	}
+
+	tf := testFile{err: errors.New("new error")}
+	refs := &testFs{
+		f: &tf,
+	}
+
+	var tests = []struct {
+		name string
+		efs  Filesystem
+	}{
+		{"open error", oefs},
+		{"readdir error", refs},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// Arrange
+			ass := assert.New(t)
+
+			th := testHandler{
+				fipaths: make(c9s.StringHashSet),
+				fopaths: make(c9s.StringHashSet),
+				fp:      make([]string, 0),
+			}
+
+			// Act
+			Scan("/", test.efs, &th)
+
+			// Assert
+			ass.Equal(0, th.files, "Invalid files count")
+			ass.Equal(1, th.folders, "Invalid folders count")
+		})
+	}
+}
+
+type testFs struct {
+	err error
+	f   File
+}
+
+type testFile struct {
+	err error
+}
+
+func (t *testFile) Close() error {
+	return t.err
+}
+
+func (t *testFile) Readdir(_ int) ([]os.FileInfo, error) {
+	return nil, t.err
+}
+
+func (e *testFs) Open(_ string) (File, error) {
+	return e.f, e.err
 }
