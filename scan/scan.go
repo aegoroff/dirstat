@@ -6,6 +6,9 @@ import (
 	"path/filepath"
 )
 
+// concurrentScans sets the default number of concurrent directory scans
+const concurrentScans = 32
+
 // Handler defines scanning handler interface that handles filesystem events
 type Handler interface {
 	// Handle handles filesystem event
@@ -138,7 +141,7 @@ func newFolderEntry(item *filesystemItem) *FolderEntry {
 func walkBreadthFirst(path string, fs Filesystem, results chan<- *filesystemItem) {
 	defer close(results)
 
-	bf := newWalker(fs, 32)
+	bf := newWalker(fs, concurrentScans)
 	defer bf.closeRestrict()
 
 	bf.push(path)
