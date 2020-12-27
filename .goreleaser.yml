@@ -59,7 +59,7 @@ brews:
       name: "Alexander Egorov"
       email: "egoroff@gmail.com"
     homepage: "https://github.com/aegoroff/dirstat"
-    description: "A small tool that shows selected folder or drive (on Windows) usage statistic"
+    description: "Small tool that shows selected folder or drive (on Windows) usage statistic"
 
 signs:
   - artifacts: checksum
