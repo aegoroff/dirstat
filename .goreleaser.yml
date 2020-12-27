@@ -6,7 +6,7 @@ before:
 builds:
   - id: "x64"
     binary: dirstat
-    ldflags: -s -w -X dirstat/cmd.Version={{ .Version }}
+    ldflags: -s -w -X github.com/aegoroff/dirstat/cmd.Version={{ .Version }}
     goos:
       - linux
       - freebsd
@@ -20,7 +20,7 @@ builds:
 
   - id: "386"
     binary: dirstat
-    ldflags: -s -w -X dirstat/cmd.Version={{ .Version }}
+    ldflags: -s -w -X github.com/aegoroff/dirstat/cmd.Version={{ .Version }}
     goos:
       - linux
       - windows
@@ -32,7 +32,7 @@ builds:
 
   - id: "arm"
     binary: dirstat
-    ldflags: -s -w -X dirstat/cmd.Version={{ .Version }}
+    ldflags: -s -w -X github.com/aegoroff/dirstat/cmd.Version={{ .Version }}
     goos:
       - linux
       - freebsd

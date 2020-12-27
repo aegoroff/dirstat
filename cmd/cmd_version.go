@@ -8,7 +8,7 @@ import (
 )
 
 // Version defines program version
-var Version = "0.10.6"
+var Version = "v0.10.16"
 
 func newVersion(w io.Writer) *cobra.Command {
 	var cmd = &cobra.Command{
@@ -17,7 +17,7 @@ func newVersion(w io.Writer) *cobra.Command {
 		Short:   "Print the version number of dirstat",
 		Long:    `All software has versions. This is dirstat's`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_, err := fmt.Fprintf(w, "dirstat v%s\n", Version)
+			_, err := fmt.Fprintf(w, "dirstat %s\n", Version)
 			return err
 		},
 	}
