@@ -17,6 +17,18 @@ type renderer interface {
 	order() int
 }
 
+type filesystem struct {
+	fs afero.Fs
+}
+
+func newFs(fs afero.Fs) scan.Filesystem {
+	return &filesystem{fs: fs}
+}
+
+func (f *filesystem) Open(path string) (scan.File, error) {
+	return f.fs.Open(path)
+}
+
 // Execute runs modules over path specified
 func Execute(path string, fs afero.Fs, w io.Writer, modules ...Module) {
 	var renderers []renderer
@@ -27,7 +39,7 @@ func Execute(path string, fs afero.Fs, w io.Writer, modules ...Module) {
 		handlers = append(handlers, m.handlers()...)
 	}
 
-	scan.Scan(path, fs, handlers...)
+	scan.Scan(path, newFs(fs), handlers...)
 
 	render(w, renderers)
 }

@@ -9,6 +9,18 @@ import (
 	"testing"
 )
 
+type filesystem struct {
+	fs afero.Fs
+}
+
+func newFs(fs afero.Fs) Filesystem {
+	return &filesystem{fs: fs}
+}
+
+func (f *filesystem) Open(path string) (File, error) {
+	return f.fs.Open(path)
+}
+
 type testHandler struct {
 	folders int
 	files   int
@@ -45,7 +57,7 @@ func Test_Scan(t *testing.T) {
 	}
 
 	// Act
-	Scan("/", fs, &th)
+	Scan("/", newFs(fs), &th)
 
 	// Assert
 	ass.Equal(2, th.files)
@@ -79,7 +91,7 @@ func Test_Scan_ManyData(t *testing.T) {
 	}
 
 	// Act
-	Scan("/", fs, &th)
+	Scan("/", newFs(fs), &th)
 
 	// Assert
 	ass.Equal(2000, th.files, "Invalid files count")

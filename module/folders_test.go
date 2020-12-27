@@ -105,7 +105,7 @@ func Test_folderHandler(t *testing.T) {
 	onlyFiles := newOnlyFoldersHandler(handler)
 
 	// Act
-	scan.Scan("/", appFS, onlyFiles)
+	scan.Scan("/", newFs(appFS), onlyFiles)
 
 	// Assert
 	ass.Equal(int64(2), fc.byCount.Len())
@@ -122,7 +122,7 @@ func Test_folderHandler_EmptyFileSystem(t *testing.T) {
 	onlyFiles := newOnlyFoldersHandler(handler)
 
 	// Act
-	scan.Scan("/", appFS, onlyFiles)
+	scan.Scan("/", newFs(appFS), onlyFiles)
 
 	// Assert
 	ass.Equal(int64(1), fc.byCount.Len())

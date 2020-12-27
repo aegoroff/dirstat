@@ -1,21 +1,20 @@
 package scan
 
 import (
-	"github.com/spf13/afero"
 	"os"
 	"path/filepath"
 	"sync"
 )
 
 type walker struct {
-	fs         afero.Fs
+	fs         Filesystem
 	wg         sync.WaitGroup
 	mu         sync.RWMutex
 	queue      []string
 	restrictor chan struct{}
 }
 
-func newWalker(fs afero.Fs, parallel int) *walker {
+func newWalker(fs Filesystem, parallel int) *walker {
 	bf := &walker{
 		fs:         fs,
 		queue:      make([]string, 0),
