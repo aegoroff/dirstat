@@ -24,6 +24,13 @@ Update dirstat if already installed:
 brew upgrade dirstat
 ```
 
+**scoop**:
+
+```sh
+scoop bucket add aegoroff https://github.com/aegoroff/scoop-bucket.git
+scoop install dirstat
+```
+
 **manually**:
 
 Download the pre-compiled binaries from the [releases](https://github.com/aegoroff/dirstat/releases) and
