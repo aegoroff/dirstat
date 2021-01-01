@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/aegoroff/dirstat/cmd"
+	"github.com/aegoroff/dirstat/internal/cmd"
 	"github.com/spf13/afero"
 	"os"
 )
