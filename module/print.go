@@ -8,11 +8,13 @@ import (
 	"sort"
 )
 
-type printer interface {
+type writable interface {
 	writer() io.Writer
-	createTab() table.Writer
+}
 
-	// cprint prints data with suppport colorizing
+type printer interface {
+	writable
+	createTab() table.Writer
 	cprint(format string, a ...interface{})
 }
 
