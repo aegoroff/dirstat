@@ -98,7 +98,7 @@ func Scan(path string, fs Filesystem, handlers ...Handler) {
 
 	scanEvents := make(chan *ScanEvent, 1024)
 
-	go readFileSystemEvents(fsEvents, scanEvents)
+	go convert(fsEvents, scanEvents)
 
 	// Read all files from channel
 	for file := range scanEvents {
@@ -108,16 +108,16 @@ func Scan(path string, fs Filesystem, handlers ...Handler) {
 	}
 }
 
-func readFileSystemEvents(in <-chan *filesystemItem, out chan<- *ScanEvent) {
-	defer close(out)
-	for item := range in {
+func convert(from <-chan *filesystemItem, to chan<- *ScanEvent) {
+	defer close(to)
+	for item := range from {
 		se := ScanEvent{}
 		if item.event == fsEventDir {
 			se.Folder = newFolderEntry(item)
 		} else {
 			se.File = newFileEntry(item)
 		}
-		out <- &se
+		to <- &se
 	}
 }
 
