@@ -159,7 +159,7 @@ func Test_Scan_OpenErrorsHandling(t *testing.T) {
 
 			// Assert
 			ass.Equal(0, th.files, "Invalid files count")
-			ass.Equal(1, th.folders, "Invalid folders count")
+			ass.Equal(0, th.folders, "Invalid folders count")
 		})
 	}
 }

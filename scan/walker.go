@@ -46,30 +46,38 @@ func (bf *walker) len() int {
 func (bf *walker) walk(d string, results chan<- *filesystemItem) {
 	defer bf.wg.Done()
 
-	entries := bf.readdir(d)
+	entries, err := bf.open(d)
+	if err != nil {
+		return
+	}
 
 	// Folder stat
 	var count int64
 	var size int64
 
 	for _, entry := range entries {
+		// Skip symlinks
+		if entry.Mode()&os.ModeSymlink != 0 {
+			continue
+		}
+
 		// Queue subdirs to walk in a queue
-		if entry.isDir {
-			bf.push(filepath.Join(d, entry.name))
+		if entry.IsDir() {
+			bf.push(filepath.Join(d, entry.Name()))
 		} else {
 			// Send to channel
 			fileEvent := filesystemItem{
 				dir:   d,
-				name:  entry.name,
+				name:  entry.Name(),
 				event: fsEventFile,
 				count: 1,
-				size:  entry.size,
+				size:  entry.Size(),
 			}
 			results <- &fileEvent
 
 			// update folder stat
 			count++
-			size += entry.size
+			size += fileEvent.size
 		}
 	}
 
@@ -103,27 +111,13 @@ func (bf *walker) wait() {
 	bf.wg.Wait()
 }
 
-func (bf *walker) readdir(path string) []*filesysEntry {
+func (bf *walker) open(path string) ([]os.FileInfo, error) {
 	defer bf.releaseRestrict()
 	f, err := bf.fs.Open(path)
 	if err != nil {
-		return []*filesysEntry{}
+		return nil, err
 	}
 	defer Close(f)
 
-	entries, err := f.Readdir(-1)
-	if err != nil {
-		return []*filesysEntry{}
-	}
-
-	result := make([]*filesysEntry, 0, len(entries))
-	for _, e := range entries {
-		// dont follow symlinks
-		if e.Mode()&os.ModeSymlink == 0 {
-			fi := filesysEntry{name: e.Name(), size: e.Size(), isDir: e.IsDir()}
-			result = append(result, &fi)
-		}
-	}
-
-	return result
+	return f.Readdir(-1)
 }
