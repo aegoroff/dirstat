@@ -9,6 +9,6 @@ func NewOsFs() Filesystem {
 	return &osFs{}
 }
 
-func (o *osFs) Open(name string) (File, error) {
+func (*osFs) Open(name string) (File, error) {
 	return os.Open(name)
 }
