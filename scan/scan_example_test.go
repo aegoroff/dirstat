@@ -4,7 +4,7 @@ import "fmt"
 
 type hndl struct{}
 
-func (h *hndl) Handle(*Event) { fmt.Println("from Handle") }
+func (*hndl) Handle(*Event) { fmt.Println("from Handle") }
 
 func ExampleScan() {
 	fs := NewOsFs()
