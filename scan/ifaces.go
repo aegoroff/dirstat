@@ -8,7 +8,7 @@ import (
 // Handler defines scanning handler interface that handles filesystem events
 type Handler interface {
 	// Handle handles filesystem event
-	Handle(evt *ScanEvent)
+	Handle(evt *Event)
 }
 
 // Filesystem represents filesystem abstraction

@@ -42,7 +42,7 @@ func newAggregateFileRenderer(ctx *Context, af *aggregateFile, order int) *aggre
 
 // Worker method
 
-func (m *aggregateFileHandler) Handle(evt *scan.ScanEvent) {
+func (m *aggregateFileHandler) Handle(evt *scan.Event) {
 	f := evt.File
 	unsignedSize := uint64(f.Size)
 

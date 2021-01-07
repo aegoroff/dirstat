@@ -22,13 +22,13 @@ func newOnlyFoldersHandler(h scan.Handler) scan.Handler {
 	}
 }
 
-func (f *onlyFilesHandler) Handle(evt *scan.ScanEvent) {
+func (f *onlyFilesHandler) Handle(evt *scan.Event) {
 	if evt.File != nil {
 		f.h.Handle(evt)
 	}
 }
 
-func (f *onlyFoldersHandler) Handle(evt *scan.ScanEvent) {
+func (f *onlyFoldersHandler) Handle(evt *scan.Event) {
 	if evt.Folder != nil {
 		f.h.Handle(evt)
 	}

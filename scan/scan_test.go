@@ -31,7 +31,7 @@ type testHandler struct {
 	fp      []string
 }
 
-func (t *testHandler) Handle(evt *ScanEvent) {
+func (t *testHandler) Handle(evt *Event) {
 	if evt.File != nil {
 		t.files++
 		t.fipaths.Remove(evt.File.Path)

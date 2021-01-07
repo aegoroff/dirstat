@@ -46,7 +46,7 @@ func newTotalRenderer(ctx *Context, order int) renderer {
 
 // Worker methods
 
-func (m *totalFileHandler) Handle(evt *scan.ScanEvent) {
+func (m *totalFileHandler) Handle(evt *scan.Event) {
 	f := evt.File
 	// Accumulate file statistic
 	m.total.FilesTotal.Count++
@@ -60,7 +60,7 @@ func (m *totalFileHandler) Handle(evt *scan.ScanEvent) {
 	m.total.extensions[ext] = a
 }
 
-func (m *totalFolderHandler) Handle(*scan.ScanEvent) {
+func (m *totalFolderHandler) Handle(*scan.Event) {
 	m.total.CountFolders++
 }
 

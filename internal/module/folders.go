@@ -95,7 +95,7 @@ func newFoldersRenderer(f *folders, ctx *Context, order int) renderer {
 
 // Worker method
 
-func (m *foldersHandler) Handle(evt *scan.ScanEvent) {
+func (m *foldersHandler) Handle(evt *scan.Event) {
 	fe := evt.Folder
 
 	fn := folder{

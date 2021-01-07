@@ -7,9 +7,9 @@ import (
 // concurrentScans sets the default number of concurrent directory scans
 const concurrentScans = 32
 
-// ScanEvent defines scanning event structure
+// Event defines scanning event structure
 // that can contain file or folder event information
-type ScanEvent struct {
+type Event struct {
 	// File set not nil in case of file event occurred
 	File *FileEntry
 
@@ -55,7 +55,7 @@ func Scan(path string, fs Filesystem, handlers ...Handler) {
 	fsEvents := make(chan *filesystemItem, 1024)
 	go walkBreadthFirst(path, fs, fsEvents)
 
-	scanEvents := make(chan *ScanEvent, 1024)
+	scanEvents := make(chan *Event, 1024)
 
 	go convert(fsEvents, scanEvents)
 
@@ -67,10 +67,10 @@ func Scan(path string, fs Filesystem, handlers ...Handler) {
 	}
 }
 
-func convert(from <-chan *filesystemItem, to chan<- *ScanEvent) {
+func convert(from <-chan *filesystemItem, to chan<- *Event) {
 	defer close(to)
 	for item := range from {
-		se := ScanEvent{}
+		se := Event{}
 		if item.event == fsEventDir {
 			se.Folder = newFolderEntry(item)
 		} else {

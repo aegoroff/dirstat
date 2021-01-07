@@ -47,7 +47,7 @@ func newTopFilesRenderer(tf *topFiles, order int) renderer {
 
 // Worker method
 
-func (m *topFilesHandler) Handle(evt *scan.ScanEvent) {
+func (m *topFilesHandler) Handle(evt *scan.Event) {
 	f := evt.File
 	fc := file{size: f.Size, path: f.Path, pd: m.pd}
 	m.tree.Insert(&fc)

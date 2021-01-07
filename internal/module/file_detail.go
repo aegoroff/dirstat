@@ -52,7 +52,7 @@ func newDetailFileRenderer(details *detailsFile, order int) renderer {
 
 // Worker method
 
-func (m *detailFileHandler) Handle(evt *scan.ScanEvent) {
+func (m *detailFileHandler) Handle(evt *scan.Event) {
 	f := evt.File
 	// Calculate files range statistic
 	for i, r := range m.fileRanges {
