@@ -77,12 +77,6 @@ type filesystemItem struct {
 	size  int64
 }
 
-type filesysEntry struct {
-	isDir bool
-	name  string
-	size  int64
-}
-
 type fsEvent int
 
 const (
@@ -144,10 +138,10 @@ func walkBreadthFirst(path string, fs Filesystem, results chan<- *filesystemItem
 	bf := newWalker(fs, concurrentScans)
 	defer bf.closeRestrict()
 
-	bf.push(path)
+	bf.enqueue(path)
 
 	for bf.len() > 0 {
-		currentDir := bf.pop()
+		currentDir := bf.dequeue()
 
 		bf.addOne()
 		go bf.walk(currentDir, results)

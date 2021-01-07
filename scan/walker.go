@@ -23,7 +23,7 @@ func newWalker(fs Filesystem, parallel int) *walker {
 	return bf
 }
 
-func (bf *walker) pop() string {
+func (bf *walker) dequeue() string {
 	bf.mu.Lock()
 	defer bf.mu.Unlock()
 	top := bf.queue[0]
@@ -31,7 +31,7 @@ func (bf *walker) pop() string {
 	return top
 }
 
-func (bf *walker) push(s string) {
+func (bf *walker) enqueue(s string) {
 	bf.mu.Lock()
 	bf.queue = append(bf.queue, s)
 	bf.mu.Unlock()
@@ -63,7 +63,7 @@ func (bf *walker) walk(d string, results chan<- *filesystemItem) {
 
 		// Queue subdirs to walk in a queue
 		if entry.IsDir() {
-			bf.push(filepath.Join(d, entry.Name()))
+			bf.enqueue(filepath.Join(d, entry.Name()))
 		} else {
 			// Send to channel
 			fileEvent := filesystemItem{
