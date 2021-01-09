@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestFile_EqualTo(t *testing.T) {
+func TestFile_Equal(t *testing.T) {
 	var tests = []struct {
 		size1  int64
 		size2  int64
@@ -37,14 +37,14 @@ func TestFile_EqualTo(t *testing.T) {
 		}
 
 		// Act
-		result := f1.EqualTo(f2)
+		result := f1.Equal(f2)
 
 		// Assert
 		ass.Equal(test.result, result)
 	}
 }
 
-func TestFile_LessThan(t *testing.T) {
+func TestFile_Less(t *testing.T) {
 	var tests = []struct {
 		size1  int64
 		size2  int64
@@ -73,7 +73,7 @@ func TestFile_LessThan(t *testing.T) {
 		}
 
 		// Act
-		result := f1.LessThan(f2)
+		result := f1.Less(f2)
 
 		// Assert
 		ass.Equal(test.result, result)

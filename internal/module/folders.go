@@ -46,13 +46,13 @@ func (f *folder) Path() string   { return f.pd.decorate(f.path) }
 
 // Count sortable folder methods
 
-func (fc *folderC) LessThan(y rbtree.Comparable) bool { return fc.count < y.(*folderC).count }
-func (fc *folderC) EqualTo(y rbtree.Comparable) bool  { return fc.count == y.(*folderC).count }
+func (fc *folderC) Less(y rbtree.Comparable) bool  { return fc.count < y.(*folderC).count }
+func (fc *folderC) Equal(y rbtree.Comparable) bool { return fc.count == y.(*folderC).count }
 
 // Size sortable folder methods
 
-func (fs *folderS) LessThan(y rbtree.Comparable) bool { return fs.size < y.(*folderS).size }
-func (fs *folderS) EqualTo(y rbtree.Comparable) bool  { return fs.size == y.(*folderS).size }
+func (fs *folderS) Less(y rbtree.Comparable) bool  { return fs.size < y.(*folderS).size }
+func (fs *folderS) Equal(y rbtree.Comparable) bool { return fs.size == y.(*folderS).size }
 
 type folders struct {
 	bySize  rbtree.RbTree
