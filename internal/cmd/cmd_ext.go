@@ -6,11 +6,11 @@ import (
 )
 
 type extCmd struct {
-	baseCommand
+	*baseCommand
 }
 
 func (e *extCmd) execute() error {
-	ctx := module.NewContext(e.top, e.removeRoot, e.path)
+	ctx := e.newContext()
 
 	e.run(module.NewExtensionModule(ctx, 0), module.NewTotalModule(ctx, 1))
 

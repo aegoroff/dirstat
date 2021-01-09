@@ -6,12 +6,12 @@ import (
 )
 
 type fileCmd struct {
-	baseCommand
+	*baseCommand
 	vrange []int
 }
 
 func (f *fileCmd) execute() error {
-	ctx := module.NewContext(f.top, f.removeRoot, f.path)
+	ctx := f.newContext()
 
 	modules := []module.Module{
 		module.NewAggregateFileModule(ctx, 0),

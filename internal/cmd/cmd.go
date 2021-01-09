@@ -18,8 +18,8 @@ type baseCommand struct {
 	removeRoot bool
 }
 
-func newBaseCmd(c conf, path string) baseCommand {
-	return baseCommand{
+func newBaseCmd(c conf, path string) *baseCommand {
+	return &baseCommand{
 		c:          c,
 		top:        *c.globals().top,
 		removeRoot: *c.globals().removeRoot,
@@ -42,6 +42,10 @@ func (b *baseCommand) run(modules ...module.Module) {
 	}
 
 	r(b.path, c.fs(), c.w(), modules...)
+}
+
+func (b *baseCommand) newContext() *module.Context {
+	return module.NewContext(b.top, b.removeRoot, b.path)
 }
 
 type cobraCreator struct {

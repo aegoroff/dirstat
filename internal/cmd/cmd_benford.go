@@ -6,11 +6,11 @@ import (
 )
 
 type benfordCmd struct {
-	baseCommand
+	*baseCommand
 }
 
 func (b *benfordCmd) execute() error {
-	ctx := module.NewContext(b.top, b.removeRoot, b.path)
+	ctx := b.newContext()
 
 	b.run(module.NewBenfordFileModule(ctx, 0), module.NewTotalModule(ctx, 1))
 

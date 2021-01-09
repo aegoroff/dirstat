@@ -6,11 +6,11 @@ import (
 )
 
 type folderCmd struct {
-	baseCommand
+	*baseCommand
 }
 
 func (f *folderCmd) execute() error {
-	ctx := module.NewContext(f.top, f.removeRoot, f.path)
+	ctx := f.newContext()
 
 	f.run(module.NewFoldersModule(ctx, 0), module.NewTotalModule(ctx, 1))
 
