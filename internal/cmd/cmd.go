@@ -50,13 +50,11 @@ type cobraCreator struct {
 
 func (c *cobraCreator) runE() cobraRunSignature {
 	return func(cmd *cobra.Command, args []string) error {
-		path := ""
 		if len(args) > 0 {
-			path = args[0]
+			return c.createCmd(args[0]).execute()
 		} else {
 			return cmd.Help()
 		}
-		return c.createCmd(path).execute()
 	}
 }
 
