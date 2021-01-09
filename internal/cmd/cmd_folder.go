@@ -12,9 +12,7 @@ type folderCmd struct {
 func (f *folderCmd) execute() error {
 	ctx := f.newContext()
 
-	f.run(module.NewFoldersModule(ctx, 0), module.NewTotalModule(ctx, 1))
-
-	return nil
+	return f.run(module.NewFoldersModule(ctx, 0), module.NewTotalModule(ctx, 1))
 }
 
 func newFolder(c conf) *cobra.Command {

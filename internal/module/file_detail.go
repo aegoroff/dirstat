@@ -74,20 +74,20 @@ func (m *detailFileHandler) Handle(evt *scan.Event) {
 
 func (m *detailFileRenderer) print(p printer) {
 	heads := m.fileRanges.heads(numPrefixDecorator)
-	p.cprint("\n<gray>Detailed files stat:</>\n")
+	p.Cprint("\n<gray>Detailed files stat:</>\n")
 	for i, r := range m.fileRanges {
 		if len(m.distribution[r]) == 0 {
 			continue
 		}
 
-		p.cprint("<gray>%s</>\n", heads[i])
+		p.Cprint("<gray>%s</>\n", heads[i])
 
 		files := m.distribution[r]
 		sort.Sort(sort.Reverse(files))
 
 		for _, f := range files {
 			size := human(f.size)
-			p.cprint("   %s - <yellow>%s</>\n", f, size)
+			p.Cprint("   %s - <yellow>%s</>\n", f, size)
 		}
 	}
 }

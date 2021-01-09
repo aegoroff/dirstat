@@ -76,7 +76,7 @@ Total file extensions:  {{.CountFileExts}}`
 	var report = template.Must(template.New("totalstat").Funcs(template.FuncMap{"toBytesString": humanize.IBytes}).Parse(totalTemplate))
 
 	_, _ = color.Set(color.FgGray)
-	_ = report.Execute(p.writer(), m.total)
+	_ = report.Execute(p.Writer(), m.total)
 
 	_, _ = color.Reset()
 }

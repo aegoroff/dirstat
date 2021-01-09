@@ -2,32 +2,31 @@ package cmd
 
 import (
 	"github.com/aegoroff/dirstat/internal/module"
+	"github.com/aegoroff/dirstat/internal/out"
 	"github.com/dustin/go-humanize"
-	"github.com/gookit/color"
 	"github.com/spf13/afero"
-	"io"
 	"os"
 	"path/filepath"
 	"runtime"
 	"time"
 )
 
-type runner func(path string, fs afero.Fs, w io.Writer, modules ...module.Module)
+type runner func(path string, fs afero.Fs, p out.Printer, modules ...module.Module)
 
 func newTimeMeasureR(wrapped runner) runner {
-	return func(path string, fs afero.Fs, w io.Writer, modules ...module.Module) {
+	return func(path string, fs afero.Fs, p out.Printer, modules ...module.Module) {
 		start := time.Now()
 
-		wrapped(path, fs, w, modules...)
+		wrapped(path, fs, p, modules...)
 
 		elapsed := time.Since(start)
 
-		color.Fprintf(w, "\n\n<gray>Read taken:\t%v</>\n", elapsed)
+		p.Cprint("\n\n<gray>Read taken:\t%v</>\n", elapsed)
 	}
 }
 
 func newPathCorrectionR(wrapped runner) runner {
-	return func(path string, fs afero.Fs, w io.Writer, modules ...module.Module) {
+	return func(path string, fs afero.Fs, p out.Printer, modules ...module.Module) {
 		if len(path) == 0 {
 			return
 		}
@@ -39,25 +38,25 @@ func newPathCorrectionR(wrapped runner) runner {
 			return
 		}
 
-		color.Fprintf(w, "Root: <red>%s</>\n\n", path)
+		p.Cprint("Root: <red>%s</>\n\n", path)
 
-		wrapped(path, fs, w, modules...)
+		wrapped(path, fs, p, modules...)
 	}
 }
 
 // newPrintMemoryR outputs the current, total and OS memory being used. As well as the number
 // of garage collection cycles completed.
 func newPrintMemoryR(wrapped runner) runner {
-	return func(path string, fs afero.Fs, w io.Writer, modules ...module.Module) {
-		wrapped(path, fs, w, modules...)
+	return func(path string, fs afero.Fs, p out.Printer, modules ...module.Module) {
+		wrapped(path, fs, p, modules...)
 
 		var m runtime.MemStats
 		runtime.ReadMemStats(&m)
 		// For info on each, see: https://golang.org/pkg/runtime/#MemStats
-		color.Fprintf(w, "\nAlloc = <gray>%s</>", humanize.IBytes(m.Alloc))
-		color.Fprintf(w, "\tTotalAlloc = <gray>%s</>", humanize.IBytes(m.TotalAlloc))
-		color.Fprintf(w, "\tSys = <gray>%s</>", humanize.IBytes(m.Sys))
-		color.Fprintf(w, "\tNumGC = <gray>%v</>", m.NumGC)
-		color.Fprintf(w, "\tNumGoRoutines = <gray>%v</>\n", runtime.NumGoroutine())
+		p.Cprint("\nAlloc = <gray>%s</>", humanize.IBytes(m.Alloc))
+		p.Cprint("\tTotalAlloc = <gray>%s</>", humanize.IBytes(m.TotalAlloc))
+		p.Cprint("\tSys = <gray>%s</>", humanize.IBytes(m.Sys))
+		p.Cprint("\tNumGC = <gray>%v</>", m.NumGC)
+		p.Cprint("\tNumGoRoutines = <gray>%v</>\n", runtime.NumGoroutine())
 	}
 }

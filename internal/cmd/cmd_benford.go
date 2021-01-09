@@ -12,9 +12,7 @@ type benfordCmd struct {
 func (b *benfordCmd) execute() error {
 	ctx := b.newContext()
 
-	b.run(module.NewBenfordFileModule(ctx, 0), module.NewTotalModule(ctx, 1))
-
-	return nil
+	return b.run(module.NewBenfordFileModule(ctx, 0), module.NewTotalModule(ctx, 1))
 }
 
 func newBenford(c conf) *cobra.Command {

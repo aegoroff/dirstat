@@ -62,7 +62,7 @@ func (m *aggregateFileHandler) Handle(evt *scan.Event) {
 // Renderer method
 
 func (m *aggregateFileRenderer) print(p printer) {
-	p.cprint("<gray>Total files stat:</>\n\n")
+	p.Cprint("<gray>Total files stat:</>\n\n")
 
 	tab := p.createTab()
 

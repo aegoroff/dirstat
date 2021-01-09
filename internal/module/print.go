@@ -1,43 +1,42 @@
 package module
 
 import (
+	"github.com/aegoroff/dirstat/internal/out"
 	"github.com/dustin/go-humanize"
-	"github.com/gookit/color"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"io"
 	"sort"
 )
 
-type writable interface {
-	writer() io.Writer
-}
-
 type printer interface {
-	writable
+	out.Printer
 	createTab() table.Writer
-	cprint(format string, a ...interface{})
 }
 
 type prn struct {
-	w io.Writer
+	p out.Printer
+}
+
+func (r *prn) Cprint(format string, a ...interface{}) {
+	r.p.Cprint(format, a...)
+}
+
+func (r *prn) Println() {
+	r.p.Println()
+}
+
+func (r *prn) Writer() io.WriteCloser {
+	return r.p.Writer()
 }
 
 func (r *prn) createTab() table.Writer {
 	tab := table.NewWriter()
 	tab.SetAllowedRowLength(0)
-	tab.SetOutputMirror(r.w)
+	tab.SetOutputMirror(r.Writer())
 	tab.SetStyle(table.StyleLight)
 	tab.Style().Options.SeparateColumns = true
 	tab.Style().Options.DrawBorder = true
 	return tab
-}
-
-func (r *prn) writer() io.Writer {
-	return r.w
-}
-
-func (r *prn) cprint(format string, a ...interface{}) {
-	color.Fprintf(r.w, format, a...)
 }
 
 func appendHeaders(heads []string, tab table.Writer) {
@@ -52,21 +51,20 @@ func human(n int64) string {
 	return humanize.IBytes(uint64(n))
 }
 
-func render(w io.Writer, renderers []renderer) {
-	p := newPrinter(w)
+func render(p out.Printer, renderers []renderer) {
+	pn := newPrinter(p)
 
 	sort.Slice(renderers, func(i, j int) bool {
 		return renderers[i].order() < renderers[j].order()
 	})
 
 	for _, r := range renderers {
-		r.print(p)
+		r.print(pn)
 	}
 }
 
-func newPrinter(w io.Writer) printer {
-	p := prn{
-		w: w,
+func newPrinter(p out.Printer) printer {
+	return &prn{
+		p: p,
 	}
-	return &p
 }

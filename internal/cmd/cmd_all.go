@@ -23,9 +23,7 @@ func (a *allCmd) execute() error {
 		module.NewTotalModule(ctx, 6),
 	}
 
-	a.run(modules...)
-
-	return nil
+	return a.run(modules...)
 }
 
 func newAll(c conf) *cobra.Command {

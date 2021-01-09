@@ -1,7 +1,7 @@
 package module
 
 import (
-	"bytes"
+	"github.com/aegoroff/dirstat/internal/out"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/aegoroff/godatastruct/rbtree/special"
 	"github.com/stretchr/testify/assert"
@@ -126,11 +126,12 @@ func Test_printTopFile_invalidCastingError(t *testing.T) {
 	fr := topFilesRenderer{topFiles: &topFiles{
 		tree: ft,
 	}}
-	w := bytes.NewBufferString("")
+	e := out.NewMemoryEnvironment()
+	p, _ := e.NewPrinter()
 
 	// Act
-	fr.print(newPrinter(w))
+	fr.print(newPrinter(p))
 
 	// Assert
-	ass.Contains(w.String(), "Invalid casting: expected *file key type but it wasn`t")
+	ass.Contains(e.String(), "Invalid casting: expected *file key type but it wasn`t")
 }

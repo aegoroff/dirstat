@@ -47,7 +47,10 @@ func (b *benfordFileHandler) Handle(evt *scan.Event) {
 }
 
 func (b *benfordFileRenderer) print(p printer) {
-	p.cprint("\n<gray>The first file's size digit distribution of non zero files (benford law):</>\n\n")
+	p.Println()
+	p.Cprint("<gray>The first file's size digit distribution of non zero files (benford law):</>")
+	p.Println()
+	p.Println()
 
 	tab := p.createTab()
 

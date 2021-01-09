@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/aegoroff/dirstat/internal/module"
+	"github.com/aegoroff/dirstat/scan"
 	"github.com/spf13/cobra"
 )
 
@@ -27,7 +28,7 @@ func newBaseCmd(c conf, path string) *baseCommand {
 	}
 }
 
-func (b *baseCommand) run(modules ...module.Module) {
+func (b *baseCommand) run(modules ...module.Module) error {
 	var r runner
 	{
 		r = module.Execute
@@ -36,12 +37,19 @@ func (b *baseCommand) run(modules ...module.Module) {
 	}
 
 	c := b.c
+	p, err := c.env().NewPrinter()
+	if err != nil {
+		return err
+	}
+
+	defer scan.Close(c.env().Writer())
 
 	if *c.globals().showMemory {
 		r = newPrintMemoryR(r)
 	}
 
-	r(b.path, c.fs(), c.w(), modules...)
+	r(b.path, c.fs(), p, modules...)
+	return nil
 }
 
 func (b *baseCommand) newContext() *module.Context {

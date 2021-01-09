@@ -20,9 +20,7 @@ func (f *fileCmd) execute() error {
 		module.NewTotalModule(ctx, 3),
 	}
 
-	f.run(modules...)
-
-	return nil
+	return f.run(modules...)
 }
 
 func newFile(c conf) *cobra.Command {

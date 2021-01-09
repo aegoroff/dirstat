@@ -1,9 +1,9 @@
 package module
 
 import (
+	"github.com/aegoroff/dirstat/internal/out"
 	"github.com/aegoroff/dirstat/scan"
 	"github.com/spf13/afero"
-	"io"
 )
 
 // Module defines working modules interface
@@ -30,7 +30,7 @@ func (f *filesystem) Open(path string) (scan.File, error) {
 }
 
 // Execute runs modules over path specified
-func Execute(path string, fs afero.Fs, w io.Writer, modules ...Module) {
+func Execute(path string, fs afero.Fs, p out.Printer, modules ...Module) {
 	var renderers []renderer
 	var handlers []scan.Handler
 
@@ -41,7 +41,7 @@ func Execute(path string, fs afero.Fs, w io.Writer, modules ...Module) {
 
 	scan.Scan(path, newFs(fs), handlers...)
 
-	render(w, renderers)
+	render(p, renderers)
 }
 
 // NewFoldersModule creates new folders module

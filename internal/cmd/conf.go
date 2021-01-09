@@ -1,24 +1,23 @@
 package cmd
 
 import (
+	"github.com/aegoroff/dirstat/internal/out"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
-	"io"
 )
 
 type conf interface {
 	// fs defines app file system abstraction
 	fs() afero.Fs
 
-	// w defines app output
-	w() io.Writer
+	env() out.PrintEnvironment
 
 	globals() *globals
 }
 
 type appConf struct {
 	filesystem afero.Fs
-	writer     io.Writer
+	e          out.PrintEnvironment
 	g          *globals
 }
 
@@ -32,18 +31,18 @@ func (a *appConf) fs() afero.Fs {
 	return a.filesystem
 }
 
-func (a *appConf) w() io.Writer {
-	return a.writer
+func (a *appConf) env() out.PrintEnvironment {
+	return a.e
 }
 
 func (a *appConf) globals() *globals {
 	return a.g
 }
 
-func newAppConf(fs afero.Fs, w io.Writer, g *globals) conf {
+func newAppConf(fs afero.Fs, env out.PrintEnvironment, g *globals) conf {
 	c := appConf{
 		filesystem: fs,
-		writer:     w,
+		e:          env,
 		g:          g,
 	}
 	return &c

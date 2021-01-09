@@ -12,9 +12,7 @@ type extCmd struct {
 func (e *extCmd) execute() error {
 	ctx := e.newContext()
 
-	e.run(module.NewExtensionModule(ctx, 0), module.NewTotalModule(ctx, 1))
-
-	return nil
+	return e.run(module.NewExtensionModule(ctx, 0), module.NewTotalModule(ctx, 1))
 }
 
 func newExt(c conf) *cobra.Command {

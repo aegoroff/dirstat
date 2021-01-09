@@ -35,7 +35,7 @@ func (e *extRenderer) print(p printer) {
 		count:   func(f *file) int64 { return e.total.extensions[f.path].Count },
 		size:    func(f *file) uint64 { return uint64(f.size) },
 		p:       p,
-		headfmt: "\n<gray>TOP %d file extensions by size:</>\n\n",
+		headfmt: "<gray>TOP %d file extensions by size:</>",
 		total:   e.total,
 	}
 
@@ -45,7 +45,7 @@ func (e *extRenderer) print(p printer) {
 		count:   func(f *file) int64 { return f.size },
 		size:    func(f *file) uint64 { return e.total.extensions[f.path].Size },
 		p:       p,
-		headfmt: "\n<gray>TOP %d file extensions by count:</>\n\n",
+		headfmt: "<gray>TOP %d file extensions by count:</>",
 		total:   e.total,
 	}
 
@@ -61,7 +61,10 @@ type fileExtPrint struct {
 }
 
 func (fp *fileExtPrint) print(data files, top int) {
-	fp.p.cprint(fp.headfmt, top)
+	fp.p.Println()
+	fp.p.Cprint(fp.headfmt, top)
+	fp.p.Println()
+	fp.p.Println()
 
 	tab := fp.p.createTab()
 

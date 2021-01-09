@@ -56,7 +56,7 @@ func (m *topFilesHandler) Handle(evt *scan.Event) {
 // Renderer method
 
 func (m *topFilesRenderer) print(p printer) {
-	p.cprint("\n<gray>TOP %d files by size:</>\n\n", m.tree.Len())
+	p.Cprint("\n<gray>TOP %d files by size:</>\n\n", m.tree.Len())
 
 	tab := p.createTab()
 
@@ -77,7 +77,7 @@ func (m *topFilesRenderer) print(p printer) {
 		file, ok := n.(*file)
 
 		if !ok {
-			p.cprint("<red>Invalid casting: expected *file key type but it wasn`t</>")
+			p.Cprint("<red>Invalid casting: expected *file key type but it wasn`t</>")
 			return
 		}
 

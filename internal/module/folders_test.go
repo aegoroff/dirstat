@@ -1,7 +1,7 @@
 package module
 
 import (
-	"bytes"
+	"github.com/aegoroff/dirstat/internal/out"
 	"github.com/aegoroff/dirstat/scan"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/aegoroff/godatastruct/rbtree/special"
@@ -138,13 +138,14 @@ func Test_ExecuteFoldersModule_WithOutput(t *testing.T) {
 	_ = afero.WriteFile(appFS, "/f/s/f.txt", []byte("1234"), 0644)
 	ctx := NewContext(2, false, "/")
 	m := NewFoldersModule(ctx, 0)
-	w := bytes.NewBufferString("")
+	e := out.NewMemoryEnvironment()
+	p, _ := e.NewPrinter()
 
 	// Act
-	Execute("/", appFS, w, m)
+	Execute("/", appFS, p, m)
 
 	// Assert
-	ass.Greater(w.Len(), 0)
+	ass.Greater(len(e.String()), 0)
 }
 
 func TestFolder_Path(t *testing.T) {
@@ -230,11 +231,12 @@ func Test_printTop_invalidCastingError(t *testing.T) {
 	ft.Insert(rbtree.Int(2))
 	ft.Insert(rbtree.Int(3))
 	fr := foldersRenderer{}
-	w := bytes.NewBufferString("")
+	e := out.NewMemoryEnvironment()
+	p, _ := e.NewPrinter()
 
 	// Act
-	fr.printTop(ft, newPrinter(w), castSize)
+	fr.printTop(ft, newPrinter(p), castSize)
 
 	// Assert
-	ass.Contains(w.String(), "invalid casting: expected *folderS key type but it wasn`t")
+	ass.Contains(e.String(), "invalid casting: expected *folderS key type but it wasn`t")
 }

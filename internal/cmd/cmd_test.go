@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"bytes"
 	"fmt"
+	"github.com/aegoroff/dirstat/internal/out"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"strings"
@@ -27,35 +27,36 @@ func Test_PositiveTests(t *testing.T) {
 		cmdline     []string
 		mustcontain string
 	}{
-		{"a -p /", []string{"a", "/"}, "Total files"},
-		{"a -p / -t 3", []string{"a", "/", "-t", "3"}, "Total files"},
-		{"a -p / -r 1", []string{"a", "/", "-r", "1"}, "Total files"},
-		{"a -p /f -r 1 -o", []string{"a", "/f", "-r", "1", "-o"}, "Total files"},
-		{"a -p / -m", []string{"a", "/", "-m"}, "Total files"},
-		{"a -p /f -o", []string{"a", "/f", "-o"}, "Total files"},
-		{"b -p /", []string{"b", "/"}, "Total files"},
-		{"fi -p /", []string{"fi", "/"}, "Total files"},
-		{"e -p /", []string{"e", "/"}, "Total files"},
-		{"fo -p /", []string{"fo", "/"}, "Total files"},
+		{"a /", []string{"a", "/"}, "Total files"},
+		{"a / -t 3", []string{"a", "/", "-t", "3"}, "Total files"},
+		{"a / -r 1", []string{"a", "/", "-r", "1"}, "Total files"},
+		{"a /f -r 1 -o", []string{"a", "/f", "-r", "1", "-o"}, "Total files"},
+		{"a / -m", []string{"a", "/", "-m"}, "Total files"},
+		{"a /f -o", []string{"a", "/f", "-o"}, "Total files"},
+		{"b /", []string{"b", "/"}, "Total files"},
+		{"fi /", []string{"fi", "/"}, "Total files"},
+		{"e /", []string{"e", "/"}, "Total files"},
+		{"fo /", []string{"fo", "/"}, "Total files"},
 		{"ver", []string{"ver"}, Version},
 		{"nothing", []string{}, ""},
-		{"fi -p :", []string{"fi", ":"}, ""},
-		{"fi -p nothing", []string{"fi", ""}, ""},
+		{"fi :", []string{"fi", ":"}, ""},
+		{"fi nothing", []string{"fi", ""}, ""},
+		{"a / -p /res", []string{"a", "/", "-p", "/res"}, ""},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			w := bytes.NewBufferString("")
+			w := out.NewMemoryEnvironment()
 			// Act
 			err := Execute(appFS, w, test.cmdline...)
 
 			// Assert
-			out := w.String()
+			o := w.String()
 			ass.NoError(err)
-			ass.Contains(out, test.mustcontain)
+			ass.Contains(o, test.mustcontain)
 			fmt.Println(strings.Join(test.cmdline, " "))
 			fmt.Println("----------------------------------------------")
-			fmt.Println(out)
+			fmt.Println(o)
 		})
 	}
 }
@@ -77,7 +78,7 @@ func Test_NoCmdOptionSetTest(t *testing.T) {
 			// Arrange
 			ass := assert.New(t)
 			appFS := afero.NewMemMapFs()
-			w := bytes.NewBufferString("")
+			w := out.NewMemoryEnvironment()
 
 			// Act
 			err := Execute(appFS, w, test.cmdline...)
@@ -90,25 +91,40 @@ func Test_NoCmdOptionSetTest(t *testing.T) {
 }
 
 func Test_NegativeCmdTest(t *testing.T) {
-	var tests = []struct {
-		name    string
-		cmdline []string
-	}{
-		{"x", []string{"x"}},
-	}
+	// Arrange
+	ass := assert.New(t)
+	appFS := afero.NewMemMapFs()
+	w := out.NewMemoryEnvironment()
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			// Arrange
-			ass := assert.New(t)
-			appFS := afero.NewMemMapFs()
-			w := bytes.NewBufferString("")
+	// Act
+	err := Execute(appFS, w, "x")
 
-			// Act
-			err := Execute(appFS, w, test.cmdline...)
+	// Assert
+	ass.Error(err)
+}
 
-			// Assert
-			ass.Error(err)
-		})
-	}
+func Test_ErrorToCreateOutputFile_Test(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	appFS := afero.NewMemMapFs()
+	w := out.NewMemoryEnvironment()
+
+	// Act
+	err := Execute(afero.NewReadOnlyFs(appFS), w, "a", "/", "-p", "/out")
+
+	// Assert
+	ass.Error(err)
+}
+
+func Test_ConsoleEnvironment_Test(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	appFS := afero.NewMemMapFs()
+	w := out.NewConsoleEnvironment()
+
+	// Act
+	err := Execute(appFS, w, "a", "/")
+
+	// Assert
+	ass.NoError(err)
 }
