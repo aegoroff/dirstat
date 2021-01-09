@@ -6,11 +6,6 @@ import (
 	"io"
 )
 
-type options struct {
-	vrange []int
-	path   string
-}
-
 type conf interface {
 	// fs defines app file system abstraction
 	fs() afero.Fs
@@ -54,17 +49,6 @@ func newAppConf(fs afero.Fs, w io.Writer, g *globals) conf {
 	return &c
 }
 
-func configure(cmd *cobra.Command, opt *options) {
-	configurePath(cmd, &opt.path)
-	confRange(cmd, &opt.vrange)
-}
-
 func confRange(cmd *cobra.Command, rn *[]int) {
 	cmd.Flags().IntSliceVarP(rn, "range", "r", []int{}, "Output verbose files info for range specified. Range is the number between 1 and 10")
-}
-
-func configurePath(cmd *cobra.Command, path *string) {
-	const param = "path"
-	cmd.Flags().StringVarP(path, param, "p", "", "REQUIRED. Directory path to show info.")
-	_ = cmd.MarkFlagRequired(param)
 }

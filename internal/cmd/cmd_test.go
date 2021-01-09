@@ -27,20 +27,20 @@ func Test_PositiveTests(t *testing.T) {
 		cmdline     []string
 		mustcontain string
 	}{
-		{"a -p /", []string{"a", "-p", "/"}, "Total files"},
-		{"a -p / -t 3", []string{"a", "-p", "/", "-t", "3"}, "Total files"},
-		{"a -p / -r 1", []string{"a", "-p", "/", "-r", "1"}, "Total files"},
-		{"a -p /f -r 1 -o", []string{"a", "-p", "/f", "-r", "1", "-o"}, "Total files"},
-		{"a -p / -m", []string{"a", "-p", "/", "-m"}, "Total files"},
-		{"a -p /f -o", []string{"a", "-p", "/f", "-o"}, "Total files"},
-		{"b -p /", []string{"b", "-p", "/"}, "Total files"},
-		{"fi -p /", []string{"fi", "-p", "/"}, "Total files"},
-		{"e -p /", []string{"e", "-p", "/"}, "Total files"},
-		{"fo -p /", []string{"fo", "-p", "/"}, "Total files"},
+		{"a -p /", []string{"a", "/"}, "Total files"},
+		{"a -p / -t 3", []string{"a", "/", "-t", "3"}, "Total files"},
+		{"a -p / -r 1", []string{"a", "/", "-r", "1"}, "Total files"},
+		{"a -p /f -r 1 -o", []string{"a", "/f", "-r", "1", "-o"}, "Total files"},
+		{"a -p / -m", []string{"a", "/", "-m"}, "Total files"},
+		{"a -p /f -o", []string{"a", "/f", "-o"}, "Total files"},
+		{"b -p /", []string{"b", "/"}, "Total files"},
+		{"fi -p /", []string{"fi", "/"}, "Total files"},
+		{"e -p /", []string{"e", "/"}, "Total files"},
+		{"fo -p /", []string{"fo", "/"}, "Total files"},
 		{"ver", []string{"ver"}, Version},
 		{"nothing", []string{}, ""},
-		{"fi -p :", []string{"fi", "-p", ":"}, ""},
-		{"fi -p nothing", []string{"fi", "-p", ""}, ""},
+		{"fi -p :", []string{"fi", ":"}, ""},
+		{"fi -p nothing", []string{"fi", ""}, ""},
 	}
 
 	for _, test := range tests {
@@ -60,7 +60,7 @@ func Test_PositiveTests(t *testing.T) {
 	}
 }
 
-func Test_NegativeCmdTest(t *testing.T) {
+func Test_NoCmdOptionSetTest(t *testing.T) {
 	var tests = []struct {
 		name    string
 		cmdline []string
@@ -70,6 +70,30 @@ func Test_NegativeCmdTest(t *testing.T) {
 		{"fi", []string{"fi"}},
 		{"fo", []string{"fo"}},
 		{"e", []string{"e"}},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// Arrange
+			ass := assert.New(t)
+			appFS := afero.NewMemMapFs()
+			w := bytes.NewBufferString("")
+
+			// Act
+			err := Execute(appFS, w, test.cmdline...)
+
+			// Assert
+			ass.NoError(err)
+			ass.Equal("", w.String())
+		})
+	}
+}
+
+func Test_NegativeCmdTest(t *testing.T) {
+	var tests = []struct {
+		name    string
+		cmdline []string
+	}{
 		{"x", []string{"x"}},
 	}
 
@@ -85,7 +109,6 @@ func Test_NegativeCmdTest(t *testing.T) {
 
 			// Assert
 			ass.Error(err)
-			fmt.Println(w.String())
 		})
 	}
 }

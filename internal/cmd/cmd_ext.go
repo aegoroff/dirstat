@@ -18,10 +18,8 @@ func (e *extCmd) execute() error {
 }
 
 func newExt(c conf) *cobra.Command {
-	var path string
-
 	cc := cobraCreator{
-		createCmd: func() command {
+		createCmd: func(path string) command {
 			return &extCmd{
 				baseCommand: newBaseCmd(c, path),
 			}
@@ -29,8 +27,6 @@ func newExt(c conf) *cobra.Command {
 	}
 
 	cmd := cc.newCobraCommand("e", "ext", "Show file extensions statistic")
-
-	configurePath(cmd, &path)
 
 	return cmd
 }

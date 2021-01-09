@@ -26,20 +26,20 @@ func (f *fileCmd) execute() error {
 }
 
 func newFile(c conf) *cobra.Command {
-	opt := options{}
+	var vrange []int
 
 	cc := cobraCreator{
-		createCmd: func() command {
+		createCmd: func(path string) command {
 			return &fileCmd{
-				baseCommand: newBaseCmd(c, opt.path),
-				vrange:      opt.vrange,
+				baseCommand: newBaseCmd(c, path),
+				vrange:      vrange,
 			}
 		},
 	}
 
 	cmd := cc.newCobraCommand("fi", "file", "Show information only about files")
 
-	configure(cmd, &opt)
+	confRange(cmd, &vrange)
 
 	return cmd
 }

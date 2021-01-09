@@ -18,10 +18,8 @@ func (f *folderCmd) execute() error {
 }
 
 func newFolder(c conf) *cobra.Command {
-	var path string
-
 	cc := cobraCreator{
-		createCmd: func() command {
+		createCmd: func(path string) command {
 			return &folderCmd{
 				baseCommand: newBaseCmd(c, path),
 			}
@@ -29,8 +27,6 @@ func newFolder(c conf) *cobra.Command {
 	}
 
 	cmd := cc.newCobraCommand("fo", "folder", "Show information only about folders")
-
-	configurePath(cmd, &path)
 
 	return cmd
 }

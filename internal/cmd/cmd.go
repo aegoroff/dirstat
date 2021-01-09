@@ -45,20 +45,27 @@ func (b *baseCommand) run(modules ...module.Module) {
 }
 
 type cobraCreator struct {
-	createCmd func() command
+	createCmd func(path string) command
 }
 
 func (c *cobraCreator) runE() cobraRunSignature {
 	return func(cmd *cobra.Command, args []string) error {
-		return c.createCmd().execute()
+		path := ""
+		if len(args) > 0 {
+			path = args[0]
+		} else {
+			return cmd.Help()
+		}
+		return c.createCmd(path).execute()
 	}
 }
 
 func (c *cobraCreator) newCobraCommand(use, alias, short string) *cobra.Command {
 	var cmd = &cobra.Command{
-		Use:     use,
+		Use:     use + " [path]",
 		Aliases: []string{alias},
 		Short:   short,
+		Args:    cobra.MaximumNArgs(1),
 		RunE:    c.runE(),
 	}
 	return cmd

@@ -29,20 +29,20 @@ func (a *allCmd) execute() error {
 }
 
 func newAll(c conf) *cobra.Command {
-	opt := options{}
+	var vrange []int
 
 	cc := cobraCreator{
-		createCmd: func() command {
+		createCmd: func(path string) command {
 			return &allCmd{
-				baseCommand: newBaseCmd(c, opt.path),
-				vrange:      opt.vrange,
+				baseCommand: newBaseCmd(c, path),
+				vrange:      vrange,
 			}
 		},
 	}
 
 	cmd := cc.newCobraCommand("a", "all", "Show all information about folder/volume")
 
-	configure(cmd, &opt)
+	confRange(cmd, &vrange)
 
 	return cmd
 }

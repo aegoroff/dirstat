@@ -18,10 +18,8 @@ func (b *benfordCmd) execute() error {
 }
 
 func newBenford(c conf) *cobra.Command {
-	var path string
-
 	cc := cobraCreator{
-		createCmd: func() command {
+		createCmd: func(path string) command {
 			return &benfordCmd{
 				baseCommand: newBaseCmd(c, path),
 			}
@@ -29,8 +27,6 @@ func newBenford(c conf) *cobra.Command {
 	}
 
 	cmd := cc.newCobraCommand("b", "benford", "Show the first digit distribution of files size (benford law validation)")
-
-	configurePath(cmd, &path)
 
 	return cmd
 }
