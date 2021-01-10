@@ -31,7 +31,7 @@ func Execute(path string, fs afero.Fs, p out.Printer, modules ...Module) {
 
 	scan.Scan(path, newFs(fs), handlers...)
 
-	render(p, renderers)
+	render(renderers, p)
 }
 
 // NewFoldersModule creates new folders module
@@ -161,7 +161,7 @@ func (br *baseRenderer) order() int {
 	return br.ord
 }
 
-func render(p out.Printer, renderers []renderer) {
+func render(renderers []renderer, p out.Printer) {
 	sort.Slice(renderers, func(i, j int) bool {
 		return renderers[i].order() < renderers[j].order()
 	})
