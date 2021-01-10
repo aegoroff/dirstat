@@ -32,7 +32,7 @@ build_script:
   - gox -osarch="linux/amd64 linux/arm linux/arm64 darwin/amd64 windows/amd64" -ldflags "-s -w -X github.com/aegoroff/dirstat/internal/cmd.Version=%APPVEYOR_BUILD_VERSION%" github.com/aegoroff/dirstat
 
 test_script:
-  - go test -coverprofile=coverage.txt -coverpkg github.com/aegoroff/dirstat/internal/cmd,github.com/aegoroff/dirstat/scan,github.com/aegoroff/dirstat/internal/module -covermode=atomic github.com/aegoroff/dirstat/...
+  - go test -coverprofile=coverage.txt -coverpkg github.com/aegoroff/dirstat/internal/cmd,github.com/aegoroff/dirstat/scan,github.com/aegoroff/dirstat/internal/module,github.com/aegoroff/dirstat/internal/out -covermode=atomic github.com/aegoroff/dirstat/...
 
 after_test:
   - ps: |
