@@ -23,7 +23,7 @@ func newExtRenderer(ctx *Context, order int) renderer {
 
 // Renderer method
 
-func (e *extRenderer) print(p out.Printer) {
+func (e *extRenderer) render(p out.Printer) {
 	extBySize := e.evolventMap(func(agr countSizeAggregate) int64 {
 		return int64(agr.Size)
 	})

@@ -67,7 +67,7 @@ func (m *totalFolderHandler) Handle(*scan.Event) {
 
 // Renderer method
 
-func (m *totalRenderer) print(p out.Printer) {
+func (m *totalRenderer) render(p out.Printer) {
 	m.total.countExtensions()
 	const totalTemplate = `
 Total files:            {{.FilesTotal.Count}} ({{.FilesTotal.Size | toBytesString }})

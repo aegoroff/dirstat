@@ -47,7 +47,7 @@ func (b *benfordFileHandler) Handle(evt *scan.Event) {
 	b.distribution[s]++
 }
 
-func (b *benfordFileRenderer) print(p out.Printer) {
+func (b *benfordFileRenderer) render(p out.Printer) {
 	p.Println()
 	p.Cprint("<gray>The first file's size digit distribution of non zero files (benford law):</>")
 	p.Println()

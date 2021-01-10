@@ -62,7 +62,7 @@ func (m *aggregateFileHandler) Handle(evt *scan.Event) {
 
 // Renderer method
 
-func (m *aggregateFileRenderer) print(p out.Printer) {
+func (m *aggregateFileRenderer) render(p out.Printer) {
 	p.Cprint("<gray>Total files stat:</>\n\n")
 
 	tab := newTableWriter(p)

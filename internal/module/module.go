@@ -7,17 +7,6 @@ import (
 	"sort"
 )
 
-// Module defines working modules interface
-type Module interface {
-	handlers() []scan.Handler
-	renderers() []renderer
-}
-
-type renderer interface {
-	print(p out.Printer)
-	order() int
-}
-
 type filesystem struct {
 	fs afero.Fs
 }
@@ -178,6 +167,6 @@ func render(p out.Printer, renderers []renderer) {
 	})
 
 	for _, r := range renderers {
-		r.print(p)
+		r.render(p)
 	}
 }

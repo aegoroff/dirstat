@@ -73,7 +73,7 @@ func (m *detailFileHandler) Handle(evt *scan.Event) {
 
 // Renderer method
 
-func (m *detailFileRenderer) print(p out.Printer) {
+func (m *detailFileRenderer) render(p out.Printer) {
 	heads := m.fileRanges.heads(numPrefixDecorator)
 	p.Cprint("\n<gray>Detailed files stat:</>\n")
 	for i, r := range m.fileRanges {

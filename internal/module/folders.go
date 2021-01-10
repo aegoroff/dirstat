@@ -2,7 +2,6 @@ package module
 
 import (
 	"errors"
-	"fmt"
 	"github.com/aegoroff/dirstat/internal/out"
 	"github.com/aegoroff/dirstat/scan"
 	"github.com/aegoroff/godatastruct/rbtree"
@@ -10,14 +9,6 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 )
-
-// Folder interface
-type folderI interface {
-	fmt.Stringer
-	Path() string
-	Size() int64
-	Count() int64
-}
 
 // folder represents file system container that described by path
 // and has size and the number of elements in it (count field).
@@ -135,7 +126,7 @@ func castCount(c rbtree.Comparable) (folderI, error) {
 	return f, nil
 }
 
-func (f *foldersRenderer) print(p out.Printer) {
+func (f *foldersRenderer) render(p out.Printer) {
 	p.Cprint("\n<gray>TOP %d folders by size:</>\n\n", f.bySize.Len())
 
 	f.printTop(f.bySize, p, castSize)

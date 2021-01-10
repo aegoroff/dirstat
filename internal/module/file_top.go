@@ -56,7 +56,7 @@ func (m *topFilesHandler) Handle(evt *scan.Event) {
 
 // Renderer method
 
-func (m *topFilesRenderer) print(p out.Printer) {
+func (m *topFilesRenderer) render(p out.Printer) {
 	p.Cprint("\n<gray>TOP %d files by size:</>\n\n", m.tree.Len())
 
 	tab := newTableWriter(p)
