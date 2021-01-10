@@ -64,9 +64,8 @@ func (c *cobraCreator) runE() cobraRunSignature {
 	return func(cmd *cobra.Command, args []string) error {
 		if len(args) > 0 {
 			return c.createCmd(args[0]).execute()
-		} else {
-			return cmd.Help()
 		}
+		return cmd.Help()
 	}
 }
 
