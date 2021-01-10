@@ -74,7 +74,10 @@ Total files:            {{.FilesTotal.Count}} ({{.FilesTotal.Size | toBytesStrin
 Total folders:          {{.CountFolders}}
 Total file extensions:  {{.CountFileExts}}`
 
-	var report = template.Must(template.New("totalstat").Funcs(template.FuncMap{"toBytesString": humanize.IBytes}).Parse(totalTemplate))
+	transform := template.FuncMap{"toBytesString": humanize.IBytes}
+	tpl := template.New("totalstat").Funcs(transform)
+
+	var report = template.Must(tpl.Parse(totalTemplate))
 
 	_, _ = color.Set(color.FgGray)
 	_ = report.Execute(p.Writer(), m.total)
