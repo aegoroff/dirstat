@@ -1,6 +1,7 @@
 package module
 
 import (
+	"github.com/aegoroff/dirstat/internal/out"
 	"github.com/aegoroff/dirstat/scan"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/aegoroff/godatastruct/rbtree/special"
@@ -55,10 +56,10 @@ func (m *topFilesHandler) Handle(evt *scan.Event) {
 
 // Renderer method
 
-func (m *topFilesRenderer) print(p printer) {
+func (m *topFilesRenderer) print(p out.Printer) {
 	p.Cprint("\n<gray>TOP %d files by size:</>\n\n", m.tree.Len())
 
-	tab := p.createTab()
+	tab := newTableWriter(p)
 
 	tab.SetColumnConfigs([]table.ColumnConfig{
 		{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignRight},

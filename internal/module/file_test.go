@@ -130,7 +130,7 @@ func Test_printTopFile_invalidCastingError(t *testing.T) {
 	p, _ := e.NewPrinter()
 
 	// Act
-	fr.print(newPrinter(p))
+	fr.print(p)
 
 	// Assert
 	ass.Contains(e.String(), "Invalid casting: expected *file key type but it wasn`t")

@@ -235,7 +235,7 @@ func Test_printTop_invalidCastingError(t *testing.T) {
 	p, _ := e.NewPrinter()
 
 	// Act
-	fr.printTop(ft, newPrinter(p), castSize)
+	fr.printTop(ft, p, castSize)
 
 	// Assert
 	ass.Contains(e.String(), "invalid casting: expected *folderS key type but it wasn`t")

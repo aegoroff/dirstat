@@ -4,6 +4,7 @@ import (
 	"github.com/aegoroff/dirstat/internal/out"
 	"github.com/aegoroff/dirstat/scan"
 	"github.com/spf13/afero"
+	"sort"
 )
 
 // Module defines working modules interface
@@ -13,7 +14,7 @@ type Module interface {
 }
 
 type renderer interface {
-	print(p printer)
+	print(p out.Printer)
 	order() int
 }
 
@@ -169,4 +170,14 @@ func newBaseRenderer(order int) *baseRenderer {
 
 func (br *baseRenderer) order() int {
 	return br.ord
+}
+
+func render(p out.Printer, renderers []renderer) {
+	sort.Slice(renderers, func(i, j int) bool {
+		return renderers[i].order() < renderers[j].order()
+	})
+
+	for _, r := range renderers {
+		r.print(p)
+	}
 }

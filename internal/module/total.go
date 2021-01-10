@@ -1,6 +1,7 @@
 package module
 
 import (
+	"github.com/aegoroff/dirstat/internal/out"
 	"github.com/aegoroff/dirstat/scan"
 	"github.com/dustin/go-humanize"
 	"github.com/gookit/color"
@@ -66,7 +67,7 @@ func (m *totalFolderHandler) Handle(*scan.Event) {
 
 // Renderer method
 
-func (m *totalRenderer) print(p printer) {
+func (m *totalRenderer) print(p out.Printer) {
 	m.total.countExtensions()
 	const totalTemplate = `
 Total files:            {{.FilesTotal.Count}} ({{.FilesTotal.Size | toBytesString }})

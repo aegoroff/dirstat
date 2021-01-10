@@ -1,6 +1,7 @@
 package module
 
 import (
+	"github.com/aegoroff/dirstat/internal/out"
 	"github.com/aegoroff/dirstat/scan"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
@@ -46,13 +47,13 @@ func (b *benfordFileHandler) Handle(evt *scan.Event) {
 	b.distribution[s]++
 }
 
-func (b *benfordFileRenderer) print(p printer) {
+func (b *benfordFileRenderer) print(p out.Printer) {
 	p.Println()
 	p.Cprint("<gray>The first file's size digit distribution of non zero files (benford law):</>")
 	p.Println()
 	p.Println()
 
-	tab := p.createTab()
+	tab := newTableWriter(p)
 
 	tab.SetColumnConfigs([]table.ColumnConfig{
 		{Number: 1, Align: text.AlignLeft, AlignHeader: text.AlignLeft},

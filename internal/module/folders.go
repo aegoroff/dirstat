@@ -3,6 +3,7 @@ package module
 import (
 	"errors"
 	"fmt"
+	"github.com/aegoroff/dirstat/internal/out"
 	"github.com/aegoroff/dirstat/scan"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/aegoroff/godatastruct/rbtree/special"
@@ -134,7 +135,7 @@ func castCount(c rbtree.Comparable) (folderI, error) {
 	return f, nil
 }
 
-func (f *foldersRenderer) print(p printer) {
+func (f *foldersRenderer) print(p out.Printer) {
 	p.Cprint("\n<gray>TOP %d folders by size:</>\n\n", f.bySize.Len())
 
 	f.printTop(f.bySize, p, castSize)
@@ -144,8 +145,8 @@ func (f *foldersRenderer) print(p printer) {
 	f.printTop(f.byCount, p, castCount)
 }
 
-func (f *foldersRenderer) printTop(ft rbtree.RbTree, p printer, cast folderCast) {
-	tab := p.createTab()
+func (f *foldersRenderer) printTop(ft rbtree.RbTree, p out.Printer, cast folderCast) {
+	tab := newTableWriter(p)
 
 	tab.SetColumnConfigs([]table.ColumnConfig{
 		{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignRight},

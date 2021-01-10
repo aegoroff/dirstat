@@ -2,6 +2,7 @@ package module
 
 import (
 	"fmt"
+	"github.com/dustin/go-humanize"
 	"time"
 )
 
@@ -81,4 +82,8 @@ func (r ranges) heads(hd headDecorator) []string {
 		heads[i] = hd(i, h)
 	}
 	return heads
+}
+
+func human(n int64) string {
+	return humanize.IBytes(uint64(n))
 }

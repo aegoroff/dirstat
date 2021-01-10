@@ -1,6 +1,7 @@
 package module
 
 import (
+	"github.com/aegoroff/dirstat/internal/out"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 	"sort"
@@ -22,7 +23,7 @@ func newExtRenderer(ctx *Context, order int) renderer {
 
 // Renderer method
 
-func (e *extRenderer) print(p printer) {
+func (e *extRenderer) print(p out.Printer) {
 	extBySize := e.evolventMap(func(agr countSizeAggregate) int64 {
 		return int64(agr.Size)
 	})
@@ -55,7 +56,7 @@ func (e *extRenderer) print(p printer) {
 type fileExtPrint struct {
 	count   func(f *file) int64
 	size    func(f *file) uint64
-	p       printer
+	p       out.Printer
 	headfmt string
 	total   *totalInfo
 }
@@ -66,7 +67,7 @@ func (fp *fileExtPrint) print(data files, top int) {
 	fp.p.Println()
 	fp.p.Println()
 
-	tab := fp.p.createTab()
+	tab := newTableWriter(fp.p)
 
 	tab.SetColumnConfigs([]table.ColumnConfig{
 		{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignRight},

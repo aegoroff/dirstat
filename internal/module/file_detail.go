@@ -1,6 +1,7 @@
 package module
 
 import (
+	"github.com/aegoroff/dirstat/internal/out"
 	"github.com/aegoroff/dirstat/scan"
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"sort"
@@ -72,7 +73,7 @@ func (m *detailFileHandler) Handle(evt *scan.Event) {
 
 // Renderer method
 
-func (m *detailFileRenderer) print(p printer) {
+func (m *detailFileRenderer) print(p out.Printer) {
 	heads := m.fileRanges.heads(numPrefixDecorator)
 	p.Cprint("\n<gray>Detailed files stat:</>\n")
 	for i, r := range m.fileRanges {
