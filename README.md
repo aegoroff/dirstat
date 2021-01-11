@@ -56,10 +56,11 @@ Available Commands:
   version     Print the version number of dirstat
 
 Flags:
-  -h, --help         help for dirstat
-  -m, --memory       Show memory statistic after run
-  -o, --removeroot   Remove root part from full path i.e. output relative paths
-  -t, --top int      The number of lines in top statistics. (default 10)
+  -h, --help            help for dirstat
+  -m, --memory          Show memory statistic after run
+  -p, --output string   Write results into file. Specify path to output file using this option
+  -o, --removeroot      Remove root part from full path i.e. output relative paths
+  -t, --top int         The number of lines in top statistics. (default 10)
 
 Use "dirstat [command] --help" for more information about a command.
 ```
