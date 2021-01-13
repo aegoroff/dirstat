@@ -28,15 +28,15 @@ func Test_PositiveTests(t *testing.T) {
 		mustcontain string
 	}{
 		{"a /", []string{"a", "/"}, "Total files"},
-		{"a / -t 3", []string{"a", "/", "-t", "3"}, "Total files"},
-		{"a / -r 1", []string{"a", "/", "-r", "1"}, "Total files"},
+		{"a / -t 3", []string{"a", "/", "-t", "3"}, "TOP 3 file extensions by size"},
+		{"a / -r 1", []string{"a", "/", "-r", "1"}, "Between 0 B and 100 KiB"},
 		{"a /f -r 1 -o", []string{"a", "/f", "-r", "1", "-o"}, "Total files"},
 		{"a / -m", []string{"a", "/", "-m"}, "Total files"},
 		{"a /f -o", []string{"a", "/f", "-o"}, "Total files"},
-		{"b /", []string{"b", "/"}, "The first file's size digit distribution of non zero files (benford law):"},
-		{"fi /", []string{"fi", "/"}, "Total files"},
-		{"e /", []string{"e", "/"}, "Total files"},
-		{"fo /", []string{"fo", "/"}, "Total files"},
+		{"b /", []string{"b", "/"}, "The first file's size digit distribution of non zero files \\(benford law\\)"},
+		{"fi /", []string{"fi", "/"}, "TOP \\d+ files by size"},
+		{"e /", []string{"e", "/"}, "TOP \\d+ file extensions by size"},
+		{"fo /", []string{"fo", "/"}, "TOP \\d+ folders by size"},
 		{"ver", []string{"ver"}, Version},
 		{"nothing", []string{}, ""},
 		{"fi :", []string{"fi", ":"}, ""},
@@ -53,7 +53,7 @@ func Test_PositiveTests(t *testing.T) {
 			// Assert
 			o := w.String()
 			ass.NoError(err)
-			ass.Contains(o, test.mustcontain)
+			ass.Regexp(test.mustcontain, o)
 			fmt.Println(strings.Join(test.cmdline, " "))
 			fmt.Println("----------------------------------------------")
 			fmt.Println(o)
