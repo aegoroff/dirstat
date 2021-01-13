@@ -137,18 +137,18 @@ func (f *foldersRenderer) render(p out.Printer) {
 }
 
 func (f *foldersRenderer) printTop(ft rbtree.RbTree, p out.Printer, cast folderCast) {
-	tab := newTableWriter(p)
+	tw := newTableWriter(p)
 
-	tab.SetColumnConfigs([]table.ColumnConfig{
+	tw.tab.SetColumnConfigs([]table.ColumnConfig{
 		{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignRight},
 		{Number: 2, Align: text.AlignLeft, AlignHeader: text.AlignLeft, WidthMax: 100},
 		{Number: 3, Align: text.AlignLeft, AlignHeader: text.AlignLeft},
-		{Number: 4, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: percentTransformer},
-		{Number: 5, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: sizeTransformer},
-		{Number: 6, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: percentTransformer},
+		{Number: 4, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.percentTransformer},
+		{Number: 5, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.sizeTransformer},
+		{Number: 6, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.percentTransformer},
 	})
 
-	appendHeaders([]string{"#", "Folder", "Files", "%", "Size", "%"}, tab)
+	tw.appendHeaders([]string{"#", "Folder", "Files", "%", "Size", "%"})
 
 	i := 1
 
@@ -166,7 +166,7 @@ func (f *foldersRenderer) printTop(ft rbtree.RbTree, p out.Printer, cast folderC
 		percentOfCount := f.total.countPercent(count)
 		percentOfSize := f.total.sizePercent(sz)
 
-		tab.AppendRow([]interface{}{
+		tw.tab.AppendRow([]interface{}{
 			i,
 			fi.Path(),
 			count,
@@ -178,5 +178,5 @@ func (f *foldersRenderer) printTop(ft rbtree.RbTree, p out.Printer, cast folderC
 		i++
 	}
 
-	tab.Render()
+	tw.tab.Render()
 }

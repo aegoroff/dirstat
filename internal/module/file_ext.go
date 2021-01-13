@@ -67,18 +67,18 @@ func (fp *fileExtPrint) print(data files, top int) {
 	fp.p.Println()
 	fp.p.Println()
 
-	tab := newTableWriter(fp.p)
+	tw := newTableWriter(fp.p)
 
-	tab.SetColumnConfigs([]table.ColumnConfig{
+	tw.tab.SetColumnConfigs([]table.ColumnConfig{
 		{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignRight},
 		{Number: 2, Align: text.AlignLeft, AlignHeader: text.AlignLeft, WidthMax: 100},
 		{Number: 3, Align: text.AlignLeft, AlignHeader: text.AlignLeft},
-		{Number: 4, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: percentTransformer},
-		{Number: 5, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: sizeTransformer},
-		{Number: 6, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: percentTransformer},
+		{Number: 4, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.percentTransformer},
+		{Number: 5, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.sizeTransformer},
+		{Number: 6, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.percentTransformer},
 	})
 
-	appendHeaders([]string{"#", "Extension", "Count", "%", "Size", "%"}, tab)
+	tw.appendHeaders([]string{"#", "Extension", "Count", "%", "Size", "%"})
 
 	sort.Sort(sort.Reverse(data))
 
@@ -91,7 +91,7 @@ func (fp *fileExtPrint) print(data files, top int) {
 		percentOfCount := fp.total.countPercent(count)
 		percentOfSize := fp.total.sizePercent(sz)
 
-		tab.AppendRow([]interface{}{
+		tw.tab.AppendRow([]interface{}{
 			i + 1,
 			h,
 			count,
@@ -101,7 +101,7 @@ func (fp *fileExtPrint) print(data files, top int) {
 		})
 	}
 
-	tab.Render()
+	tw.tab.Render()
 }
 
 func (e *extRenderer) evolventMap(mapper func(countSizeAggregate) int64) files {

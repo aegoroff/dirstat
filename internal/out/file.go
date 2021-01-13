@@ -41,6 +41,10 @@ func (e *fileEnvironment) PrintFunc(w io.Writer, format string, a ...interface{}
 	e.base.PrintFunc(w, format, a...)
 }
 
+func (e *fileEnvironment) SprintFunc(format string, a ...interface{}) string {
+	return e.base.SprintFunc(format, a...)
+}
+
 func (e *fileEnvironment) Writer() io.WriteCloser {
 	return e.base.Writer()
 }

@@ -59,15 +59,15 @@ func (m *topFilesHandler) Handle(evt *scan.Event) {
 func (m *topFilesRenderer) render(p out.Printer) {
 	p.Cprint("\n<gray>TOP %d files by size:</>\n\n", m.tree.Len())
 
-	tab := newTableWriter(p)
+	tw := newTableWriter(p)
 
-	tab.SetColumnConfigs([]table.ColumnConfig{
+	tw.tab.SetColumnConfigs([]table.ColumnConfig{
 		{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignRight},
 		{Number: 2, Align: text.AlignLeft, AlignHeader: text.AlignLeft, WidthMax: 100},
-		{Number: 3, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: sizeTransformer},
+		{Number: 3, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.sizeTransformer},
 	})
 
-	appendHeaders([]string{"#", "File", "Size"}, tab)
+	tw.appendHeaders([]string{"#", "File", "Size"})
 
 	i := 1
 
@@ -82,7 +82,7 @@ func (m *topFilesRenderer) render(p out.Printer) {
 			return
 		}
 
-		tab.AppendRow([]interface{}{
+		tw.tab.AppendRow([]interface{}{
 			i,
 			file,
 			uint64(file.size),
@@ -91,5 +91,5 @@ func (m *topFilesRenderer) render(p out.Printer) {
 		i++
 	}
 
-	tab.Render()
+	tw.tab.Render()
 }

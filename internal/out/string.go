@@ -23,8 +23,12 @@ func newStringEnvironment(w io.WriteCloser) *stringEnvironment {
 }
 
 func (e *stringEnvironment) PrintFunc(w io.Writer, format string, a ...interface{}) {
+	_, _ = fmt.Fprintf(w, e.SprintFunc(format, a...))
+}
+
+func (e *stringEnvironment) SprintFunc(format string, a ...interface{}) string {
 	s := fmt.Sprintf(format, a...)
-	_, _ = fmt.Fprintf(w, e.re.ReplaceAllString(s, "$1"))
+	return e.re.ReplaceAllString(s, "$1")
 }
 
 func (e *stringEnvironment) Writer() io.WriteCloser {

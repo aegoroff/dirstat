@@ -35,6 +35,10 @@ func (*consoleEnvironment) PrintFunc(w io.Writer, format string, a ...interface{
 	color.Fprintf(w, format, a...)
 }
 
+func (e *consoleEnvironment) SprintFunc(format string, a ...interface{}) string {
+	return color.Sprintf(format, a...)
+}
+
 func (e *consoleEnvironment) Writer() io.WriteCloser {
 	return e.stdout
 }

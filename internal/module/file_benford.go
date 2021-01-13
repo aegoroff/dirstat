@@ -53,18 +53,18 @@ func (b *benfordFileRenderer) render(p out.Printer) {
 	p.Println()
 	p.Println()
 
-	tab := newTableWriter(p)
+	tw := newTableWriter(p)
 
-	tab.SetColumnConfigs([]table.ColumnConfig{
+	tw.tab.SetColumnConfigs([]table.ColumnConfig{
 		{Number: 1, Align: text.AlignLeft, AlignHeader: text.AlignLeft},
 		{Number: 2, Align: text.AlignLeft, AlignHeader: text.AlignLeft},
-		{Number: 3, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: percentTransformer},
+		{Number: 3, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.percentTransformer},
 		{Number: 4, Align: text.AlignLeft, AlignHeader: text.AlignLeft},
-		{Number: 5, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: percentTransformer},
-		{Number: 6, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: percentTransformer},
+		{Number: 5, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.percentTransformer},
+		{Number: 6, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.percentTransformer},
 	})
 
-	appendHeaders([]string{"Digit", "Count", "%", "Benford ideal", "%", "Deviation"}, tab)
+	tw.appendHeaders([]string{"Digit", "Count", "%", "Benford ideal", "%", "Deviation"})
 
 	// IDEAL percents
 	ideals := []float64{30.1, 17.6, 12.5, 9.7, 7.9, 6.7, 5.8, 5.1, 4.6}
@@ -90,7 +90,7 @@ func (b *benfordFileRenderer) render(p out.Printer) {
 			deviation = float64(diff) / float64(ideal)
 		}
 
-		tab.AppendRow([]interface{}{
+		tw.tab.AppendRow([]interface{}{
 			i,
 			count,
 			percentOfCount,
@@ -100,5 +100,5 @@ func (b *benfordFileRenderer) render(p out.Printer) {
 		})
 	}
 
-	tab.Render()
+	tw.tab.Render()
 }

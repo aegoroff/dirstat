@@ -65,18 +65,18 @@ func (m *aggregateFileHandler) Handle(evt *scan.Event) {
 func (m *aggregateFileRenderer) render(p out.Printer) {
 	p.Cprint("<gray>Total files stat:</>\n\n")
 
-	tab := newTableWriter(p)
+	tw := newTableWriter(p)
 
-	tab.SetColumnConfigs([]table.ColumnConfig{
+	tw.tab.SetColumnConfigs([]table.ColumnConfig{
 		{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignRight},
 		{Number: 2, Align: text.AlignLeft, AlignHeader: text.AlignLeft, WidthMax: 100},
 		{Number: 3, Align: text.AlignLeft, AlignHeader: text.AlignLeft},
-		{Number: 4, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: percentTransformer},
-		{Number: 5, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: sizeTransformer},
-		{Number: 6, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: percentTransformer},
+		{Number: 4, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.percentTransformer},
+		{Number: 5, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.sizeTransformer},
+		{Number: 6, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.percentTransformer},
 	})
 
-	appendHeaders([]string{"#", "File size", "Amount", "%", "Size", "%"}, tab)
+	tw.appendHeaders([]string{"#", "File size", "Amount", "%", "Size", "%"})
 
 	heads := m.fileRanges.heads(transparentDecorator)
 	for i, r := range m.fileRanges {
@@ -86,7 +86,7 @@ func (m *aggregateFileRenderer) render(p out.Printer) {
 		percentOfCount := m.total.countPercent(count)
 		percentOfSize := m.total.sizePercent(sz)
 
-		tab.AppendRow([]interface{}{
+		tw.tab.AppendRow([]interface{}{
 			i + 1,
 			heads[i],
 			count,
@@ -95,5 +95,5 @@ func (m *aggregateFileRenderer) render(p out.Printer) {
 			percentOfSize,
 		})
 	}
-	tab.Render()
+	tw.tab.Render()
 }

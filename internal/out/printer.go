@@ -15,6 +15,10 @@ func (r *prn) Cprint(format string, a ...interface{}) {
 	r.env.PrintFunc(r.env.Writer(), format, a...)
 }
 
+func (r *prn) Sprintf(format string, a ...interface{}) string {
+	return r.env.SprintFunc(format, a...)
+}
+
 func (r *prn) Println() {
 	r.Cprint("\n")
 }
