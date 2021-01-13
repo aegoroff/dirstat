@@ -33,7 +33,7 @@ func Test_PositiveTests(t *testing.T) {
 		{"a /f -r 1 -o", []string{"a", "/f", "-r", "1", "-o"}, "Total files"},
 		{"a / -m", []string{"a", "/", "-m"}, "Total files"},
 		{"a /f -o", []string{"a", "/f", "-o"}, "Total files"},
-		{"b /", []string{"b", "/"}, "Total files"},
+		{"b /", []string{"b", "/"}, "The first file's size digit distribution of non zero files (benford law):"},
 		{"fi /", []string{"fi", "/"}, "Total files"},
 		{"e /", []string{"e", "/"}, "Total files"},
 		{"fo /", []string{"fo", "/"}, "Total files"},
