@@ -12,26 +12,29 @@ func TestRange_Contains(t *testing.T) {
 		Max: 100,
 	}
 	var tests = []struct {
+		name   string
 		val    int64
 		result bool
 	}{
-		{-1, false},
-		{1, true},
-		{100, true},
-		{50, true},
-		{0, false},
-		{101, false},
+		{"-1", -1, false},
+		{"1", 1, true},
+		{"100", 100, true},
+		{"50", 50, true},
+		{"0", 0, false},
+		{"101", 101, false},
 	}
 
 	for _, test := range tests {
-		// Arrange
-		ass := assert.New(t)
+		t.Run(test.name, func(t *testing.T) {
+			// Arrange
+			ass := assert.New(t)
 
-		// Act
-		contains := r.Contains(test.val)
+			// Act
+			contains := r.Contains(test.val)
 
-		// Assert
-		ass.Equal(test.result, contains)
+			// Assert
+			ass.Equal(test.result, contains)
+		})
 	}
 }
 
@@ -84,5 +87,32 @@ func Test_heads(t *testing.T) {
 		for _, s := range ss {
 			ass.Regexp(test.match, s)
 		}
+	}
+}
+
+func Test_percent(t *testing.T) {
+	var tests = []struct {
+		name     string
+		val      float64
+		total    float64
+		expected float64
+	}{
+		{"0/100 = 0", 0, 100, 0},
+		{"10/100 = 10", 10, 100, 10},
+		{"10/0 = 0", 10, 0, 0},
+		{"33.5/100 = 33.5", 33.5, 100, 33.5},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// Arrange
+			ass := assert.New(t)
+
+			// Act
+			result := percent(test.val, test.total)
+
+			// Assert
+			ass.Equal(test.expected, result)
+		})
 	}
 }

@@ -62,6 +62,9 @@ func (t *totalInfo) countExtensions() {
 }
 
 func percent(value float64, total float64) float64 {
+	if total == 0 {
+		return 0
+	}
 	return (value / total) * 100
 }
 
