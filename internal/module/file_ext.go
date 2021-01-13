@@ -28,16 +28,13 @@ func (e *extRenderer) render(p out.Printer) {
 	e.createTops()
 
 	heads := []string{"#", "Extension", "Count", "%", "Size", "%"}
+	top := newTopper(p, e.total, heads)
 
 	p.Cprint("\n<gray>TOP %d file extensions by size:</>\n\n", e.bySize.Len())
-
-	ts := newTop(e.bySize, castSize, heads)
-	ts.print(p, e.total)
+	top.print(e.bySize, castSize)
 
 	p.Cprint("\n<gray>TOP %d file extensions by count:</>\n\n", e.byCount.Len())
-
-	tc := newTop(e.byCount, castCount, heads)
-	tc.print(p, e.total)
+	top.print(e.byCount, castCount)
 }
 
 func (e *extRenderer) createTops() {

@@ -232,10 +232,10 @@ func Test_printTop_invalidCastingError(t *testing.T) {
 	ft.Insert(rbtree.Int(3))
 	e := out.NewMemoryEnvironment()
 	p, _ := e.NewPrinter()
-	tp := newTop(ft, castSize, nil)
+	tp := newTopper(p, nil, nil)
 
 	// Act
-	tp.print(p, nil)
+	tp.print(ft, castSize)
 
 	// Assert
 	ass.Contains(e.String(), "invalid casting: expected *folderS key type but it wasn`t")

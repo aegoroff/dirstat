@@ -65,14 +65,11 @@ func (m *foldersHandler) Handle(evt *scan.Event) {
 
 func (f *foldersRenderer) render(p out.Printer) {
 	heads := []string{"#", "Folder", "Files", "%", "Size", "%"}
+	top := newTopper(p, f.total, heads)
 
 	p.Cprint("\n<gray>TOP %d folders by size:</>\n\n", f.bySize.Len())
-
-	ts := newTop(f.bySize, castSize, heads)
-	ts.print(p, f.total)
+	top.print(f.bySize, castSize)
 
 	p.Cprint("\n<gray>TOP %d folders by count:</>\n\n", f.byCount.Len())
-
-	tc := newTop(f.byCount, castCount, heads)
-	tc.print(p, f.total)
+	top.print(f.byCount, castCount)
 }
