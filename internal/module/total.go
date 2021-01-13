@@ -70,11 +70,15 @@ func (m *totalFolderHandler) Handle(*scan.Event) {
 func (m *totalRenderer) render(p out.Printer) {
 	m.total.countExtensions()
 	const totalTemplate = `
-Total files:            {{.FilesTotal.Count}} ({{.FilesTotal.Size | toBytesString }})
-Total folders:          {{.CountFolders}}
-Total file extensions:  {{.CountFileExts}}`
+Total files:            {{.FilesTotal.Count | humanCount}} ({{.FilesTotal.Size | humanSize}})
+Total folders:          {{.CountFolders | humanCount}}
+Total file extensions:  {{.CountFileExts | humanCountInt}}`
 
-	transform := template.FuncMap{"toBytesString": humanize.IBytes}
+	transform := template.FuncMap{
+		"humanSize":     humanize.IBytes,
+		"humanCount":    humanize.Comma,
+		"humanCountInt": func(i int) string { return humanize.Comma(int64(i)) },
+	}
 	tpl := template.New("totalstat").Funcs(transform)
 
 	var report = template.Must(tpl.Parse(totalTemplate))

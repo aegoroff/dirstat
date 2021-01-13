@@ -57,3 +57,8 @@ func (*tableWriter) sizeTransformer(val interface{}) string {
 	sz := val.(uint64)
 	return humanize.IBytes(sz)
 }
+
+func (*tableWriter) countTransformer(val interface{}) string {
+	sz := val.(int64)
+	return humanize.Comma(sz)
+}

@@ -57,9 +57,9 @@ func (b *benfordFileRenderer) render(p out.Printer) {
 
 	tw.configColumns([]table.ColumnConfig{
 		{Number: 1, Align: text.AlignLeft, AlignHeader: text.AlignLeft},
-		{Number: 2, Align: text.AlignLeft, AlignHeader: text.AlignLeft},
+		{Number: 2, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.countTransformer},
 		{Number: 3, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.percentTransformer},
-		{Number: 4, Align: text.AlignLeft, AlignHeader: text.AlignLeft},
+		{Number: 4, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.countTransformer},
 		{Number: 5, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.percentTransformer},
 		{Number: 6, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.percentTransformer},
 	})

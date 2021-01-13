@@ -70,7 +70,7 @@ func (m *aggregateFileRenderer) render(p out.Printer) {
 	tw.configColumns([]table.ColumnConfig{
 		{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignRight},
 		{Number: 2, Align: text.AlignLeft, AlignHeader: text.AlignLeft, WidthMax: 100},
-		{Number: 3, Align: text.AlignLeft, AlignHeader: text.AlignLeft},
+		{Number: 3, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.countTransformer},
 		{Number: 4, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.percentTransformer},
 		{Number: 5, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.sizeTransformer},
 		{Number: 6, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.percentTransformer},
