@@ -15,12 +15,11 @@ func (a *allCmd) execute() error {
 
 	return a.run(
 		module.NewAggregateFileModule(ctx, 0),
-		module.NewBenfordFileModule(ctx, 1),
-		module.NewExtensionModule(ctx, 2),
-		module.NewTopFilesModule(ctx, 3),
-		module.NewFoldersModule(ctx, 4),
-		module.NewDetailFileModule(ctx, 5, a.vrange),
-		module.NewTotalModule(ctx, 6),
+		module.NewExtensionModule(ctx, 1),
+		module.NewTopFilesModule(ctx, 2),
+		module.NewFoldersModule(ctx, 3),
+		module.NewDetailFileModule(ctx, 4, a.vrange),
+		module.NewTotalModule(ctx, 5),
 	)
 }
 
