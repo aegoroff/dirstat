@@ -25,7 +25,7 @@ func newExtRenderer(ctx *Context, order int) renderer {
 // Renderer method
 
 func (e *extRenderer) render(p out.Printer) {
-	e.createTops()
+	e.fillTops()
 
 	heads := []string{"#", "Extension", "Count", "%", "Size", "%"}
 	top := newTopper(p, e.total, heads)
@@ -37,7 +37,7 @@ func (e *extRenderer) render(p out.Printer) {
 	top.print(e.byCount, castCount)
 }
 
-func (e *extRenderer) createTops() {
+func (e *extRenderer) fillTops() {
 	pd := &nonDestructiveDecorator{}
 	for k, v := range e.total.extensions {
 		fn := folder{
