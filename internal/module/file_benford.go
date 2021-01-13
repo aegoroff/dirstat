@@ -55,7 +55,7 @@ func (b *benfordFileRenderer) render(p out.Printer) {
 
 	tw := newTableWriter(p)
 
-	tw.tab.SetColumnConfigs([]table.ColumnConfig{
+	tw.configColumns([]table.ColumnConfig{
 		{Number: 1, Align: text.AlignLeft, AlignHeader: text.AlignLeft},
 		{Number: 2, Align: text.AlignLeft, AlignHeader: text.AlignLeft},
 		{Number: 3, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.percentTransformer},
@@ -64,7 +64,7 @@ func (b *benfordFileRenderer) render(p out.Printer) {
 		{Number: 6, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.percentTransformer},
 	})
 
-	tw.appendHeaders([]string{"Digit", "Count", "%", "Benford ideal", "%", "Deviation"})
+	tw.addHeaders([]string{"Digit", "Count", "%", "Benford ideal", "%", "Deviation"})
 
 	// IDEAL percents
 	ideals := []float64{30.1, 17.6, 12.5, 9.7, 7.9, 6.7, 5.8, 5.1, 4.6}
@@ -90,7 +90,7 @@ func (b *benfordFileRenderer) render(p out.Printer) {
 			deviation = float64(diff) / float64(ideal)
 		}
 
-		tw.tab.AppendRow([]interface{}{
+		tw.addRow([]interface{}{
 			i,
 			count,
 			percentOfCount,
@@ -100,5 +100,5 @@ func (b *benfordFileRenderer) render(p out.Printer) {
 		})
 	}
 
-	tw.tab.Render()
+	tw.render()
 }

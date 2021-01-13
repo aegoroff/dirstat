@@ -67,7 +67,7 @@ func (m *aggregateFileRenderer) render(p out.Printer) {
 
 	tw := newTableWriter(p)
 
-	tw.tab.SetColumnConfigs([]table.ColumnConfig{
+	tw.configColumns([]table.ColumnConfig{
 		{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignRight},
 		{Number: 2, Align: text.AlignLeft, AlignHeader: text.AlignLeft, WidthMax: 100},
 		{Number: 3, Align: text.AlignLeft, AlignHeader: text.AlignLeft},
@@ -76,7 +76,7 @@ func (m *aggregateFileRenderer) render(p out.Printer) {
 		{Number: 6, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.percentTransformer},
 	})
 
-	tw.appendHeaders([]string{"#", "File size", "Amount", "%", "Size", "%"})
+	tw.addHeaders([]string{"#", "File size", "Amount", "%", "Size", "%"})
 
 	heads := m.fileRanges.heads(transparentDecorator)
 	for i, r := range m.fileRanges {
@@ -86,7 +86,7 @@ func (m *aggregateFileRenderer) render(p out.Printer) {
 		percentOfCount := m.total.countPercent(count)
 		percentOfSize := m.total.sizePercent(sz)
 
-		tw.tab.AppendRow([]interface{}{
+		tw.addRow([]interface{}{
 			i + 1,
 			heads[i],
 			count,
@@ -95,5 +95,5 @@ func (m *aggregateFileRenderer) render(p out.Printer) {
 			percentOfSize,
 		})
 	}
-	tw.tab.Render()
+	tw.render()
 }

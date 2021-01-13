@@ -61,13 +61,13 @@ func (m *topFilesRenderer) render(p out.Printer) {
 
 	tw := newTableWriter(p)
 
-	tw.tab.SetColumnConfigs([]table.ColumnConfig{
+	tw.configColumns([]table.ColumnConfig{
 		{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignRight},
 		{Number: 2, Align: text.AlignLeft, AlignHeader: text.AlignLeft, WidthMax: 100},
 		{Number: 3, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.sizeTransformer},
 	})
 
-	tw.appendHeaders([]string{"#", "File", "Size"})
+	tw.addHeaders([]string{"#", "File", "Size"})
 
 	i := 1
 
@@ -82,7 +82,7 @@ func (m *topFilesRenderer) render(p out.Printer) {
 			return
 		}
 
-		tw.tab.AppendRow([]interface{}{
+		tw.addRow([]interface{}{
 			i,
 			file,
 			uint64(file.size),
@@ -91,5 +91,5 @@ func (m *topFilesRenderer) render(p out.Printer) {
 		i++
 	}
 
-	tw.tab.Render()
+	tw.render()
 }

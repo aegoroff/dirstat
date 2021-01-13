@@ -22,12 +22,24 @@ func newTableWriter(p out.Printer) *tableWriter {
 	return &tableWriter{p: p, tab: tab}
 }
 
-func (t *tableWriter) appendHeaders(heads []string) {
+func (t *tableWriter) addHeaders(heads []string) {
 	headers := table.Row{}
 	for _, head := range heads {
 		headers = append(headers, head)
 	}
 	t.tab.AppendHeader(headers)
+}
+
+func (t *tableWriter) configColumns(cc []table.ColumnConfig) {
+	t.tab.SetColumnConfigs(cc)
+}
+
+func (t *tableWriter) render() string {
+	return t.tab.Render()
+}
+
+func (t *tableWriter) addRow(row table.Row, configs ...table.RowConfig) {
+	t.tab.AppendRow(row, configs...)
 }
 
 func (t *tableWriter) percentTransformer(val interface{}) string {
