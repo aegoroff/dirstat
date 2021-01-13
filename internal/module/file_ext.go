@@ -2,114 +2,58 @@ package module
 
 import (
 	"github.com/aegoroff/dirstat/internal/out"
-	"github.com/jedib0t/go-pretty/v6/table"
-	"github.com/jedib0t/go-pretty/v6/text"
-	"sort"
+	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/aegoroff/godatastruct/rbtree/special"
 )
 
 type extRenderer struct {
 	*baseRenderer
-	total *totalInfo
-	top   int
+	total   *totalInfo
+	bySize  rbtree.RbTree
+	byCount rbtree.RbTree
 }
 
 func newExtRenderer(ctx *Context, order int) renderer {
 	return &extRenderer{
 		baseRenderer: newBaseRenderer(order),
 		total:        ctx.total,
-		top:          ctx.top,
+		bySize:       special.NewMaxTree(int64(ctx.top)),
+		byCount:      special.NewMaxTree(int64(ctx.top)),
 	}
 }
 
 // Renderer method
 
 func (e *extRenderer) render(p out.Printer) {
-	extBySize := e.evolventMap(func(agr countSizeAggregate) int64 {
-		return int64(agr.Size)
-	})
+	e.createTops()
 
-	extByCount := e.evolventMap(func(agr countSizeAggregate) int64 {
-		return agr.Count
-	})
+	heads := []string{"#", "Extension", "Count", "%", "Size", "%"}
 
-	sizePrint := fileExtPrint{
-		count:   func(f *file) int64 { return e.total.extensions[f.path].Count },
-		size:    func(f *file) uint64 { return uint64(f.size) },
-		p:       p,
-		headfmt: "<gray>TOP %d file extensions by size:</>",
-		total:   e.total,
-	}
+	p.Cprint("\n<gray>TOP %d file extensions by size:</>\n\n", e.bySize.Len())
 
-	sizePrint.print(extBySize, e.top)
+	ts := newTop(e.bySize, castSize, heads)
+	ts.print(p, e.total)
 
-	countPrint := fileExtPrint{
-		count:   func(f *file) int64 { return f.size },
-		size:    func(f *file) uint64 { return e.total.extensions[f.path].Size },
-		p:       p,
-		headfmt: "<gray>TOP %d file extensions by count:</>",
-		total:   e.total,
-	}
+	p.Cprint("\n<gray>TOP %d file extensions by count:</>\n\n", e.byCount.Len())
 
-	countPrint.print(extByCount, e.top)
+	tc := newTop(e.byCount, castCount, heads)
+	tc.print(p, e.total)
 }
 
-type fileExtPrint struct {
-	count   func(f *file) int64
-	size    func(f *file) uint64
-	p       out.Printer
-	headfmt string
-	total   *totalInfo
-}
-
-func (fp *fileExtPrint) print(data files, top int) {
-	fp.p.Println()
-	fp.p.Cprint(fp.headfmt, top)
-	fp.p.Println()
-	fp.p.Println()
-
-	tw := newTableWriter(fp.p)
-
-	tw.configColumns([]table.ColumnConfig{
-		{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignRight},
-		{Number: 2, Align: text.AlignLeft, AlignHeader: text.AlignLeft, WidthMax: 100},
-		{Number: 3, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.countTransformer},
-		{Number: 4, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.percentTransformer},
-		{Number: 5, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.sizeTransformer},
-		{Number: 6, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.percentTransformer},
-	})
-
-	tw.addHeaders([]string{"#", "Extension", "Count", "%", "Size", "%"})
-
-	sort.Sort(sort.Reverse(data))
-
-	for i := 0; i < top && i < len(data); i++ {
-		h := data[i].path
-
-		count := fp.count(data[i])
-		sz := fp.size(data[i])
-
-		percentOfCount := fp.total.countPercent(count)
-		percentOfSize := fp.total.sizePercent(sz)
-
-		tw.addRow([]interface{}{
-			i + 1,
-			h,
-			count,
-			percentOfCount,
-			sz,
-			percentOfSize,
-		})
-	}
-
-	tw.render()
-}
-
-func (e *extRenderer) evolventMap(mapper func(countSizeAggregate) int64) files {
-	var result = make(files, len(e.total.extensions))
-	i := 0
+func (e *extRenderer) createTops() {
+	pd := &nonDestructiveDecorator{}
 	for k, v := range e.total.extensions {
-		result[i] = &file{size: mapper(v), path: k}
-		i++
+		fn := folder{
+			path:  k,
+			count: v.Count,
+			size:  int64(v.Size),
+			pd:    pd,
+		}
+
+		fs := folderS{fn}
+		e.bySize.Insert(&fs)
+
+		fc := folderC{fn}
+		e.byCount.Insert(&fc)
 	}
-	return result
 }

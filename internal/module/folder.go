@@ -3,9 +3,7 @@ package module
 import (
 	"errors"
 	"github.com/aegoroff/dirstat/internal/out"
-	"github.com/aegoroff/dirstat/scan"
 	"github.com/aegoroff/godatastruct/rbtree"
-	"github.com/aegoroff/godatastruct/rbtree/special"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 )
@@ -46,68 +44,6 @@ func (fc *folderC) Equal(y rbtree.Comparable) bool { return fc.count == y.(*fold
 func (fs *folderS) Less(y rbtree.Comparable) bool  { return fs.size < y.(*folderS).size }
 func (fs *folderS) Equal(y rbtree.Comparable) bool { return fs.size == y.(*folderS).size }
 
-type folders struct {
-	bySize  rbtree.RbTree
-	byCount rbtree.RbTree
-}
-
-type foldersHandler struct {
-	*folders
-	pd decorator
-}
-
-type foldersRenderer struct {
-	*folders
-	*baseRenderer
-	total *totalInfo
-}
-
-func newFolders(top int) *folders {
-	return &folders{
-		bySize:  special.NewMaxTree(int64(top)),
-		byCount: special.NewMaxTree(int64(top)),
-	}
-}
-
-func newFoldersHandler(fc *folders, pd decorator) scan.Handler {
-	h := &foldersHandler{
-		folders: fc,
-		pd:      pd,
-	}
-	return newOnlyFoldersHandler(h)
-}
-
-func newFoldersRenderer(f *folders, ctx *Context, order int) renderer {
-	return &foldersRenderer{
-		folders:      f,
-		total:        ctx.total,
-		baseRenderer: newBaseRenderer(order),
-	}
-}
-
-// Worker method
-
-func (m *foldersHandler) Handle(evt *scan.Event) {
-	fe := evt.Folder
-
-	fn := folder{
-		path:  fe.Path,
-		count: fe.Count,
-		size:  fe.Size,
-		pd:    m.pd,
-	}
-
-	fs := folderS{fn}
-	m.bySize.Insert(&fs)
-
-	fc := folderC{fn}
-	m.byCount.Insert(&fc)
-}
-
-// Renderer method
-
-type folderCast func(c rbtree.Comparable) (folderI, error)
-
 func castSize(c rbtree.Comparable) (folderI, error) {
 	f, ok := c.(*folderS)
 
@@ -126,18 +62,22 @@ func castCount(c rbtree.Comparable) (folderI, error) {
 	return f, nil
 }
 
-func (f *foldersRenderer) render(p out.Printer) {
-	p.Cprint("\n<gray>TOP %d folders by size:</>\n\n", f.bySize.Len())
+type castFn func(c rbtree.Comparable) (folderI, error)
 
-	f.printTop(f.bySize, p, castSize)
-
-	p.Cprint("\n<gray>TOP %d folders by count:</>\n\n", f.byCount.Len())
-
-	f.printTop(f.byCount, p, castCount)
+type top struct {
+	tree    rbtree.RbTree
+	cast    castFn
+	headers []string
 }
 
-func (f *foldersRenderer) printTop(ft rbtree.RbTree, p out.Printer, cast folderCast) {
+func newTop(tree rbtree.RbTree, cast castFn, heads []string) *top {
+	return &top{tree: tree, cast: cast, headers: heads}
+}
+
+func (t *top) print(p out.Printer, total *totalInfo) {
 	tw := newTableWriter(p)
+
+	tw.addHeaders(t.headers)
 
 	tw.configColumns([]table.ColumnConfig{
 		{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignRight},
@@ -148,14 +88,12 @@ func (f *foldersRenderer) printTop(ft rbtree.RbTree, p out.Printer, cast folderC
 		{Number: 6, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.percentTransformer},
 	})
 
-	tw.addHeaders([]string{"#", "Folder", "Files", "%", "Size", "%"})
-
 	i := 1
 
-	it := rbtree.NewDescend(ft).Iterator()
+	it := rbtree.NewDescend(t.tree).Iterator()
 
 	for it.Next() {
-		fi, err := cast(it.Current())
+		fi, err := t.cast(it.Current())
 		if err != nil {
 			p.Cprint("<red>%v</>", err)
 			return
@@ -163,8 +101,8 @@ func (f *foldersRenderer) printTop(ft rbtree.RbTree, p out.Printer, cast folderC
 
 		count := fi.Count()
 		sz := uint64(fi.Size())
-		percentOfCount := f.total.countPercent(count)
-		percentOfSize := f.total.sizePercent(sz)
+		percentOfCount := total.countPercent(count)
+		percentOfSize := total.sizePercent(sz)
 
 		tw.addRow([]interface{}{
 			i,

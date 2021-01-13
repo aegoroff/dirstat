@@ -230,12 +230,12 @@ func Test_printTop_invalidCastingError(t *testing.T) {
 	ft.Insert(rbtree.Int(1))
 	ft.Insert(rbtree.Int(2))
 	ft.Insert(rbtree.Int(3))
-	fr := foldersRenderer{}
 	e := out.NewMemoryEnvironment()
 	p, _ := e.NewPrinter()
+	tp := newTop(ft, castSize, nil)
 
 	// Act
-	fr.printTop(ft, p, castSize)
+	tp.print(p, nil)
 
 	// Assert
 	ass.Contains(e.String(), "invalid casting: expected *folderS key type but it wasn`t")
