@@ -13,14 +13,12 @@ type fileCmd struct {
 func (f *fileCmd) execute() error {
 	ctx := f.newContext()
 
-	modules := []module.Module{
+	return f.run(
 		module.NewAggregateFileModule(ctx, 0),
 		module.NewTopFilesModule(ctx, 1),
 		module.NewDetailFileModule(ctx, 2, f.vrange),
 		module.NewTotalModule(ctx, 3),
-	}
-
-	return f.run(modules...)
+	)
 }
 
 func newFile(c conf) *cobra.Command {

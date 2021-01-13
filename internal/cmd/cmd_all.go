@@ -13,7 +13,7 @@ type allCmd struct {
 func (a *allCmd) execute() error {
 	ctx := a.newContext()
 
-	modules := []module.Module{
+	return a.run(
 		module.NewAggregateFileModule(ctx, 0),
 		module.NewBenfordFileModule(ctx, 1),
 		module.NewExtensionModule(ctx, 2),
@@ -21,9 +21,7 @@ func (a *allCmd) execute() error {
 		module.NewFoldersModule(ctx, 4),
 		module.NewDetailFileModule(ctx, 5, a.vrange),
 		module.NewTotalModule(ctx, 6),
-	}
-
-	return a.run(modules...)
+	)
 }
 
 func newAll(c conf) *cobra.Command {
