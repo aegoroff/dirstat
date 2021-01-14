@@ -27,15 +27,18 @@ type Range struct {
 	files files
 }
 
+// NewRange creates new *Range
 func NewRange(min int64, max int64) *Range {
 	return &Range{Min: min, Max: max, files: make(files, 0)}
 }
 
+// Less gets whether value specified less then current value
 func (r *Range) Less(y rbtree.Comparable) bool {
 	r1 := y.(*Range)
 	return r.Min < r1.Min && r.Max < r1.Max
 }
 
+// Equal gets whether value specified equal current value
 func (r *Range) Equal(y rbtree.Comparable) bool {
 	r1 := y.(*Range)
 	return r.Contains(r1.Min) || r1.Contains(r.Min)
@@ -45,10 +48,12 @@ func (r *Range) String() string {
 	return fmt.Sprintf("Between %s and %s", human(r.Min), human(r.Max))
 }
 
+// Size gets total size of all files that match the Range
 func (r *Range) Size() int64 {
 	return r.size
 }
 
+// Count gets  the number of files that match the Range
 func (r *Range) Count() int64 {
 	return r.count
 }
