@@ -49,7 +49,11 @@ func (t *topper) print(e rbtree.Enumerable) {
 	it := e.Iterator()
 
 	for it.Next() {
-		fi := it.Current().(folderI)
+		fi, ok := it.Current().(folderI)
+		if !ok {
+			t.p.Cprint("<red>Invalid casting: expected folderI key type but it wasn`t</>")
+			return
+		}
 
 		count := fi.Count()
 		sz := fi.Size()
