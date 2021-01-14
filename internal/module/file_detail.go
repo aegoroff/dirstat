@@ -3,12 +3,14 @@ package module
 import (
 	"github.com/aegoroff/dirstat/internal/out"
 	"github.com/aegoroff/dirstat/scan"
+	"github.com/aegoroff/godatastruct/countingsort"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"sort"
 )
 
 type detailsFile struct {
-	enabled map[int]*Range
+	enabled     map[int]*Range
+	totalRanges int
 }
 
 type detailFileHandler struct {
@@ -21,13 +23,14 @@ type detailFileRenderer struct {
 	pd decorator
 }
 
-func newDetailsFile(rs rbtree.RbTree, enabledRanges []int) *detailsFile {
+func newDetailsFile(ranges rbtree.RbTree, enabledRanges []int) *detailsFile {
 	w := &detailsFile{
-		enabled: make(map[int]*Range, len(enabledRanges)),
+		enabled:     make(map[int]*Range, len(enabledRanges)),
+		totalRanges: int(ranges.Len()),
 	}
 
 	for _, er := range enabledRanges {
-		n, ok := rs.OrderStatisticSelect(int64(er))
+		n, ok := ranges.OrderStatisticSelect(int64(er))
 		if ok {
 			w.enabled[er] = n.Key().(*Range)
 		}
@@ -73,7 +76,8 @@ func (m *detailFileRenderer) render(p out.Printer) {
 
 	keys := m.enabledKeys()
 
-	for _, k := range keys {
+	for i := len(keys) - 1; i >= 0; i-- {
+		k := keys[i]
 		r := m.enabled[k]
 		if len(r.files) == 0 {
 			continue
@@ -98,6 +102,6 @@ func (m *detailFileRenderer) enabledKeys() sort.IntSlice {
 		keys[i] = k
 		i++
 	}
-	sort.Sort(sort.Reverse(keys))
+	countingsort.Ints(keys, m.totalRanges)
 	return keys
 }
