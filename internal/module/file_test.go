@@ -28,12 +28,10 @@ func TestFile_Equal(t *testing.T) {
 		f1 := &file{
 			path: "/",
 			size: test.size1,
-			pd:   nil,
 		}
 		f2 := &file{
 			path: "/f",
 			size: test.size2,
-			pd:   &nonDestructiveDecorator{},
 		}
 
 		// Act
@@ -64,12 +62,10 @@ func TestFile_Less(t *testing.T) {
 		f1 := &file{
 			path: "/",
 			size: test.size1,
-			pd:   &nonDestructiveDecorator{},
 		}
 		f2 := &file{
 			path: "/f",
 			size: test.size2,
-			pd:   &nonDestructiveDecorator{},
 		}
 
 		// Act
@@ -86,7 +82,6 @@ func TestFile_String(t *testing.T) {
 	f := &file{
 		path: "/",
 		size: 0,
-		pd:   &nonDestructiveDecorator{},
 	}
 
 	// Act
@@ -94,25 +89,6 @@ func TestFile_String(t *testing.T) {
 
 	// Assert
 	ass.Equal("/", result)
-}
-
-func TestFile_String_PathDecorating(t *testing.T) {
-	// Arrange
-	pd := removeRootDecorator{
-		root: "/usr",
-	}
-	ass := assert.New(t)
-	f := &file{
-		path: "/usr/local",
-		size: 0,
-		pd:   &pd,
-	}
-
-	// Act
-	result := f.String()
-
-	// Assert
-	ass.Equal("/local", result)
 }
 
 func Test_printTopFile_invalidCastingError(t *testing.T) {

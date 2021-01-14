@@ -45,8 +45,8 @@ func NewFoldersModule(ctx *Context, order int) Module {
 // NewTopFilesModule creates new top files statistic module
 func NewTopFilesModule(ctx *Context, order int) Module {
 	tf := newTopFiles(ctx.top)
-	handler := newTopFilesHandler(tf, ctx.pd)
-	rend := newTopFilesRenderer(tf, order)
+	handler := newTopFilesHandler(tf)
+	rend := newTopFilesRenderer(tf, ctx.pd, order)
 
 	m := newModule(rend, handler)
 	return m
@@ -58,9 +58,9 @@ func NewDetailFileModule(ctx *Context, order int, enabledRanges []int) Module {
 	if len(enabledRanges) == 0 {
 		return newVoidModule()
 	}
-	details := newDetailsFile(newRanges())
-	handler := newDetailFileHandler(details, enabledRanges, ctx.pd)
-	rend := newDetailFileRenderer(details, order)
+	details := newDetailsFile(newRanges(), enabledRanges)
+	handler := newDetailFileHandler(details)
+	rend := newDetailFileRenderer(details, ctx.pd, order)
 
 	m := newModule(rend, handler)
 	return m
@@ -131,22 +131,6 @@ func newModule(r renderer, handlers ...scan.Handler) Module {
 	}
 	m.hlers = append(m.hlers, handlers...)
 	return &m
-}
-
-func newRanges() ranges {
-	rs := []Range{
-		{Min: 0, Max: 100 * kbyte},
-		{Min: 100 * kbyte, Max: mbyte},
-		{Min: mbyte, Max: 10 * mbyte},
-		{Min: 10 * mbyte, Max: 100 * mbyte},
-		{Min: 100 * mbyte, Max: gbyte},
-		{Min: gbyte, Max: 10 * gbyte},
-		{Min: 10 * gbyte, Max: 100 * gbyte},
-		{Min: 100 * gbyte, Max: tbyte},
-		{Min: tbyte, Max: 10 * tbyte},
-		{Min: 10 * tbyte, Max: pbyte},
-	}
-	return rs
 }
 
 type baseRenderer struct {

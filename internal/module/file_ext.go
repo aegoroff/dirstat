@@ -31,10 +31,10 @@ func (e *extRenderer) render(p out.Printer) {
 	top := newTopper(p, e.total, heads)
 
 	p.Cprint("\n<gray>TOP %d file extensions by size:</>\n\n", e.bySize.Len())
-	top.print(e.bySize)
+	top.descend(e.bySize)
 
 	p.Cprint("\n<gray>TOP %d file extensions by count:</>\n\n", e.byCount.Len())
-	top.print(e.byCount)
+	top.descend(e.byCount)
 }
 
 func (e *extRenderer) fillTops() {

@@ -17,7 +17,15 @@ func newTopper(p out.Printer, total *totalInfo, heads []string) *topper {
 	return &topper{p: p, total: total, headers: heads}
 }
 
-func (t *topper) print(tree rbtree.RbTree) {
+func (t *topper) descend(tree rbtree.RbTree) {
+	t.print(rbtree.NewDescend(tree))
+}
+
+func (t *topper) ascend(tree rbtree.RbTree) {
+	t.print(rbtree.NewAscend(tree))
+}
+
+func (t *topper) print(e rbtree.Enumerable) {
 	tw := newTableWriter(t.p)
 
 	tw.addHeaders(t.headers)
@@ -33,7 +41,7 @@ func (t *topper) print(tree rbtree.RbTree) {
 
 	i := 1
 
-	it := rbtree.NewDescend(tree).Iterator()
+	it := e.Iterator()
 
 	for it.Next() {
 		fi := it.Current().(folderI)
@@ -45,7 +53,7 @@ func (t *topper) print(tree rbtree.RbTree) {
 
 		tw.addRow([]interface{}{
 			i,
-			fi.Path(),
+			fi.String(),
 			count,
 			percentOfCount,
 			sz,

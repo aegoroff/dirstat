@@ -3,13 +3,11 @@ package module
 import (
 	"github.com/aegoroff/dirstat/internal/out"
 	"github.com/aegoroff/dirstat/scan"
-	"github.com/jedib0t/go-pretty/v6/table"
-	"github.com/jedib0t/go-pretty/v6/text"
+	"github.com/aegoroff/godatastruct/rbtree"
 )
 
 type aggregateFile struct {
-	aggregate  map[Range]fileStat
-	fileRanges ranges
+	franges rbtree.RbTree
 }
 
 type aggregateFileHandler struct {
@@ -22,10 +20,9 @@ type aggregateFileRenderer struct {
 	total *totalInfo
 }
 
-func newAggregateFile(rs ranges) *aggregateFile {
+func newAggregateFile(rs rbtree.RbTree) *aggregateFile {
 	return &aggregateFile{
-		aggregate:  make(map[Range]fileStat, len(rs)),
-		fileRanges: rs,
+		franges: rs,
 	}
 }
 
@@ -45,18 +42,12 @@ func newAggregateFileRenderer(ctx *Context, af *aggregateFile, order int) *aggre
 
 func (m *aggregateFileHandler) Handle(evt *scan.Event) {
 	f := evt.File
-	unsignedSize := uint64(f.Size)
 
-	// Calculate files range statistic
-	for _, r := range m.fileRanges {
-		if !r.Contains(f.Size) {
-			continue
-		}
-
-		s := m.aggregate[r]
-		s.TotalFilesCount++
-		s.TotalFilesSize += unsignedSize
-		m.aggregate[r] = s
+	n, ok := m.franges.Search(&Range{Min: f.Size, Max: f.Size})
+	if ok {
+		r := n.(*Range)
+		r.size += f.Size
+		r.count++
 	}
 }
 
@@ -65,35 +56,6 @@ func (m *aggregateFileHandler) Handle(evt *scan.Event) {
 func (m *aggregateFileRenderer) render(p out.Printer) {
 	p.Cprint("<gray>Total files stat:</>\n\n")
 
-	tw := newTableWriter(p)
-
-	tw.configColumns([]table.ColumnConfig{
-		{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignRight},
-		{Number: 2, Align: text.AlignLeft, AlignHeader: text.AlignLeft, WidthMax: 100},
-		{Number: 3, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.countTransformer},
-		{Number: 4, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.percentTransformer},
-		{Number: 5, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.sizeTransformer},
-		{Number: 6, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.percentTransformer},
-	})
-
-	tw.addHeaders([]string{"#", "File size", "Amount", "%", "Size", "%"})
-
-	heads := m.fileRanges.heads(transparentDecorator)
-	for i, r := range m.fileRanges {
-		count := m.aggregate[r].TotalFilesCount
-		sz := m.aggregate[r].TotalFilesSize
-
-		percentOfCount := m.total.countPercent(count)
-		percentOfSize := m.total.sizePercent(sz)
-
-		tw.addRow([]interface{}{
-			i + 1,
-			heads[i],
-			count,
-			percentOfCount,
-			sz,
-			percentOfSize,
-		})
-	}
-	tw.render()
+	topp := newTopper(p, m.total, []string{"#", "File size", "Amount", "%", "Size", "%"})
+	topp.ascend(m.franges)
 }

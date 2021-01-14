@@ -159,7 +159,7 @@ func TestFolder_Path(t *testing.T) {
 	}
 
 	// Act
-	result := fo.Path()
+	result := fo.String()
 
 	// Assert
 	ass.Equal("/usr", result)
@@ -179,7 +179,7 @@ func TestFolder_Path_PathDecorating(t *testing.T) {
 	}
 
 	// Act
-	result := fo.Path()
+	result := fo.String()
 
 	// Assert
 	ass.Equal("/local", result)

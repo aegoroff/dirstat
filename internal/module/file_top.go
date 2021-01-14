@@ -15,12 +15,12 @@ type topFiles struct {
 
 type topFilesHandler struct {
 	*topFiles
-	pd decorator
 }
 
 type topFilesRenderer struct {
 	*topFiles
 	*baseRenderer
+	pd decorator
 }
 
 func newTopFiles(top int) *topFiles {
@@ -29,18 +29,18 @@ func newTopFiles(top int) *topFiles {
 	}
 }
 
-func newTopFilesHandler(tf *topFiles, pd decorator) scan.Handler {
+func newTopFilesHandler(tf *topFiles) scan.Handler {
 	h := &topFilesHandler{
 		topFiles: tf,
-		pd:       pd,
 	}
 	return newOnlyFilesHandler(h)
 }
 
-func newTopFilesRenderer(tf *topFiles, order int) renderer {
+func newTopFilesRenderer(tf *topFiles, pd decorator, order int) renderer {
 	w := topFilesRenderer{
 		topFiles:     tf,
 		baseRenderer: newBaseRenderer(order),
+		pd:           pd,
 	}
 
 	return &w
@@ -50,7 +50,7 @@ func newTopFilesRenderer(tf *topFiles, order int) renderer {
 
 func (m *topFilesHandler) Handle(evt *scan.Event) {
 	f := evt.File
-	fc := file{size: f.Size, path: f.Path, pd: m.pd}
+	fc := file{size: f.Size, path: f.Path}
 	m.tree.Insert(&fc)
 }
 
@@ -84,7 +84,7 @@ func (m *topFilesRenderer) render(p out.Printer) {
 
 		tw.addRow([]interface{}{
 			i,
-			file,
+			m.pd.decorate(file.String()),
 			uint64(file.size),
 		})
 

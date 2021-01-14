@@ -68,8 +68,8 @@ func (f *foldersRenderer) render(p out.Printer) {
 	top := newTopper(p, f.total, heads)
 
 	p.Cprint("\n<gray>TOP %d folders by size:</>\n\n", f.bySize.Len())
-	top.print(f.bySize)
+	top.descend(f.bySize)
 
 	p.Cprint("\n<gray>TOP %d folders by count:</>\n\n", f.byCount.Len())
-	top.print(f.byCount)
+	top.descend(f.byCount)
 }

@@ -15,7 +15,6 @@ type Module interface {
 // Folder interface
 type folderI interface {
 	fmt.Stringer
-	Path() string
 	Size() int64
 	Count() int64
 }
