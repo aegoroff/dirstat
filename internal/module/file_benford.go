@@ -39,6 +39,8 @@ func newBenfordFileRenderer(ctx *Context, bf *benfordFile, order int) renderer {
 	}
 }
 
+// Handler method
+
 func (b *benfordFileHandler) Handle(evt *scan.Event) {
 	s := evt.File.Size
 	for s >= 10 {
@@ -46,6 +48,8 @@ func (b *benfordFileHandler) Handle(evt *scan.Event) {
 	}
 	b.distribution[s]++
 }
+
+// Renderer method
 
 func (b *benfordFileRenderer) render(p out.Printer) {
 	p.Println()

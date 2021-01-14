@@ -9,13 +9,13 @@ import (
 
 type foldersHandler struct {
 	*folders
-	pd decorator
 }
 
 type foldersRenderer struct {
 	*folders
 	*baseRenderer
 	total *totalInfo
+	pd    decorator
 }
 
 type folders struct {
@@ -30,11 +30,8 @@ func newFolders(top int) *folders {
 	}
 }
 
-func newFoldersHandler(fc *folders, pd decorator) scan.Handler {
-	h := &foldersHandler{
-		folders: fc,
-		pd:      pd,
-	}
+func newFoldersHandler(fc *folders) scan.Handler {
+	h := &foldersHandler{fc}
 	return newOnlyFoldersHandler(h)
 }
 
@@ -43,8 +40,11 @@ func newFoldersRenderer(f *folders, ctx *Context, order int) renderer {
 		folders:      f,
 		total:        ctx.total,
 		baseRenderer: newBaseRenderer(order),
+		pd:           ctx.pd,
 	}
 }
+
+// Handler method
 
 func (m *foldersHandler) Handle(evt *scan.Event) {
 	fe := evt.Folder
@@ -53,7 +53,6 @@ func (m *foldersHandler) Handle(evt *scan.Event) {
 		path:  fe.Path,
 		count: fe.Count,
 		size:  fe.Size,
-		pd:    m.pd,
 	}
 
 	fs := folderS{fn}
@@ -63,9 +62,11 @@ func (m *foldersHandler) Handle(evt *scan.Event) {
 	m.byCount.Insert(&fc)
 }
 
+// Renderer method
+
 func (f *foldersRenderer) render(p out.Printer) {
 	heads := []string{"#", "Folder", "Files", "%", "Size", "%"}
-	top := newTopper(p, f.total, heads)
+	top := newTopper(p, f.total, heads, f.pd)
 
 	p.Cprint("\n<gray>TOP %d folders by size:</>\n\n", f.bySize.Len())
 	top.descend(f.bySize)

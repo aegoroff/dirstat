@@ -49,7 +49,7 @@ func newDetailFileRenderer(details *detailsFile, pd decorator, order int) render
 	}
 }
 
-// Worker method
+// Handler method
 
 func (m *detailFileHandler) Handle(evt *scan.Event) {
 	f := evt.File

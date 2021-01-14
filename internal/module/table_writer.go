@@ -54,8 +54,15 @@ func (t *tableWriter) percentTransformer(val interface{}) string {
 }
 
 func (*tableWriter) sizeTransformer(val interface{}) string {
-	sz := val.(uint64)
-	return humanize.IBytes(sz)
+	szu, ok := val.(uint64)
+	if ok {
+		return humanize.IBytes(szu)
+	}
+	szi, ok := val.(int64)
+	if ok {
+		return humanize.IBytes(uint64(szi))
+	}
+	return ""
 }
 
 func (*tableWriter) countTransformer(val interface{}) string {

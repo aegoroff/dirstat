@@ -16,7 +16,7 @@ func NewContext(top int, rr bool, root string) *Context {
 	if rr {
 		pd = &removeRootDecorator{root: root}
 	} else {
-		pd = &nonDestructiveDecorator{}
+		pd = &noChangeDecorator{}
 	}
 
 	ctx := Context{

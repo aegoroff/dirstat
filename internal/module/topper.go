@@ -11,10 +11,11 @@ type topper struct {
 	headers []string
 	p       out.Printer
 	total   *totalInfo
+	pd      decorator
 }
 
-func newTopper(p out.Printer, total *totalInfo, heads []string) *topper {
-	return &topper{p: p, total: total, headers: heads}
+func newTopper(p out.Printer, total *totalInfo, heads []string, pd decorator) *topper {
+	return &topper{p: p, total: total, headers: heads, pd: pd}
 }
 
 func (t *topper) descend(tree rbtree.RbTree) {
@@ -25,6 +26,10 @@ func (t *topper) ascend(tree rbtree.RbTree) {
 	t.print(rbtree.NewAscend(tree))
 }
 
+func (t *topper) decoratePathOrName(val interface{}) string {
+	return t.pd.decorate(val.(string))
+}
+
 func (t *topper) print(e rbtree.Enumerable) {
 	tw := newTableWriter(t.p)
 
@@ -32,7 +37,7 @@ func (t *topper) print(e rbtree.Enumerable) {
 
 	tw.configColumns([]table.ColumnConfig{
 		{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignRight},
-		{Number: 2, Align: text.AlignLeft, AlignHeader: text.AlignLeft, WidthMax: 100},
+		{Number: 2, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: t.decoratePathOrName, WidthMax: 100},
 		{Number: 3, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.countTransformer},
 		{Number: 4, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.percentTransformer},
 		{Number: 5, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.sizeTransformer},

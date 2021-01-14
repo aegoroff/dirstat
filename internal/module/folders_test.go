@@ -15,26 +15,22 @@ func Test_bySizeFoldersTest(t *testing.T) {
 	ass := assert.New(t)
 	tree := special.NewMaxTree(2)
 
-	pd := nonDestructiveDecorator{}
 	f1 := folder{
 		path:  "/f1",
 		count: 3,
 		size:  100,
-		pd:    &pd,
 	}
 	fs1 := folderS{f1}
 	f2 := folder{
 		path:  "/f2",
 		count: 2,
 		size:  200,
-		pd:    &pd,
 	}
 	fs2 := folderS{f2}
 	f3 := folder{
 		path:  "/f3",
 		count: 1,
 		size:  300,
-		pd:    &pd,
 	}
 	fs3 := folderS{f3}
 
@@ -56,26 +52,22 @@ func Test_byCountFoldersTest(t *testing.T) {
 	ass := assert.New(t)
 	tree := special.NewMaxTree(2)
 
-	pd := nonDestructiveDecorator{}
 	f1 := folder{
 		path:  "/f1",
 		count: 3,
 		size:  100,
-		pd:    &pd,
 	}
 	fc1 := folderC{f1}
 	f2 := folder{
 		path:  "/f2",
 		count: 2,
 		size:  200,
-		pd:    &pd,
 	}
 	fc2 := folderC{f2}
 	f3 := folder{
 		path:  "/f3",
 		count: 1,
 		size:  300,
-		pd:    &pd,
 	}
 	fc3 := folderC{f3}
 
@@ -101,7 +93,7 @@ func Test_folderHandler(t *testing.T) {
 	_ = afero.WriteFile(appFS, "/f/s/f.txt", []byte("1234"), 0644)
 	ctx := NewContext(2, false, "/")
 	fc := newFolders(ctx.top)
-	handler := newFoldersHandler(fc, ctx.pd)
+	handler := newFoldersHandler(fc)
 	onlyFiles := newOnlyFoldersHandler(handler)
 
 	// Act
@@ -118,7 +110,7 @@ func Test_folderHandler_EmptyFileSystem(t *testing.T) {
 	appFS := afero.NewMemMapFs()
 	ctx := NewContext(2, false, "/")
 	fc := newFolders(ctx.top)
-	handler := newFoldersHandler(fc, ctx.pd)
+	handler := newFoldersHandler(fc)
 	onlyFiles := newOnlyFoldersHandler(handler)
 
 	// Act
@@ -148,14 +140,13 @@ func Test_ExecuteFoldersModule_WithOutput(t *testing.T) {
 	ass.Greater(len(e.String()), 0)
 }
 
-func TestFolder_Path(t *testing.T) {
+func TestFolder_String(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	fo := folder{
 		path:  "/usr",
 		size:  0,
 		count: 0,
-		pd:    &nonDestructiveDecorator{},
 	}
 
 	// Act
@@ -163,24 +154,4 @@ func TestFolder_Path(t *testing.T) {
 
 	// Assert
 	ass.Equal("/usr", result)
-}
-
-func TestFolder_Path_PathDecorating(t *testing.T) {
-	// Arrange
-	ass := assert.New(t)
-	pd := &removeRootDecorator{
-		root: "/usr",
-	}
-	fo := folder{
-		path:  "/usr/local",
-		size:  0,
-		count: 0,
-		pd:    pd,
-	}
-
-	// Act
-	result := fo.String()
-
-	// Assert
-	ass.Equal("/local", result)
 }

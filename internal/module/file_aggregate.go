@@ -38,7 +38,7 @@ func newAggregateFileRenderer(ctx *Context, af *aggregateFile, order int) *aggre
 	}
 }
 
-// Worker method
+// Handler method
 
 func (m *aggregateFileHandler) Handle(evt *scan.Event) {
 	f := evt.File
@@ -56,6 +56,6 @@ func (m *aggregateFileHandler) Handle(evt *scan.Event) {
 func (m *aggregateFileRenderer) render(p out.Printer) {
 	p.Cprint("<gray>Total files stat:</>\n\n")
 
-	topp := newTopper(p, m.total, []string{"#", "File size", "Amount", "%", "Size", "%"})
+	topp := newTopper(p, m.total, []string{"#", "File size", "Amount", "%", "Size", "%"}, &noChangeDecorator{})
 	topp.ascend(m.ranges)
 }

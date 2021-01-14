@@ -14,7 +14,7 @@ func Test_PathDecorator(t *testing.T) {
 		result string
 	}{
 		{"remove root", &removeRootDecorator{root: root}, "/local"},
-		{"dont change", &nonDestructiveDecorator{}, "/usr/local"},
+		{"dont change", &noChangeDecorator{}, "/usr/local"},
 	}
 
 	for _, test := range tests {

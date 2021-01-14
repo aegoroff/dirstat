@@ -10,7 +10,6 @@ type folder struct {
 	path  string
 	size  int64
 	count int64
-	pd    decorator
 }
 
 // Count sortable folder
@@ -25,7 +24,7 @@ type folderS struct {
 
 // Path sortable folder methods
 
-func (f *folder) String() string { return f.pd.decorate(f.path) }
+func (f *folder) String() string { return f.path }
 func (f *folder) Size() int64    { return f.size }
 func (f *folder) Count() int64   { return f.count }
 

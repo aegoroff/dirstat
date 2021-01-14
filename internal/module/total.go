@@ -45,7 +45,7 @@ func newTotalRenderer(ctx *Context, order int) renderer {
 	}
 }
 
-// Worker methods
+// Handler methods
 
 func (m *totalFileHandler) Handle(evt *scan.Event) {
 	f := evt.File

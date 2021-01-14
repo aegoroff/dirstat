@@ -28,7 +28,7 @@ func (e *extRenderer) render(p out.Printer) {
 	e.fillTops()
 
 	heads := []string{"#", "Extension", "Count", "%", "Size", "%"}
-	top := newTopper(p, e.total, heads)
+	top := newTopper(p, e.total, heads, &noChangeDecorator{})
 
 	p.Cprint("\n<gray>TOP %d file extensions by size:</>\n\n", e.bySize.Len())
 	top.descend(e.bySize)
@@ -38,13 +38,11 @@ func (e *extRenderer) render(p out.Printer) {
 }
 
 func (e *extRenderer) fillTops() {
-	pd := &nonDestructiveDecorator{}
 	for k, v := range e.total.extensions {
 		fn := folder{
 			path:  k,
 			count: v.Count,
 			size:  int64(v.Size),
-			pd:    pd,
 		}
 
 		fs := folderS{fn}

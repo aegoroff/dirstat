@@ -240,3 +240,28 @@ func Test_percent(t *testing.T) {
 		})
 	}
 }
+
+func Test_TableWriter_sizeTransformer(t *testing.T) {
+	var tests = []struct {
+		val      interface{}
+		expected string
+	}{
+		{int64(10), "10 B"},
+		{uint64(10), "10 B"},
+		{"10", ""},
+	}
+
+	for _, test := range tests {
+		t.Run(test.expected, func(t *testing.T) {
+			// Arrange
+			ass := assert.New(t)
+			tw := &tableWriter{}
+
+			// Act
+			result := tw.sizeTransformer(test.val)
+
+			// Assert
+			ass.Equal(test.expected, result)
+		})
+	}
+}

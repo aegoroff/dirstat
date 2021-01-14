@@ -46,7 +46,7 @@ func newTopFilesRenderer(tf *topFiles, pd decorator, order int) renderer {
 	return &w
 }
 
-// Worker method
+// Handler method
 
 func (m *topFilesHandler) Handle(evt *scan.Event) {
 	f := evt.File
@@ -63,7 +63,7 @@ func (m *topFilesRenderer) render(p out.Printer) {
 
 	tw.configColumns([]table.ColumnConfig{
 		{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignRight},
-		{Number: 2, Align: text.AlignLeft, AlignHeader: text.AlignLeft, WidthMax: 100},
+		{Number: 2, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: m.decoratePathOrName, WidthMax: 100},
 		{Number: 3, Align: text.AlignLeft, AlignHeader: text.AlignLeft, Transformer: tw.sizeTransformer},
 	})
 
@@ -84,12 +84,16 @@ func (m *topFilesRenderer) render(p out.Printer) {
 
 		tw.addRow([]interface{}{
 			i,
-			m.pd.decorate(file.String()),
-			uint64(file.size),
+			file.String(),
+			file.size,
 		})
 
 		i++
 	}
 
 	tw.render()
+}
+
+func (m *topFilesRenderer) decoratePathOrName(val interface{}) string {
+	return m.pd.decorate(val.(string))
 }

@@ -4,7 +4,8 @@ type decorator interface {
 	decorate(s string) string
 }
 
-type nonDestructiveDecorator struct{}
+// noChangeDecorator does nothing i.e. keep original string unchanged
+type noChangeDecorator struct{}
 
 type removeRootDecorator struct {
 	root string
@@ -12,4 +13,4 @@ type removeRootDecorator struct {
 
 func (p *removeRootDecorator) decorate(s string) string { return s[len(p.root):] }
 
-func (*nonDestructiveDecorator) decorate(s string) string { return s }
+func (*noChangeDecorator) decorate(s string) string { return s }
