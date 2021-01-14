@@ -49,12 +49,12 @@ func newTotalRenderer(ctx *Context, order int) renderer {
 
 func (m *totalFileHandler) Handle(evt *scan.Event) {
 	f := evt.File
+
 	// Accumulate file statistic
 	m.total.FilesTotal++
 	m.total.FilesSize += f.Size
 
 	// Accumulate file extensions statistic
-
 	fn := &folder{
 		name:  filepath.Ext(f.Path),
 		count: 1,
