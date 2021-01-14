@@ -85,7 +85,7 @@ func (m *detailFileRenderer) render(p out.Printer) {
 
 		for _, f := range r.files {
 			size := human(f.size)
-			p.Cprint("   %s - <yellow>%s</>\n", f, size)
+			p.Cprint("   %s - <yellow>%s</>\n", m.pd.decorate(f.String()), size)
 		}
 	}
 }
