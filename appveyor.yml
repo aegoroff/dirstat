@@ -1,5 +1,5 @@
 ﻿# version format
-version: 0.13.{build}
+version: 1.0.0.{build}
 
 clone_folder: c:\gopath\src\dirstat
 
