@@ -8,7 +8,7 @@ import (
 )
 
 type detailsFile struct {
-	enabled []*Range
+	enabled map[int]*Range
 }
 
 type detailFileHandler struct {
@@ -23,13 +23,13 @@ type detailFileRenderer struct {
 
 func newDetailsFile(rs rbtree.RbTree, enabledRanges []int) *detailsFile {
 	w := &detailsFile{
-		enabled: make([]*Range, 0, len(enabledRanges)),
+		enabled: make(map[int]*Range, len(enabledRanges)),
 	}
 
 	for _, er := range enabledRanges {
 		n, ok := rs.OrderStatisticSelect(int64(er))
 		if ok {
-			w.enabled = append(w.enabled, n.Key().(*Range))
+			w.enabled[er] = n.Key().(*Range)
 		}
 	}
 
@@ -70,12 +70,16 @@ func (m *detailFileHandler) Handle(evt *scan.Event) {
 
 func (m *detailFileRenderer) render(p out.Printer) {
 	p.Cprint("\n<gray>Detailed files stat:</>\n")
-	for i, r := range m.enabled {
+
+	keys := m.enabledKeys()
+
+	for _, k := range keys {
+		r := m.enabled[k]
 		if len(r.files) == 0 {
 			continue
 		}
 
-		p.Cprint("<gray>%s</>\n", numPrefixDecorator(i, r.String()))
+		p.Cprint("<gray>%2d. %s</>\n", k, r.String())
 
 		sort.Sort(sort.Reverse(r.files))
 
@@ -84,4 +88,16 @@ func (m *detailFileRenderer) render(p out.Printer) {
 			p.Cprint("   %s - <yellow>%s</>\n", f, size)
 		}
 	}
+}
+
+func (m *detailFileRenderer) enabledKeys() sort.IntSlice {
+	keys := make(sort.IntSlice, len(m.enabled))
+
+	i := 0
+	for k := range m.enabled {
+		keys[i] = k
+		i++
+	}
+	sort.Sort(sort.Reverse(keys))
+	return keys
 }

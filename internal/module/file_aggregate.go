@@ -7,7 +7,7 @@ import (
 )
 
 type aggregateFile struct {
-	franges rbtree.RbTree
+	ranges rbtree.RbTree
 }
 
 type aggregateFileHandler struct {
@@ -22,7 +22,7 @@ type aggregateFileRenderer struct {
 
 func newAggregateFile(rs rbtree.RbTree) *aggregateFile {
 	return &aggregateFile{
-		franges: rs,
+		ranges: rs,
 	}
 }
 
@@ -43,7 +43,7 @@ func newAggregateFileRenderer(ctx *Context, af *aggregateFile, order int) *aggre
 func (m *aggregateFileHandler) Handle(evt *scan.Event) {
 	f := evt.File
 
-	n, ok := m.franges.Search(&Range{Min: f.Size, Max: f.Size})
+	n, ok := m.ranges.Search(&Range{Min: f.Size, Max: f.Size})
 	if ok {
 		r := n.(*Range)
 		r.size += f.Size
@@ -57,5 +57,5 @@ func (m *aggregateFileRenderer) render(p out.Printer) {
 	p.Cprint("<gray>Total files stat:</>\n\n")
 
 	topp := newTopper(p, m.total, []string{"#", "File size", "Amount", "%", "Size", "%"})
-	topp.ascend(m.franges)
+	topp.ascend(m.ranges)
 }

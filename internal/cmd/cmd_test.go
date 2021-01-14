@@ -29,7 +29,8 @@ func Test_PositiveTests(t *testing.T) {
 	}{
 		{"a /", []string{"a", "/"}, "Total files"},
 		{"a / -t 3", []string{"a", "/", "-t", "3"}, "TOP 3 file extensions by size"},
-		{"a / -r 1", []string{"a", "/", "-r", "1"}, "Between 0 B and 100 KiB"},
+		{"a / -r 1", []string{"a", "/", "-r", "1"}, "1\\. Between 0 B and 100 KiB"},
+		{"a / -r 1,2,3", []string{"a", "/", "-r", "1,2,3"}, "1\\. Between 0 B and 100 KiB"},
 		{"a /f -r 1 -o", []string{"a", "/f", "-r", "1", "-o"}, "Total files"},
 		{"a / -m", []string{"a", "/", "-m"}, "Total files"},
 		{"a /f -o", []string{"a", "/f", "-o"}, "Total files"},

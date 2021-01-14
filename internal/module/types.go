@@ -1,7 +1,6 @@
 package module
 
 import (
-	"fmt"
 	"github.com/dustin/go-humanize"
 	"time"
 )
@@ -36,10 +35,6 @@ func percent(value float64, total float64) float64 {
 		return 0
 	}
 	return (value / total) * 100
-}
-
-func numPrefixDecorator(ix int, h string) string {
-	return fmt.Sprintf("%2d. %s", ix+1, h)
 }
 
 func human(n int64) string {
