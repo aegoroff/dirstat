@@ -91,54 +91,54 @@ Root: c:\
 
 Total files stat:
 
-┌────┬─────────────────────────────┬─────────┬────────┬────────┬────────┐
-│  # │ FILE SIZE                   │ AMOUNT  │ %      │ SIZE   │ %      │
-├────┼─────────────────────────────┼─────────┼────────┼────────┼────────┤
-│  1 │ Between 0 B and 100 KiB     │ 1432007 │ 88.09% │ 15 GiB │ 4.78%  │
-│  2 │ Between 100 KiB and 1.0 MiB │ 157685  │ 9.70%  │ 47 GiB │ 14.81% │
-│  3 │ Between 1.0 MiB and 10 MiB  │ 32480   │ 2.00%  │ 83 GiB │ 26.00% │
-│  4 │ Between 10 MiB and 100 MiB  │ 3731    │ 0.23%  │ 95 GiB │ 29.73% │
-│  5 │ Between 100 MiB and 1.0 GiB │ 175     │ 0.01%  │ 37 GiB │ 11.57% │
-│  6 │ Between 1.0 GiB and 10 GiB  │ 4       │ 0.00%  │ 18 GiB │ 5.60%  │
-│  7 │ Between 10 GiB and 100 GiB  │ 1       │ 0.00%  │ 24 GiB │ 7.70%  │
-│  8 │ Between 100 GiB and 1.0 TiB │ 0       │ 0.00%  │ 0 B    │ 0.00%  │
-│  9 │ Between 1.0 TiB and 10 TiB  │ 0       │ 0.00%  │ 0 B    │ 0.00%  │
-│ 10 │ Between 10 TiB and 1.0 PiB  │ 0       │ 0.00%  │ 0 B    │ 0.00%  │
-└────┴─────────────────────────────┴─────────┴────────┴────────┴────────┘
+┌────┬─────────────────────────────┬───────────┬────────┬────────┬────────┐
+│  # │ FILE SIZE                   │ AMOUNT    │ %      │ SIZE   │ %      │
+├────┼─────────────────────────────┼───────────┼────────┼────────┼────────┤
+│  1 │ Between 0 B and 100 KiB     │ 1,422,801 │ 88.09% │ 15 GiB │ 4.76%  │
+│  2 │ Between 100 KiB and 1.0 MiB │ 156,536   │ 9.69%  │ 47 GiB │ 14.81% │
+│  3 │ Between 1.0 MiB and 10 MiB  │ 32,018    │ 1.98%  │ 82 GiB │ 25.94% │
+│  4 │ Between 10 MiB and 100 MiB  │ 3,721     │ 0.23%  │ 94 GiB │ 29.63% │
+│  5 │ Between 100 MiB and 1.0 GiB │ 172       │ 0.01%  │ 36 GiB │ 11.48% │
+│  6 │ Between 1.0 GiB and 10 GiB  │ 4         │ 0.00%  │ 18 GiB │ 5.64%  │
+│  7 │ Between 10 GiB and 100 GiB  │ 1         │ 0.00%  │ 24 GiB │ 7.75%  │
+│  8 │ Between 100 GiB and 1.0 TiB │ 0         │ 0.00%  │ 0 B    │ 0.00%  │
+│  9 │ Between 1.0 TiB and 10 TiB  │ 0         │ 0.00%  │ 0 B    │ 0.00%  │
+│ 10 │ Between 10 TiB and 1.0 PiB  │ 0         │ 0.00%  │ 0 B    │ 0.00%  │
+└────┴─────────────────────────────┴───────────┴────────┴────────┴────────┘
 
 TOP 10 file extensions by size:
 
-┌────┬───────────┬────────┬────────┬─────────┬────────┐
-│  # │ EXTENSION │ COUNT  │ %      │ SIZE    │ %      │
-├────┼───────────┼────────┼────────┼─────────┼────────┤
-│  1 │ .dll      │ 193703 │ 11.92% │ 77 GiB  │ 24.20% │
-│  2 │ .vhdx     │ 5      │ 0.00%  │ 37 GiB  │ 11.65% │
-│  3 │ .exe      │ 18009  │ 1.11%  │ 19 GiB  │ 6.03%  │
-│  4 │ .lib      │ 15445  │ 0.95%  │ 18 GiB  │ 5.61%  │
-│  5 │           │ 145504 │ 8.95%  │ 13 GiB  │ 4.20%  │
-│  6 │ .jar      │ 9786   │ 0.60%  │ 12 GiB  │ 3.82%  │
-│  7 │ .cab      │ 2211   │ 0.14%  │ 11 GiB  │ 3.49%  │
-│  8 │ .msi      │ 1998   │ 0.12%  │ 11 GiB  │ 3.44%  │
-│  9 │ .xml      │ 67058  │ 4.13%  │ 10 GiB  │ 3.24%  │
-│ 10 │ .pdb      │ 8963   │ 0.55%  │ 6.6 GiB │ 2.06%  │
-└────┴───────────┴────────┴────────┴─────────┴────────┘
+┌────┬───────────┬─────────┬────────┬─────────┬────────┐
+│  # │ EXTENSION │ COUNT   │ %      │ SIZE    │ %      │
+├────┼───────────┼─────────┼────────┼─────────┼────────┤
+│  1 │ .dll      │ 187,010 │ 11.58% │ 76 GiB  │ 24.10% │
+│  2 │ .vhdx     │ 5       │ 0.00%  │ 37 GiB  │ 11.72% │
+│  3 │ .exe      │ 17,867  │ 1.11%  │ 19 GiB  │ 6.06%  │
+│  4 │ .lib      │ 15,465  │ 0.96%  │ 18 GiB  │ 5.65%  │
+│  5 │           │ 143,385 │ 8.88%  │ 13 GiB  │ 4.16%  │
+│  6 │ .jar      │ 9,786   │ 0.61%  │ 12 GiB  │ 3.84%  │
+│  7 │ .msi      │ 2,010   │ 0.12%  │ 12 GiB  │ 3.64%  │
+│  8 │ .xml      │ 66,852  │ 4.14%  │ 10 GiB  │ 3.25%  │
+│  9 │ .cab      │ 2,189   │ 0.14%  │ 10 GiB  │ 3.22%  │
+│ 10 │ .pdb      │ 8,923   │ 0.55%  │ 6.6 GiB │ 2.08%  │
+└────┴───────────┴─────────┴────────┴─────────┴────────┘
 
 TOP 10 file extensions by count:
 
-┌────┬───────────┬────────┬────────┬─────────┬────────┐
-│  # │ EXTENSION │ COUNT  │ %      │ SIZE    │ %      │
-├────┼───────────┼────────┼────────┼─────────┼────────┤
-│  1 │ .dll      │ 193703 │ 11.92% │ 77 GiB  │ 24.20% │
-│  2 │           │ 145504 │ 8.95%  │ 13 GiB  │ 4.20%  │
-│  3 │ .py       │ 74963  │ 4.61%  │ 766 MiB │ 0.23%  │
-│  4 │ .js       │ 69719  │ 4.29%  │ 2.3 GiB │ 0.73%  │
-│  5 │ .xml      │ 67058  │ 4.13%  │ 10 GiB  │ 3.24%  │
-│  6 │ .png      │ 61267  │ 3.77%  │ 868 MiB │ 0.27%  │
-│  7 │ .h        │ 60334  │ 3.71%  │ 2.5 GiB │ 0.79%  │
-│  8 │ .pyc      │ 50239  │ 3.09%  │ 525 MiB │ 0.16%  │
-│  9 │ .manifest │ 47668  │ 2.93%  │ 380 MiB │ 0.12%  │
-│ 10 │ .html     │ 46017  │ 2.83%  │ 616 MiB │ 0.19%  │
-└────┴───────────┴────────┴────────┴─────────┴────────┘
+┌────┬───────────┬─────────┬────────┬─────────┬────────┐
+│  # │ EXTENSION │ COUNT   │ %      │ SIZE    │ %      │
+├────┼───────────┼─────────┼────────┼─────────┼────────┤
+│  1 │ .dll      │ 187,010 │ 11.58% │ 76 GiB  │ 24.10% │
+│  2 │           │ 143,385 │ 8.88%  │ 13 GiB  │ 4.16%  │
+│  3 │ .py       │ 74,963  │ 4.64%  │ 766 MiB │ 0.24%  │
+│  4 │ .js       │ 69,742  │ 4.32%  │ 2.3 GiB │ 0.74%  │
+│  5 │ .xml      │ 66,852  │ 4.14%  │ 10 GiB  │ 3.25%  │
+│  6 │ .png      │ 61,279  │ 3.79%  │ 868 MiB │ 0.27%  │
+│  7 │ .h        │ 60,354  │ 3.74%  │ 2.5 GiB │ 0.80%  │
+│  8 │ .pyc      │ 50,239  │ 3.11%  │ 525 MiB │ 0.16%  │
+│  9 │ .manifest │ 47,652  │ 2.95%  │ 380 MiB │ 0.12%  │
+│ 10 │ .html     │ 46,017  │ 2.85%  │ 616 MiB │ 0.19%  │
+└────┴───────────┴─────────┴────────┴─────────┴────────┘
 
 TOP 10 files by size:
 
@@ -163,42 +163,40 @@ TOP 10 folders by size:
 ┌────┬──────────────────────────────────────────────────────────────────────────────────────────────────────┬───────┬───────┬─────────┬───────┐
 │  # │ FOLDER                                                                                               │ FILES │ %     │ SIZE    │ %     │
 ├────┼──────────────────────────────────────────────────────────────────────────────────────────────────────┼───────┼───────┼─────────┼───────┤
-│  1 │ c:\Users\egr\AppData\Local\Docker\wsl\data                                                           │ 1     │ 0.00% │ 24 GiB  │ 7.70% │
-│  2 │ c:\Windows\Installer                                                                                 │ 1976  │ 0.12% │ 11 GiB  │ 3.54% │
-│  3 │ c:\ProgramData\DockerDesktop\vm-data                                                                 │ 1     │ 0.00% │ 9.5 GiB │ 2.97% │
-│  4 │ c:\Program Files\MongoDB\Server\4.0\data                                                             │ 41    │ 0.00% │ 3.5 GiB │ 1.08% │
-│  5 │ c:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.1\bin                                         │ 47    │ 0.00% │ 3.4 GiB │ 1.06% │
-│  6 │ c:\Users\egr\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu20.04onWindows_79rhkp1fndgsc\LocalSt │ 1     │ 0.00% │ 2.9 GiB │ 0.92% │
+│  1 │ c:\Users\egr\AppData\Local\Docker\wsl\data                                                           │ 1     │ 0.00% │ 24 GiB  │ 7.75% │
+│  2 │ c:\Windows\Installer                                                                                 │ 1,988 │ 0.12% │ 12 GiB  │ 3.65% │
+│  3 │ c:\ProgramData\DockerDesktop\vm-data                                                                 │ 1     │ 0.00% │ 9.5 GiB │ 2.99% │
+│  4 │ c:\Program Files\MongoDB\Server\4.0\data                                                             │ 41    │ 0.00% │ 3.5 GiB │ 1.09% │
+│  5 │ c:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.1\bin                                         │ 47    │ 0.00% │ 3.4 GiB │ 1.07% │
+│  6 │ c:\Users\egr\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu20.04onWindows_79rhkp1fndgsc\LocalSt │ 1     │ 0.00% │ 2.9 GiB │ 0.93% │
 │    │ ate                                                                                                  │       │       │         │       │
-│  7 │ c:\Program Files\MongoDB\Server\4.0\log                                                              │ 1     │ 0.00% │ 2.9 GiB │ 0.91% │
-│  8 │ c:\Windows\System32                                                                                  │ 5053  │ 0.31% │ 2.6 GiB │ 0.81% │
-│  9 │ c:\Program Files (x86)\Windows Kits\10\Emulation\Mobile\10.0.10586.0                                 │ 1     │ 0.00% │ 2.6 GiB │ 0.80% │
-│ 10 │ c:\ProgramData\Package Cache\{EA923538-8370-4294-A5CC-F6130FAAD89D}v10.1.10586.11\Redistributable\1. │ 51    │ 0.00% │ 1.5 GiB │ 0.47% │
+│  7 │ c:\Program Files\MongoDB\Server\4.0\log                                                              │ 1     │ 0.00% │ 2.9 GiB │ 0.92% │
+│  8 │ c:\Windows\System32                                                                                  │ 5,053 │ 0.31% │ 2.6 GiB │ 0.81% │
+│  9 │ c:\Program Files (x86)\Windows Kits\10\Emulation\Mobile\10.0.10586.0                                 │ 1     │ 0.00% │ 2.6 GiB │ 0.81% │
+│ 10 │ c:\ProgramData\Package Cache\{EA923538-8370-4294-A5CC-F6130FAAD89D}v10.1.10586.11\Redistributable\1. │ 51    │ 0.00% │ 1.5 GiB │ 0.48% │
 │    │ 0.0.0                                                                                                │       │       │         │       │
 └────┴──────────────────────────────────────────────────────────────────────────────────────────────────────┴───────┴───────┴─────────┴───────┘
 
 TOP 10 folders by count:
 
-┌────┬─────────────────────────────────────────────────────────────────────────────────────────────────┬───────┬───────┬─────────┬───────┐
-│  # │ FOLDER                                                                                          │ FILES │ %     │ SIZE    │ %     │
-├────┼─────────────────────────────────────────────────────────────────────────────────────────────────┼───────┼───────┼─────────┼───────┤
-│  1 │ c:\Windows\servicing\LCU\Package_for_RollupFix~31bf3856ad364e35~amd64~~19041.685.1.6            │ 32058 │ 1.97% │ 492 MiB │ 0.15% │
-│  2 │ c:\Windows\servicing\LCU\Package_for_RollupFix~31bf3856ad364e35~amd64~~19041.746.1.6            │ 31644 │ 1.95% │ 472 MiB │ 0.14% │
-│  3 │ c:\Windows\WinSxS\Manifests                                                                     │ 25373 │ 1.56% │ 23 MiB  │ 0.01% │
-│  4 │ c:\Users\egr\AppData\Local\Google\Chrome\User Data\Default\Local Storage                        │ 6862  │ 0.42% │ 84 MiB  │ 0.03% │
-│  5 │ c:\msys64\usr\share\man\man3                                                                    │ 6739  │ 0.41% │ 24 MiB  │ 0.01% │
-│  6 │ c:\Users\egr\AppData\Roaming\Microsoft\Crypto\RSA\S-1-5-21-2126183571-1528345743-823968152-1001 │ 5144  │ 0.32% │ 15 MiB  │ 0.00% │
-│  7 │ c:\Windows\System32                                                                             │ 5053  │ 0.31% │ 2.6 GiB │ 0.81% │
-│  8 │ c:\Windows\servicing\Packages                                                                   │ 4490  │ 0.28% │ 62 MiB  │ 0.02% │
-│  9 │ c:\msys64\usr\share\doc\openssl\html\man3                                                       │ 3792  │ 0.23% │ 36 MiB  │ 0.01% │
-│ 10 │ c:\Users\egr\AppData\Local\Microsoft\Edge\User Data\Default\Code Cache\js                       │ 3771  │ 0.23% │ 286 MiB │ 0.09% │
-└────┴─────────────────────────────────────────────────────────────────────────────────────────────────┴───────┴───────┴─────────┴───────┘
+┌────┬─────────────────────────────────────────────────────────────────────────────────────────────────┬────────┬───────┬─────────┬───────┐
+│  # │ FOLDER                                                                                          │ FILES  │ %     │ SIZE    │ %     │
+├────┼─────────────────────────────────────────────────────────────────────────────────────────────────┼────────┼───────┼─────────┼───────┤
+│  1 │ c:\Windows\servicing\LCU\Package_for_RollupFix~31bf3856ad364e35~amd64~~19041.685.1.6            │ 32,058 │ 1.98% │ 492 MiB │ 0.15% │
+│  2 │ c:\Windows\servicing\LCU\Package_for_RollupFix~31bf3856ad364e35~amd64~~19041.746.1.6            │ 31,644 │ 1.96% │ 472 MiB │ 0.15% │
+│  3 │ c:\Windows\WinSxS\Manifests                                                                     │ 25,373 │ 1.57% │ 23 MiB  │ 0.01% │
+│  4 │ c:\Users\egr\AppData\Local\Google\Chrome\User Data\Default\Local Storage                        │ 6,862  │ 0.42% │ 84 MiB  │ 0.03% │
+│  5 │ c:\msys64\usr\share\man\man3                                                                    │ 6,739  │ 0.42% │ 24 MiB  │ 0.01% │
+│  6 │ c:\Users\egr\AppData\Roaming\Microsoft\Crypto\RSA\S-1-5-21-2126183571-1528345743-823968152-1001 │ 5,144  │ 0.32% │ 15 MiB  │ 0.00% │
+│  7 │ c:\Windows\System32                                                                             │ 5,053  │ 0.31% │ 2.6 GiB │ 0.81% │
+│  8 │ c:\Windows\servicing\Packages                                                                   │ 4,490  │ 0.28% │ 62 MiB  │ 0.02% │
+│  9 │ c:\msys64\usr\share\doc\openssl\html\man3                                                       │ 3,792  │ 0.23% │ 36 MiB  │ 0.01% │
+│ 10 │ c:\Program Files\Adobe\Adobe Premiere Rush\PNG                                                  │ 3,587  │ 0.22% │ 15 MiB  │ 0.00% │
+└────┴─────────────────────────────────────────────────────────────────────────────────────────────────┴────────┴───────┴─────────┴───────┘
 
-Total files:            1625602 (319 GiB)
-Total folders:          365894
-Total file extensions:  6401
+Total files:            1,615,253 (317 GiB)
+Total folders:          363,476
+Total file extensions:  6,402
 
-Read taken:	5.9741123s
-
-Alloc = 3.3 MiB	TotalAlloc = 2.7 GiB	Sys = 82 MiB	NumGC = 453	NumGoRoutines = 1
+Read taken:	6.5079993s
 ```
