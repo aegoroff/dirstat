@@ -73,7 +73,7 @@ func (b *benfordFileRenderer) render(p out.Printer) {
 	// IDEAL percents
 	ideals := []float64{30.1, 17.6, 12.5, 9.7, 7.9, 6.7, 5.8, 5.1, 4.6}
 
-	total := float64(b.total.FilesTotal.Count - b.distribution[0])
+	total := float64(b.total.FilesTotal - b.distribution[0])
 	var percents []float64
 	for i, count := range b.distribution {
 		if i == 0 {

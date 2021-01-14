@@ -190,7 +190,7 @@ func Test_countPercent(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	ti := totalInfo{
-		FilesTotal: countSizeAggregate{Count: 100},
+		FilesTotal: 100,
 	}
 
 	// Act
@@ -204,7 +204,7 @@ func Test_sizePercent(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	ti := totalInfo{
-		FilesTotal: countSizeAggregate{Size: 100},
+		FilesSize: 100,
 	}
 
 	// Act

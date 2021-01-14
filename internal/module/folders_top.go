@@ -49,7 +49,7 @@ func newFoldersRenderer(f *folders, ctx *Context, order int) renderer {
 func (m *foldersHandler) Handle(evt *scan.Event) {
 	fe := evt.Folder
 
-	fn := folder{
+	fn := &folder{
 		path:  fe.Path,
 		count: fe.Count,
 		size:  fe.Size,

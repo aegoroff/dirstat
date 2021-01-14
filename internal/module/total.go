@@ -50,34 +50,42 @@ func newTotalRenderer(ctx *Context, order int) renderer {
 func (m *totalFileHandler) Handle(evt *scan.Event) {
 	f := evt.File
 	// Accumulate file statistic
-	m.total.FilesTotal.Count++
-	m.total.FilesTotal.Size += uint64(f.Size)
+	m.total.FilesTotal++
+	m.total.FilesSize += f.Size
 
 	// Accumulate file extensions statistic
-	ext := filepath.Ext(f.Path)
-	a := m.total.extensions[ext]
-	a.Size += uint64(f.Size)
-	a.Count++
-	m.total.extensions[ext] = a
+
+	fn := &folder{
+		path:  filepath.Ext(f.Path),
+		count: 1,
+		size:  f.Size,
+	}
+	n, ok := m.total.extensions.Search(fn)
+	if ok {
+		fold := n.(*folder)
+		fold.size += fn.size
+		fold.count++
+	} else {
+		m.total.extensions.Insert(fn)
+	}
 }
 
 func (m *totalFolderHandler) Handle(*scan.Event) {
-	m.total.CountFolders++
+	m.total.FoldersTotal++
 }
 
 // Renderer method
 
 func (m *totalRenderer) render(p out.Printer) {
-	m.total.countExtensions()
+	m.total.ExtensionsTotal = m.total.extensions.Len()
 	const totalTemplate = `
-Total files:            {{.FilesTotal.Count | humanCount}} ({{.FilesTotal.Size | humanSize}})
-Total folders:          {{.CountFolders | humanCount}}
-Total file extensions:  {{.CountFileExts | humanCountInt}}`
+Total files:            {{.FilesTotal | humanCount}} ({{.FilesSize | humanSize}})
+Total folders:          {{.FoldersTotal | humanCount}}
+Total file extensions:  {{.ExtensionsTotal | humanCount}}`
 
 	transform := template.FuncMap{
-		"humanSize":     humanize.IBytes,
-		"humanCount":    humanize.Comma,
-		"humanCountInt": func(i int) string { return humanize.Comma(int64(i)) },
+		"humanSize":  humanSize,
+		"humanCount": humanize.Comma,
 	}
 	tpl := template.New("totalstat").Funcs(transform)
 

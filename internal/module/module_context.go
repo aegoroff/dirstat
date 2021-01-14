@@ -1,5 +1,7 @@
 package module
 
+import "github.com/aegoroff/godatastruct/rbtree"
+
 // Context defines modules context
 type Context struct {
 	total *totalInfo
@@ -9,7 +11,9 @@ type Context struct {
 
 // NewContext creates new module's context that needed to create new modules
 func NewContext(top int, rr bool, root string) *Context {
-	total := totalInfo{extensions: make(map[string]countSizeAggregate, 8192)}
+	total := totalInfo{
+		extensions: rbtree.New(),
+	}
 
 	var pd decorator
 

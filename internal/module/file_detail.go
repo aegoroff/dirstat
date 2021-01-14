@@ -84,7 +84,7 @@ func (m *detailFileRenderer) render(p out.Printer) {
 		sort.Sort(sort.Reverse(r.files))
 
 		for _, f := range r.files {
-			size := human(f.size)
+			size := humanSize(f.size)
 			p.Cprint("   %s - <yellow>%s</>\n", m.pd.decorate(f.String()), size)
 		}
 	}

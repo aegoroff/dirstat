@@ -52,7 +52,7 @@ func (t *topper) print(e rbtree.Enumerable) {
 		fi := it.Current().(folderI)
 
 		count := fi.Count()
-		sz := uint64(fi.Size())
+		sz := fi.Size()
 		percentOfCount := t.total.countPercent(count)
 		percentOfSize := t.total.sizePercent(sz)
 

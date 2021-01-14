@@ -2,6 +2,7 @@ package module
 
 import (
 	"github.com/aegoroff/godatastruct/rbtree"
+	"strings"
 )
 
 // folder represents file system container that described by path
@@ -14,19 +15,21 @@ type folder struct {
 
 // Count sortable folder
 type folderC struct {
-	folder
+	*folder
 }
 
 // Size sortable folder
 type folderS struct {
-	folder
+	*folder
 }
 
 // Path sortable folder methods
 
-func (f *folder) String() string { return f.path }
-func (f *folder) Size() int64    { return f.size }
-func (f *folder) Count() int64   { return f.count }
+func (f *folder) String() string                 { return f.path }
+func (f *folder) Size() int64                    { return f.size }
+func (f *folder) Count() int64                   { return f.count }
+func (f *folder) Less(y rbtree.Comparable) bool  { return strings.Compare(f.path, y.(*folder).path) < 0 }
+func (f *folder) Equal(y rbtree.Comparable) bool { return f.path == y.(*folder).path }
 
 // Count sortable folder methods
 

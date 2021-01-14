@@ -38,17 +38,13 @@ func (e *extRenderer) render(p out.Printer) {
 }
 
 func (e *extRenderer) fillTops() {
-	for k, v := range e.total.extensions {
-		fn := folder{
-			path:  k,
-			count: v.Count,
-			size:  int64(v.Size),
-		}
-
+	it := rbtree.NewWalkInorder(e.total.extensions)
+	it.Foreach(func(k rbtree.Comparable) {
+		fn := k.(*folder)
 		fs := folderS{fn}
 		e.bySize.Insert(&fs)
 
 		fc := folderC{fn}
 		e.byCount.Insert(&fc)
-	}
+	})
 }

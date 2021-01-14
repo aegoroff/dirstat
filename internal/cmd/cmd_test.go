@@ -18,6 +18,7 @@ func Test_PositiveTests(t *testing.T) {
 	_ = afero.WriteFile(appFS, "/f/s/f.md", []byte("1234"), 0644)
 	_ = afero.WriteFile(appFS, "/f/f2.text", []byte("12345"), 0644)
 	_ = afero.WriteFile(appFS, "/f/f3.xml", []byte("123456"), 0644)
+	_ = afero.WriteFile(appFS, "/f/f31.xml", []byte("123456_"), 0644)
 	_ = afero.WriteFile(appFS, "/f/f4.pdf", []byte("1234567"), 0644)
 	_ = afero.WriteFile(appFS, "/f/f5.html", []byte("12345678"), 0644)
 	_ = afero.WriteFile(appFS, "/f/f6.htm", []byte("12345678910"), 0644)

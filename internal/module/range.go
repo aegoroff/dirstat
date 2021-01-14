@@ -45,7 +45,7 @@ func (r *Range) Equal(y rbtree.Comparable) bool {
 }
 
 func (r *Range) String() string {
-	return fmt.Sprintf("Between %s and %s", human(r.Min), human(r.Max))
+	return fmt.Sprintf("Between %s and %s", humanSize(r.Min), humanSize(r.Max))
 }
 
 // Size gets total size of all files that match the Range
