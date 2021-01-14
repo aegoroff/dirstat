@@ -50,7 +50,7 @@ func (m *foldersHandler) Handle(evt *scan.Event) {
 	fe := evt.Folder
 
 	fn := &folder{
-		path:  fe.Path,
+		name:  fe.Path,
 		count: fe.Count,
 		size:  fe.Size,
 	}

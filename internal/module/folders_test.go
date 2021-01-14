@@ -16,19 +16,19 @@ func Test_bySizeFoldersTest(t *testing.T) {
 	tree := special.NewMaxTree(2)
 
 	f1 := &folder{
-		path:  "/f1",
+		name:  "/f1",
 		count: 3,
 		size:  100,
 	}
 	fs1 := folderS{f1}
 	f2 := &folder{
-		path:  "/f2",
+		name:  "/f2",
 		count: 2,
 		size:  200,
 	}
 	fs2 := folderS{f2}
 	f3 := &folder{
-		path:  "/f3",
+		name:  "/f3",
 		count: 1,
 		size:  300,
 	}
@@ -53,19 +53,19 @@ func Test_byCountFoldersTest(t *testing.T) {
 	tree := special.NewMaxTree(2)
 
 	f1 := &folder{
-		path:  "/f1",
+		name:  "/f1",
 		count: 3,
 		size:  100,
 	}
 	fc1 := folderC{f1}
 	f2 := &folder{
-		path:  "/f2",
+		name:  "/f2",
 		count: 2,
 		size:  200,
 	}
 	fc2 := folderC{f2}
 	f3 := &folder{
-		path:  "/f3",
+		name:  "/f3",
 		count: 1,
 		size:  300,
 	}
@@ -144,7 +144,7 @@ func TestFolder_String(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	fo := folder{
-		path:  "/usr",
+		name:  "/usr",
 		size:  0,
 		count: 0,
 	}

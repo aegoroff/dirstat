@@ -56,7 +56,7 @@ func (m *totalFileHandler) Handle(evt *scan.Event) {
 	// Accumulate file extensions statistic
 
 	fn := &folder{
-		path:  filepath.Ext(f.Path),
+		name:  filepath.Ext(f.Path),
 		count: 1,
 		size:  f.Size,
 	}

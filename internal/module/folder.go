@@ -5,10 +5,10 @@ import (
 	"strings"
 )
 
-// folder represents file system container that described by path
+// folder represents file system container that described by some name (path, extension, etc.)
 // and has size and the number of elements in it (count field).
 type folder struct {
-	path  string
+	name  string
 	size  int64
 	count int64
 }
@@ -25,11 +25,11 @@ type folderS struct {
 
 // Path sortable folder methods
 
-func (f *folder) String() string                 { return f.path }
+func (f *folder) String() string                 { return f.name }
 func (f *folder) Size() int64                    { return f.size }
 func (f *folder) Count() int64                   { return f.count }
-func (f *folder) Less(y rbtree.Comparable) bool  { return strings.Compare(f.path, y.(*folder).path) < 0 }
-func (f *folder) Equal(y rbtree.Comparable) bool { return f.path == y.(*folder).path }
+func (f *folder) Less(y rbtree.Comparable) bool  { return strings.Compare(f.name, y.(*folder).name) < 0 }
+func (f *folder) Equal(y rbtree.Comparable) bool { return f.name == y.(*folder).name }
 
 // Count sortable folder methods
 
