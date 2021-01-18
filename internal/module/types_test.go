@@ -5,27 +5,28 @@ import (
 	"testing"
 )
 
-func TestRange_Search(t *testing.T) {
+func TestRange_Floor(t *testing.T) {
 	// Arrange
 	tree := newRanges()
 
 	var tests = []struct {
 		name   string
 		val    int64
-		result bool
+		result int64
 	}{
-		{"-1", -1, false},
-		{"1", 1, true},
-		{"100*kbyte + 10", 100*kbyte + 10, true},
-		{"mbyte + 10", mbyte + 10, true},
-		{"10*mbyte + 10", 10*mbyte + 10, true},
-		{"100*mbyte + 10", 100*mbyte + 10, true},
-		{"gbyte + 10", gbyte + 10, true},
-		{"10*gbyte + 10", 10*gbyte + 10, true},
-		{"100*gbyte + 10", 100*gbyte + 10, true},
-		{"tbyte + 10", tbyte + 10, true},
-		{"10*tbyte + 10", 10*tbyte + 10, true},
-		{"pbyte + 10", pbyte + 10, false},
+		{"-1", -1, 1},
+		{"0", 0, 1},
+		{"1", 1, 1},
+		{"100*kbyte + 10", 100*kbyte + 10, 2},
+		{"mbyte + 10", mbyte + 10, 3},
+		{"10*mbyte + 10", 10*mbyte + 10, 4},
+		{"100*mbyte + 10", 100*mbyte + 10, 5},
+		{"gbyte + 10", gbyte + 10, 6},
+		{"10*gbyte + 10", 10*gbyte + 10, 7},
+		{"100*gbyte + 10", 100*gbyte + 10, 8},
+		{"tbyte + 10", tbyte + 10, 9},
+		{"10*tbyte + 10", 10*tbyte + 10, 10},
+		{"pbyte + 10", pbyte + 10, 10},
 	}
 
 	for _, test := range tests {
@@ -35,52 +36,12 @@ func TestRange_Search(t *testing.T) {
 			k := &Range{Min: test.val, Max: test.val}
 
 			// Act
-			_, ok := tree.Search(k)
+			r, ok := tree.Floor(k)
 
 			// Assert
-			ass.Equal(test.result, ok)
-		})
-	}
-}
-
-func TestRange_MatchingPredefinedRanges(t *testing.T) {
-	// Arrange
-	var tests = []struct {
-		name string
-		val  int64
-		r    *Range
-	}{
-		{"0", 0, NewRange(0, 100*kbyte)},
-		{"1", 1, NewRange(0, 100*kbyte)},
-		{"100*kbyte", 100 * kbyte, NewRange(0, 100*kbyte)},
-		{"100*kbyte + 1", 100*kbyte + 1, NewRange(100*kbyte+1, mbyte)},
-		{"100*kbyte + 10", 100*kbyte + 10, NewRange(100*kbyte+1, mbyte)},
-		{"mbyte", mbyte, NewRange(100*kbyte+1, mbyte)},
-		{"mbyte + 1", mbyte + 1, NewRange(mbyte+1, 10*mbyte)},
-		{"mbyte + 10", mbyte + 10, NewRange(mbyte+1, 10*mbyte)},
-		{"10*mbyte", 10 * mbyte, NewRange(mbyte+1, 10*mbyte)},
-		{"10*mbyte + 10", 10*mbyte + 10, NewRange(10*mbyte+1, 100*mbyte)},
-		{"100*mbyte + 10", 100*mbyte + 10, NewRange(100*mbyte+1, gbyte)},
-		{"gbyte + 10", gbyte + 10, NewRange(gbyte+1, 10*gbyte)},
-		{"10*gbyte + 10", 10*gbyte + 10, NewRange(10*gbyte+1, 100*gbyte)},
-		{"100*gbyte + 10", 100*gbyte + 10, NewRange(100*gbyte+1, tbyte)},
-		{"tbyte + 10", tbyte + 10, NewRange(tbyte+1, 10*tbyte)},
-		{"10*tbyte + 10", 10*tbyte + 10, NewRange(10*tbyte+1, pbyte)},
-	}
-
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			// Arrange
-			ass := assert.New(t)
-			k := &Range{Min: test.val, Max: test.val}
-
-			// Act
-			less := test.r.Less(k)
-			eq := test.r.Equal(k)
-
-			// Assert
-			ass.False(less)
-			ass.True(eq)
+			ass.True(ok)
+			expect, _ := tree.OrderStatisticSelect(test.result)
+			ass.True(expect.Key().Equal(r))
 		})
 	}
 }
@@ -97,10 +58,10 @@ func TestRange_Equal(t *testing.T) {
 		result bool
 	}{
 		{"-1", -1, false},
-		{"1", 1, true},
-		{"100", 100, true},
-		{"50", 50, true},
 		{"0", 0, true},
+		{"1", 1, false},
+		{"50", 50, false},
+		{"100", 100, false},
 		{"101", 101, false},
 	}
 
@@ -121,7 +82,7 @@ func TestRange_Equal(t *testing.T) {
 
 func TestRange_Less(t *testing.T) {
 	// Arrange
-	r := Range{
+	r := &Range{
 		Min: 0,
 		Max: 100,
 	}
@@ -130,12 +91,12 @@ func TestRange_Less(t *testing.T) {
 		val    int64
 		result bool
 	}{
-		{"-1", -1, false},
-		{"1", 1, false},
-		{"100", 100, false},
-		{"50", 50, false},
+		{"-1", -1, true},
 		{"0", 0, false},
-		{"101", 101, true},
+		{"1", 1, false},
+		{"50", 50, false},
+		{"100", 100, false},
+		{"101", 101, false},
 	}
 
 	for _, test := range tests {
@@ -145,7 +106,7 @@ func TestRange_Less(t *testing.T) {
 			k := &Range{Min: test.val, Max: test.val}
 
 			// Act
-			contains := r.Less(k)
+			contains := k.Less(r)
 
 			// Assert
 			ass.Equal(test.result, contains)

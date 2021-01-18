@@ -43,7 +43,7 @@ func newAggregateFileRenderer(ctx *Context, af *aggregateFile, order int) *aggre
 func (m *aggregateFileHandler) Handle(evt *scan.Event) {
 	f := evt.File
 
-	n, ok := m.ranges.Search(&Range{Min: f.Size, Max: f.Size})
+	n, ok := m.ranges.Floor(&Range{Min: f.Size})
 	if ok {
 		r := n.(*Range)
 		r.size += f.Size

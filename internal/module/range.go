@@ -34,14 +34,12 @@ func NewRange(min int64, max int64) *Range {
 
 // Less gets whether value specified less then current value
 func (r *Range) Less(y rbtree.Comparable) bool {
-	r1 := y.(*Range)
-	return r.Min < r1.Min && r.Max < r1.Max
+	return r.Min < y.(*Range).Min
 }
 
 // Equal gets whether value specified equal current value
 func (r *Range) Equal(y rbtree.Comparable) bool {
-	r1 := y.(*Range)
-	return r.Contains(r1.Min) || r1.Contains(r.Min)
+	return r.Min == y.(*Range).Min
 }
 
 func (r *Range) String() string {
