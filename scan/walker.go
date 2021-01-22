@@ -70,7 +70,6 @@ func (bf *walker) walk(d string, results chan<- *filesystemItem) {
 				dir:   d,
 				name:  entry.Name(),
 				event: fsEventFile,
-				count: 1,
 				size:  entry.Size(),
 			}
 			results <- &fileEvent
