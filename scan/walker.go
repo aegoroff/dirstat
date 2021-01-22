@@ -61,14 +61,14 @@ func (bf *walker) walk(d string, results chan<- *filesystemItem) {
 			continue
 		}
 
+		path := filepath.Join(d, entry.Name())
 		// Queue subdirs to walk in a queue
 		if entry.IsDir() {
-			bf.enqueue(filepath.Join(d, entry.Name()))
+			bf.enqueue(path)
 		} else {
 			// Send to channel
 			fileEvent := filesystemItem{
-				dir:   d,
-				name:  entry.Name(),
+				path:  path,
 				event: fsEventFile,
 				size:  entry.Size(),
 			}
@@ -81,7 +81,7 @@ func (bf *walker) walk(d string, results chan<- *filesystemItem) {
 	}
 
 	dirEvent := filesystemItem{
-		dir:   d,
+		path:  d,
 		event: fsEventDir,
 		count: count,
 		size:  size,

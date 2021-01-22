@@ -1,9 +1,5 @@
 package scan
 
-import (
-	"path/filepath"
-)
-
 // concurrentScans sets the default number of concurrent directory scans
 const concurrentScans = 32
 
@@ -42,8 +38,7 @@ type FolderEntry struct {
 }
 
 type filesystemItem struct {
-	dir   string
-	name  string
+	path  string
 	event fsEvent
 	count int64
 	size  int64
@@ -90,7 +85,7 @@ func convert(from <-chan *filesystemItem, to chan<- *Event) {
 func newFileEntry(item *filesystemItem) *FileEntry {
 	return &FileEntry{
 		Size: item.size,
-		Path: filepath.Join(item.dir, item.name),
+		Path: item.path,
 	}
 }
 
@@ -98,7 +93,7 @@ func newFolderEntry(item *filesystemItem) *FolderEntry {
 	return &FolderEntry{
 		FileEntry: FileEntry{
 			Size: item.size,
-			Path: item.dir,
+			Path: item.path,
 		},
 		Count: item.count,
 	}
