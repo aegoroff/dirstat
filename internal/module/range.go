@@ -63,16 +63,16 @@ func (r *Range) Contains(num int64) bool {
 
 func newRanges() rbtree.RbTree {
 	rs := []*Range{
-		NewRange(0, 100*kbyte),
-		NewRange(100*kbyte+1, mbyte),
-		NewRange(mbyte+1, 10*mbyte),
-		NewRange(10*mbyte+1, 100*mbyte),
-		NewRange(100*mbyte+1, gbyte),
-		NewRange(gbyte+1, 10*gbyte),
-		NewRange(10*gbyte+1, 100*gbyte),
-		NewRange(100*gbyte+1, tbyte),
-		NewRange(tbyte+1, 10*tbyte),
-		NewRange(10*tbyte+1, pbyte),
+		NewRange(0, 100*kbyte-1),
+		NewRange(100*kbyte, mbyte-1),
+		NewRange(mbyte, 10*mbyte-1),
+		NewRange(10*mbyte, 100*mbyte-1),
+		NewRange(100*mbyte, gbyte-1),
+		NewRange(gbyte, 10*gbyte-1),
+		NewRange(10*gbyte, 100*gbyte-1),
+		NewRange(100*gbyte, tbyte-1),
+		NewRange(tbyte, 10*tbyte-1),
+		NewRange(10*tbyte, pbyte),
 	}
 	t := rbtree.New()
 	for _, r := range rs {
