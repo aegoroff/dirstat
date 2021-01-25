@@ -101,7 +101,7 @@ func (bf *walker) closeRestrict() {
 	close(bf.restrictor)
 }
 
-func (bf *walker) addOne() {
+func (bf *walker) start() {
 	bf.wg.Add(1)
 	bf.acquireRestrict()
 }

@@ -110,7 +110,7 @@ func walkBreadthFirst(path string, fs Filesystem, results chan<- *filesystemItem
 	for bf.len() > 0 {
 		currentDir := bf.dequeue()
 
-		bf.addOne()
+		bf.start()
 		go bf.walk(currentDir, results)
 
 		if bf.len() == 0 {
