@@ -12,7 +12,6 @@ builds:
       - freebsd
       - windows
       - openbsd
-      - solaris
       - netbsd
       - darwin
     goarch:
