@@ -56,16 +56,17 @@ func (bf *walker) walk(d string, results chan<- *filesystemItem) {
 	var size int64
 
 	for _, entry := range entries {
+		m := entry.Mode()
 		// Skip symlinks
-		if entry.Mode()&os.ModeSymlink != 0 {
+		if m&os.ModeSymlink != 0 {
 			continue
 		}
 
 		path := filepath.Join(d, entry.Name())
 		// Queue subdirs to walk in a queue
-		if entry.IsDir() {
+		if m.IsDir() {
 			bf.enqueue(path)
-		} else {
+		} else if m.IsRegular() {
 			// Send to channel
 			fileEvent := filesystemItem{
 				path:  path,
