@@ -43,7 +43,7 @@ func newBenfordFileRenderer(ctx *Context, bf *benfordFile, order int) renderer {
 
 func (b *benfordFileHandler) Handle(evt *scan.Event) {
 	s := evt.File.Size
-	for s >= 10 {
+	for s > 9 {
 		s = s / 10
 	}
 	b.distribution[s]++
