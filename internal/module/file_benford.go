@@ -44,9 +44,24 @@ func newBenfordFileRenderer(ctx *Context, bf *benfordFile, order int) renderer {
 func (b *benfordFileHandler) Handle(evt *scan.Event) {
 	s := evt.File.Size
 	for s > 9 {
-		s = s / 10
+		s = div10(s)
 	}
 	b.distribution[s]++
+}
+
+func div10(n int64) int64 {
+	var q int64
+	var r int64
+	q = (n >> 1) + (n >> 2)
+	q = q + (q >> 4)
+	q = q + (q >> 8)
+	q = q + (q >> 16)
+	q = q >> 3
+	r = n - (((q << 2) + q) << 1)
+	if r > 9 {
+		return q + 1
+	}
+	return q
 }
 
 // Renderer method
