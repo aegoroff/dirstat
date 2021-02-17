@@ -37,9 +37,19 @@ builds:
       - freebsd
     goarch:
       - arm
-      - arm64
     goarm:
       - 7
+
+  - id: "arm64"
+    binary: dirstat
+    ldflags: -s -w -X github.com/aegoroff/dirstat/internal/cmd.Version={{ .Version }}
+    goos:
+      - linux
+      - freebsd
+      - darwin
+    goarch:
+      - arm64
+
 
 archives:
   - id: default
