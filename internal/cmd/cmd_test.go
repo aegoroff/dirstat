@@ -11,7 +11,6 @@ import (
 
 func Test_PositiveTests(t *testing.T) {
 	// Arrange
-	ass := assert.New(t)
 	appFS := afero.NewMemMapFs()
 	_ = appFS.MkdirAll("/f/s", 0755)
 	_ = afero.WriteFile(appFS, "/f/f.txt", []byte("123"), 0644)
@@ -48,7 +47,9 @@ func Test_PositiveTests(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			ass := assert.New(t)
 			w := out.NewMemoryEnvironment()
+
 			// Act
 			err := Execute(appFS, w, test.cmdline...)
 
