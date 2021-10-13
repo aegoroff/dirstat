@@ -24,7 +24,7 @@ install:
   - go env
   - go get "github.com/mitchellh/gox"
 
-stack: go ^1.15
+stack: go ^1.17
 
 image: Visual Studio 2019
 
