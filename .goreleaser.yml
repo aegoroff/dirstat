@@ -11,8 +11,6 @@ builds:
       - linux
       - freebsd
       - windows
-      - openbsd
-      - netbsd
       - darwin
     goarch:
       - amd64
@@ -24,8 +22,6 @@ builds:
       - linux
       - windows
       - freebsd
-      - openbsd
-      - netbsd
     goarch:
       - 386
 
