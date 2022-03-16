@@ -102,6 +102,6 @@ func (m *detailFileRenderer) enabledKeys() sort.IntSlice {
 		keys[i] = k
 		i++
 	}
-	countingsort.Ints(keys, m.totalRanges)
+	countingsort.Sort(keys, m.totalRanges)
 	return keys
 }
