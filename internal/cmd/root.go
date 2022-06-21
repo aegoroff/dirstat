@@ -25,7 +25,7 @@ func init() {
 func Execute(fs afero.Fs, env out.PrintEnvironment, args ...string) error {
 	rootCmd := newRoot()
 
-	if args != nil && len(args) > 0 {
+	if len(args) > 0 {
 		rootCmd.SetArgs(args)
 	}
 

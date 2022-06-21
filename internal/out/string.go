@@ -23,7 +23,7 @@ func newStringEnvironment(w io.WriteCloser) *stringEnvironment {
 }
 
 func (e *stringEnvironment) PrintFunc(w io.Writer, format string, a ...interface{}) {
-	_, _ = fmt.Fprintf(w, e.SprintFunc(format, a...))
+	_, _ = fmt.Fprint(w, e.SprintFunc(format, a...))
 }
 
 func (e *stringEnvironment) SprintFunc(format string, a ...interface{}) string {
