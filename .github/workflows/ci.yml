@@ -50,6 +50,11 @@ jobs:
       if: matrix.build != 'linux'
       run: go test ./...
 
+    - name: Static analysis
+    - uses: dominikh/staticcheck-action@v1.2.0
+      with:
+         version: "2022.1.1"
+
     - name: Send coverage
       if: matrix.build == 'linux'
       run: |
