@@ -3,6 +3,8 @@ package scan
 import (
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 	"sync"
 )
 
@@ -63,6 +65,9 @@ func (bf *walker) walk(d string, results chan<- *filesystemItem) {
 		}
 
 		path := filepath.Join(d, entry.Name())
+		if runtime.GOOS == "linux" && strings.HasPrefix(path, "/proc") {
+			continue
+		}
 		// Queue subdirs to walk in a queue
 		if m.IsDir() {
 			bf.enqueue(path)
