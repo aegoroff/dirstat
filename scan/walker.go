@@ -25,6 +25,11 @@ func newWalker(fs Filesystem, parallel int) *walker {
 	return bf
 }
 
+var linuxPrefixesToSkip = []string  {
+	"/proc",
+	"/dev",
+}
+
 func (bf *walker) dequeue() string {
 	bf.mu.Lock()
 	defer bf.mu.Unlock()
@@ -65,8 +70,17 @@ func (bf *walker) walk(d string, results chan<- *filesystemItem) {
 		}
 
 		path := filepath.Join(d, entry.Name())
-		if runtime.GOOS == "linux" && strings.HasPrefix(path, "/proc") {
-			continue
+		if runtime.GOOS == "linux" {
+			skip := false
+			for _, prefix := range linuxPrefixesToSkip {
+				skip = strings.HasPrefix(path, prefix)
+				if skip {
+					break
+				}
+			}
+			if skip {
+				continue
+			}
 		}
 		// Queue subdirs to walk in a queue
 		if m.IsDir() {
