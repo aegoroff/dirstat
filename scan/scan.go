@@ -8,8 +8,8 @@ const concurrentScans = 32
 // Each event can only be file or folder event but not
 // file and folder simultaneously. Why do not make unified
 // event type with three fields where count field in case
-// of file will always be one? The answer is - memory. Typically
-// there are much more files then folders in the filesystem so
+// of file will always be one? The answer is - memory. Typically,
+// there are much more files than folders in the filesystem, so
 // we can decrease memory consumption not to have extra 4 bytes
 // for each file event because we know they are always contain one
 type Event struct {
