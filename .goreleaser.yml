@@ -78,6 +78,18 @@ scoop:
   description: Small tool that shows selected folder or drive (on Windows) usage statistic
   license: Apache-2.0
 
+nfpms:
+  -
+    package_name: dirstat
+    homepage: https://github.com/aegoroff/dirstat
+    maintainer: Alexander Egorov <egoroff@gmail.com>
+    description: Small tool that shows selected folder or drive (on Windows) usage statistic
+    license: MIT
+    bindir: /usr/bin
+    formats:
+      - deb
+      - rpm
+
 signs:
   - artifacts: checksum
     args: ["--batch", "-u", "{{ .Env.GPG_FINGERPRINT }}", "--output", "${signature}", "--detach-sign", "${artifact}"]
