@@ -54,7 +54,7 @@ jobs:
       uses: dominikh/staticcheck-action@v1.3.0
       with:
          version: "2022.1.3"
-         install-go: false
+         install-go: true
 
     - name: Send coverage
       if: matrix.build == 'linux'
