@@ -59,7 +59,7 @@ func (m *detailFileHandler) Handle(evt *scan.Event) {
 
 	// Calculate files range statistic
 	for _, r := range m.enabled {
-		// Store each file info within range only if this this file size detail option set
+		// Store each file info within range only if this file size detail option set
 		if !r.Contains(f.Size) {
 			continue
 		}
