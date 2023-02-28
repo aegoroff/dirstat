@@ -11,7 +11,7 @@ require (
 	github.com/rivo/uniseg v0.4.2 // indirect
 	github.com/spf13/afero v1.9.4
 	github.com/spf13/cobra v1.6.1
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.8.2
 	golang.org/x/text v0.3.8 // indirect
 )
 
