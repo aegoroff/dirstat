@@ -39,6 +39,21 @@ scoop install dirstat
 Download the pre-compiled binaries from the [releases](https://github.com/aegoroff/dirstat/releases) and
 copy to the desired location.
 
+**install deb package on Arch Linux**:
+
+1. Install [debtap](https://github.com/helixarch/debtap) from AUR using yay:
+```sh
+ yay -S debtap
+```
+2. Create equivalent package using debtap:
+```sh
+ sudo debtap -u
+ debtap dirstat_x.x.x_amd64.deb
+ ```
+3. Install using pacman:
+```sh
+sudo pacman -U dirstat-x.x.x-1-x86_64.pkg.tar.zst
+```
 
 Syntax:
 ------
