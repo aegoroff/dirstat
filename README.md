@@ -1,5 +1,4 @@
-dirstat
-=======
+# dirstat
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/771c99225c8c4ad0a83115d2403f9fa0)](https://app.codacy.com/manual/egoroff/dirstat?utm_source=github.com&utm_medium=referral&utm_content=aegoroff/dirstat&utm_campaign=Badge_Grade_Dashboard) [![codecov](https://codecov.io/gh/aegoroff/dirstat/branch/master/graph/badge.svg)](https://codecov.io/gh/aegoroff/dirstat)
 [![Go Report Card](https://goreportcard.com/badge/github.com/aegoroff/dirstat)](https://goreportcard.com/report/github.com/aegoroff/dirstat)
@@ -15,14 +14,19 @@ file statistics by extension and by file size range.
 **homebrew** (only on macOS and Linux for now):
 
 Add my tap (do it once):
+
 ```sh
 brew tap aegoroff/tap
 ```
+
 And then install dirstat:
+
 ```sh
 brew install dirstat
 ```
+
 Update dirstat if already installed:
+
 ```sh
 brew upgrade dirstat
 ```
@@ -34,6 +38,20 @@ scoop bucket add aegoroff https://github.com/aegoroff/scoop-bucket.git
 scoop install dirstat
 ```
 
+**AUR (Arch Linux User Repository)**:
+
+install binary package:
+
+```sh
+ yay -S dirstat-bin
+```
+
+or if yay reports that package not found force updating repo info
+
+```sh
+yay -Syyu dirstat-bin
+```
+
 **manually**:
 
 Download the pre-compiled binaries from the [releases](https://github.com/aegoroff/dirstat/releases) and
@@ -42,21 +60,26 @@ copy to the desired location.
 **install deb package on Arch Linux**:
 
 1. Install [debtap](https://github.com/helixarch/debtap) from AUR using yay:
+
 ```sh
  yay -S debtap
 ```
+
 2. Create equivalent package using debtap:
+
 ```sh
  sudo debtap -u
  debtap dirstat_x.x.x_amd64.deb
- ```
+```
+
 3. Install using pacman:
+
 ```sh
 sudo pacman -U dirstat-x.x.x-1-x86_64.pkg.tar.zst
 ```
 
-Syntax:
-------
+## Syntax:
+
 ```
  A small tool that shows selected folder or drive (on Windows) usage statistic
 
@@ -82,30 +105,39 @@ Flags:
 
 Use "dirstat [command] --help" for more information about a command.
 ```
-Examples:
----------
+
+## Examples:
+
 Show statistic about all D drive (on Windows)
+
 ```
 dirstat a d:
 ```
+
 Show all statistic about specific folder d:\folder
+
 ```
 dirstat a d:\folder
 ```
-Show all statistic and additional verbose statistic about files in ranges Between 10 GiB and 100 GiB and Between 100 GiB and 1.0 TiB 
+
+Show all statistic and additional verbose statistic about files in ranges Between 10 GiB and 100 GiB and Between 100 GiB and 1.0 TiB
+
 ```
 dirstat a d:\ -r 7 -r 8
 ```
+
 or
+
 ```
 dirstat a d:\ -r 7,8
 ```
+
 The second form is equivalent
 
-Output example:
----------------
+## Output example:
 
 Windows:
+
 ```
 Root: c:\
 
@@ -222,6 +254,7 @@ Read taken:	6.5079993s
 ```
 
 Mac OSX
+
 ```
 Root: /System/Volumes/Data
 
