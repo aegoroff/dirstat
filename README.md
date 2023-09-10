@@ -43,13 +43,13 @@ scoop install dirstat
 install binary package:
 
 ```sh
- yay -S dirstat-bin
+ yay -S dirstat-go-bin
 ```
 
 or if yay reports that package not found force updating repo info
 
 ```sh
-yay -Syyu dirstat-bin
+yay -Syyu dirstat-go-bin
 ```
 
 **manually**:
