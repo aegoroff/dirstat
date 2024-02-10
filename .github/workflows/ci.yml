@@ -24,6 +24,8 @@ jobs:
             os: macos-latest
           - build: windows
             os: windows-latest
+    env:
+      GOCOVERDIR: "_icoverdir_"
 
     steps:
 
@@ -44,7 +46,9 @@ jobs:
 
     - name: Test with coverage
       if: matrix.build == 'linux'
-      run: go test -coverprofile=coverage.txt -coverpkg github.com/aegoroff/dirstat/internal/cmd,github.com/aegoroff/dirstat/scan,github.com/aegoroff/dirstat/internal/module,github.com/aegoroff/dirstat/internal/out -covermode=atomic github.com/aegoroff/dirstat/...
+      run: |
+        mkdir _icoverdir_
+        go test -coverprofile=coverage.txt -coverpkg github.com/aegoroff/dirstat/internal/cmd,github.com/aegoroff/dirstat/scan,github.com/aegoroff/dirstat/internal/module,github.com/aegoroff/dirstat/internal/out -covermode=atomic github.com/aegoroff/dirstat/...
 
     - name: Test
       if: matrix.build != 'linux'
