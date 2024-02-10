@@ -48,7 +48,7 @@ jobs:
       if: matrix.build == 'linux'
       run: |
         mkdir _icoverdir_
-        go test -coverprofile=coverage.txt -coverpkg github.com/aegoroff/dirstat/internal/cmd,github.com/aegoroff/dirstat/scan,github.com/aegoroff/dirstat/internal/module,github.com/aegoroff/dirstat/internal/out -covermode=atomic github.com/aegoroff/dirstat/...
+        go test -cover -coverprofile=coverage.txt -coverpkg github.com/aegoroff/dirstat/internal/cmd,github.com/aegoroff/dirstat/scan,github.com/aegoroff/dirstat/internal/module,github.com/aegoroff/dirstat/internal/out -covermode=atomic ./...
 
     - name: Test
       if: matrix.build != 'linux'
