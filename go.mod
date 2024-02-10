@@ -1,6 +1,6 @@
 module github.com/aegoroff/dirstat
 
-go 1.18
+go 1.22
 
 require (
 	github.com/aegoroff/godatastruct v1.3.0
