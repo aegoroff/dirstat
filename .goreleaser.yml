@@ -58,7 +58,7 @@ archives:
 brews:
 -
     goarm: 7
-    tap:
+    repository:
       owner: aegoroff
       name: homebrew-tap
     commit_author:
@@ -70,13 +70,14 @@ brews:
     description: "Small tool that shows selected folder or drive (on Windows) usage statistic"
     license: "Apache-2.0"
 
-scoop:
-  bucket:
-    owner: aegoroff
-    name: scoop-bucket
-  homepage:  https://github.com/aegoroff/dirstat
-  description: Small tool that shows selected folder or drive (on Windows) usage statistic
-  license: Apache-2.0
+scoops:
+  -
+    repository:
+      owner: aegoroff
+      name: scoop-bucket
+    homepage:  https://github.com/aegoroff/dirstat
+    description: Small tool that shows selected folder or drive (on Windows) usage statistic
+    license: Apache-2.0
 
 nfpms:
   -
