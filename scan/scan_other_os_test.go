@@ -1,14 +1,14 @@
-// +build windows darwin
+//go:build windows || darwin
 
 package scan
 
 import (
+	"testing"
+
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
-
 
 func Test_SkipTest(t *testing.T) {
 	// Arrange
@@ -18,8 +18,8 @@ func Test_SkipTest(t *testing.T) {
 	_ = afero.WriteFile(fs, "/proc/f.txt", []byte("123"), 0644)
 
 	th := testHandler{
-		fipaths: make(c9s.StringHashSet),
-		fopaths: make(c9s.StringHashSet),
+		fipaths: make(c9s.HashSet[string]),
+		fopaths: make(c9s.HashSet[string]),
 		fp:      make([]string, 0),
 	}
 

@@ -3,12 +3,13 @@ package scan
 import (
 	"errors"
 	"fmt"
-	c9s "github.com/aegoroff/godatastruct/collections"
-	"github.com/spf13/afero"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"path/filepath"
 	"testing"
+
+	c9s "github.com/aegoroff/godatastruct/collections"
+	"github.com/spf13/afero"
+	"github.com/stretchr/testify/assert"
 )
 
 type filesystem struct {
@@ -26,8 +27,8 @@ func (f *filesystem) Open(path string) (File, error) {
 type testHandler struct {
 	folders int
 	files   int
-	fipaths c9s.StringHashSet
-	fopaths c9s.StringHashSet
+	fipaths c9s.HashSet[string]
+	fopaths c9s.HashSet[string]
 	fp      []string
 }
 
@@ -53,8 +54,8 @@ func Test_Scan(t *testing.T) {
 	_ = afero.WriteFile(fs, "/f/s/f.txt", []byte("1234"), 0644)
 
 	th := testHandler{
-		fipaths: make(c9s.StringHashSet),
-		fopaths: make(c9s.StringHashSet),
+		fipaths: make(c9s.HashSet[string]),
+		fopaths: make(c9s.HashSet[string]),
 		fp:      make([]string, 0),
 	}
 
@@ -72,8 +73,8 @@ func Test_Scan_ManyData(t *testing.T) {
 	fs := afero.NewMemMapFs()
 
 	th := testHandler{
-		fipaths: make(c9s.StringHashSet),
-		fopaths: make(c9s.StringHashSet),
+		fipaths: make(c9s.HashSet[string]),
+		fopaths: make(c9s.HashSet[string]),
 		fp:      make([]string, 0),
 	}
 
@@ -149,8 +150,8 @@ func Test_Scan_OpenErrorsHandling(t *testing.T) {
 			ass := assert.New(t)
 
 			th := testHandler{
-				fipaths: make(c9s.StringHashSet),
-				fopaths: make(c9s.StringHashSet),
+				fipaths: make(c9s.HashSet[string]),
+				fopaths: make(c9s.HashSet[string]),
 				fp:      make([]string, 0),
 			}
 
