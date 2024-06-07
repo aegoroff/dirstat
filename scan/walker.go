@@ -25,7 +25,7 @@ func newWalker(fs Filesystem, parallel int) *walker {
 	return bf
 }
 
-var linuxPrefixesToSkip = []string  {
+var linuxPrefixesToSkip = []string{
 	"/proc",
 	"/dev",
 }
