@@ -23,7 +23,7 @@ builds:
       - windows
       - freebsd
     goarch:
-      - 386
+      - "386"
 
   - id: "arm"
     binary: dirstat
@@ -34,7 +34,7 @@ builds:
     goarch:
       - arm
     goarm:
-      - 7
+      - "7"
 
   - id: "arm64"
     binary: dirstat
@@ -53,11 +53,11 @@ archives:
       - x64
       - arm
       - arm64
-      - 386
+      - "386"
 
 brews:
 -
-    goarm: 7
+    goarm: "7"
     repository:
       owner: aegoroff
       name: homebrew-tap
