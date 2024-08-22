@@ -28,6 +28,7 @@ func newWalker(fs Filesystem, parallel int) *walker {
 var linuxPrefixesToSkip = []string{
 	"/proc",
 	"/dev",
+	"/sys",
 }
 
 func (bf *walker) dequeue() string {
