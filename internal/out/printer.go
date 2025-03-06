@@ -11,11 +11,11 @@ func NewPrinter(pe PrintEnvironment) Printer {
 	return &prn{env: pe}
 }
 
-func (r *prn) Cprint(format string, a ...interface{}) {
+func (r *prn) Cprint(format string, a ...any) {
 	r.env.PrintFunc(r.env.Writer(), format, a...)
 }
 
-func (r *prn) Sprintf(format string, a ...interface{}) string {
+func (r *prn) Sprintf(format string, a ...any) string {
 	return r.env.SprintFunc(format, a...)
 }
 

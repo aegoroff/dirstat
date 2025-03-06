@@ -82,7 +82,7 @@ func (m *topFilesRenderer) render(p out.Printer) {
 			return
 		}
 
-		tw.addRow([]interface{}{
+		tw.addRow([]any{
 			i,
 			file.String(),
 			file.size,
@@ -94,6 +94,6 @@ func (m *topFilesRenderer) render(p out.Printer) {
 	tw.render()
 }
 
-func (m *topFilesRenderer) decoratePathOrName(val interface{}) string {
+func (m *topFilesRenderer) decoratePathOrName(val any) string {
 	return m.pd.decorate(val.(string))
 }

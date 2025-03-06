@@ -10,10 +10,10 @@ type PrintEnvironment interface {
 	Writable
 
 	// PrintFunc represents printing function implementation
-	PrintFunc(w io.Writer, format string, a ...interface{})
+	PrintFunc(w io.Writer, format string, a ...any)
 
 	// SprintFunc represents printing to string function implementation
-	SprintFunc(format string, a ...interface{}) string
+	SprintFunc(format string, a ...any) string
 
 	// NewPrinter creates new printer
 	NewPrinter() (Printer, error)
@@ -29,9 +29,9 @@ type StringEnvironment interface {
 type Printer interface {
 	Writable
 	// Cprint prints data with colorizing support
-	Cprint(format string, a ...interface{})
+	Cprint(format string, a ...any)
 	// Sprintf writes formatted string into another and do cleanup if necessary
-	Sprintf(format string, a ...interface{}) string
+	Sprintf(format string, a ...any) string
 	// Println prints new line
 	Println()
 }

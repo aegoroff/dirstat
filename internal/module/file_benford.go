@@ -107,7 +107,7 @@ func (b *benfordFileRenderer) render(p out.Printer) {
 			deviation = float64(diff) / float64(ideal)
 		}
 
-		tw.addRow([]interface{}{
+		tw.addRow([]any{
 			i,
 			count,
 			percentOfCount,

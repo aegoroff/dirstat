@@ -1,8 +1,9 @@
 package out
 
 import (
-	"github.com/spf13/afero"
 	"io"
+
+	"github.com/spf13/afero"
 )
 
 type fileEnvironment struct {
@@ -37,11 +38,11 @@ func (e *fileEnvironment) NewPrinter() (Printer, error) {
 	return NewPrinter(e), nil
 }
 
-func (e *fileEnvironment) PrintFunc(w io.Writer, format string, a ...interface{}) {
+func (e *fileEnvironment) PrintFunc(w io.Writer, format string, a ...any) {
 	e.base.PrintFunc(w, format, a...)
 }
 
-func (e *fileEnvironment) SprintFunc(format string, a ...interface{}) string {
+func (e *fileEnvironment) SprintFunc(format string, a ...any) string {
 	return e.base.SprintFunc(format, a...)
 }
 

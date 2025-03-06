@@ -42,7 +42,7 @@ func (t *tableWriter) addRow(row table.Row, configs ...table.RowConfig) {
 	t.tab.AppendRow(row, configs...)
 }
 
-func (t *tableWriter) percentTransformer(val interface{}) string {
+func (t *tableWriter) percentTransformer(val any) string {
 	v := val.(float64)
 	if v >= 90.0 {
 		return t.p.Sprintf("<red>%.2f%%</>", v)
@@ -53,7 +53,7 @@ func (t *tableWriter) percentTransformer(val interface{}) string {
 	return t.p.Sprintf("%.2f%%", v)
 }
 
-func (*tableWriter) sizeTransformer(val interface{}) string {
+func (*tableWriter) sizeTransformer(val any) string {
 	szu, ok := val.(uint64)
 	if ok {
 		return humanize.IBytes(szu)
@@ -65,7 +65,7 @@ func (*tableWriter) sizeTransformer(val interface{}) string {
 	return ""
 }
 
-func (*tableWriter) countTransformer(val interface{}) string {
+func (*tableWriter) countTransformer(val any) string {
 	sz := val.(int64)
 	return humanize.Comma(sz)
 }

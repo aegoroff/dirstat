@@ -1,8 +1,9 @@
 package module
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRange_Floor(t *testing.T) {
@@ -204,7 +205,7 @@ func Test_percent(t *testing.T) {
 
 func Test_TableWriter_sizeTransformer(t *testing.T) {
 	var tests = []struct {
-		val      interface{}
+		val      any
 		expected string
 	}{
 		{int64(10), "10 B"},

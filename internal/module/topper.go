@@ -26,7 +26,7 @@ func (t *topper) ascend(tree rbtree.RbTree) {
 	t.print(rbtree.NewAscend(tree))
 }
 
-func (t *topper) decoratePathOrName(val interface{}) string {
+func (t *topper) decoratePathOrName(val any) string {
 	return t.pd.decorate(val.(string))
 }
 
@@ -60,7 +60,7 @@ func (t *topper) print(e rbtree.Enumerable) {
 		percentOfCount := t.total.countPercent(count)
 		percentOfSize := t.total.sizePercent(sz)
 
-		tw.addRow([]interface{}{
+		tw.addRow([]any{
 			i,
 			fi.String(),
 			count,

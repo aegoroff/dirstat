@@ -1,9 +1,10 @@
 package out
 
 import (
-	"github.com/gookit/color"
 	"io"
 	"os"
+
+	"github.com/gookit/color"
 )
 
 type consoleEnvironment struct {
@@ -31,11 +32,11 @@ func (e *consoleEnvironment) NewPrinter() (Printer, error) {
 	return NewPrinter(e), nil
 }
 
-func (*consoleEnvironment) PrintFunc(w io.Writer, format string, a ...interface{}) {
+func (*consoleEnvironment) PrintFunc(w io.Writer, format string, a ...any) {
 	color.Fprintf(w, format, a...)
 }
 
-func (*consoleEnvironment) SprintFunc(format string, a ...interface{}) string {
+func (*consoleEnvironment) SprintFunc(format string, a ...any) string {
 	return color.Sprintf(format, a...)
 }
 
