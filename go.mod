@@ -1,6 +1,8 @@
 module github.com/aegoroff/dirstat
 
-go 1.22
+go 1.23.0
+
+toolchain go1.24.0
 
 require (
 	github.com/aegoroff/godatastruct v1.4.1
@@ -9,10 +11,10 @@ require (
 	github.com/jedib0t/go-pretty/v6 v6.6.7
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
-	github.com/spf13/afero v1.12.0
+	github.com/spf13/afero v1.14.0
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/text v0.22.0 // indirect
+	golang.org/x/text v0.23.0 // indirect
 )
 
 require (
