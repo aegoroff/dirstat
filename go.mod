@@ -8,7 +8,7 @@ require (
 	github.com/aegoroff/godatastruct v1.4.1
 	github.com/dustin/go-humanize v1.0.1
 	github.com/gookit/color v1.6.0
-	github.com/jedib0t/go-pretty/v6 v6.6.8
+	github.com/jedib0t/go-pretty/v6 v6.6.9
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/spf13/afero v1.15.0
