@@ -9,25 +9,27 @@ jobs:
   goreleaser:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v4
+      - name: Query version number
+        id: get_version
+        shell: bash
+        run: |
+          echo "using version tag ${GITHUB_REF:11}"
+          echo "version=${GITHUB_REF:11}" >> $GITHUB_OUTPUT
+      - name: Checkout
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      -
-        name: Set up Go
+      - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version: "1.23"
-      -
-        name: Import GPG key
+      - name: Import GPG key
         id: import_gpg
         uses: crazy-max/ghaction-import-gpg@v6
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
-      -
-        name: Run GoReleaser
+      - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
@@ -37,3 +39,11 @@ jobs:
           CGO_ENABLED: 0
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
+      - name: Publish dirstat-go-bin
+        uses: zokugun/github-actions-aur-releaser@v1
+        with:
+          package_name: dirstat-go-bin
+          aur_private_key: ${{ secrets.AUR_PRIVATE_KEY }}
+          aur_username: ${{ secrets.AUR_USERNAME }}
+          aur_email: ${{ secrets.AUR_EMAIL }}
+          package_version: ${{ steps.get_version.outputs.VERSION }}
