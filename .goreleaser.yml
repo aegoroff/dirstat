@@ -1,3 +1,5 @@
+version: 2
+
 env:
   - GO111MODULE=on
 before:
@@ -49,7 +51,7 @@ builds:
 
 archives:
   - id: default
-    builds:
+    ids:
       - x64
       - arm
       - arm64
@@ -98,4 +100,4 @@ signs:
 checksum:
   name_template: "checksums.txt"
 snapshot:
-  name_template: "{{ .Tag }}"
+  version_template: "{{ .Tag }}"
