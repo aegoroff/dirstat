@@ -29,12 +29,20 @@ jobs:
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
+      - name: Generate a changelog
+        uses: orhun/git-cliff-action@main
+        id: git-cliff
+        with:
+          config: cliff.toml
+          args: --latest --strip header
+        env:
+          OUTPUT: CHANGELOG.md
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
           version: latest
-          args: release --clean
+          args: release --clean --release-notes=CHANGELOG.md
         env:
           CGO_ENABLED: 0
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
