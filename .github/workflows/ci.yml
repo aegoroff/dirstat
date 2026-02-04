@@ -31,14 +31,14 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: "1.23"
+        go-version: "1.24"
       id: go
 
     - name: Install gox
       run: go install github.com/mitchellh/gox@latest
 
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Build
       run: gox -osarch="${{ matrix.build }}/amd64" -ldflags "-s -w -X github.com/aegoroff/dirstat/internal/cmd.Version=v1.0.${{ github.run_number }}-dev" github.com/aegoroff/dirstat
