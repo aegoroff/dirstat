@@ -138,11 +138,12 @@ func Test_Scan_OpenErrorsHandling(t *testing.T) {
 	}
 
 	var tests = []struct {
-		name string
-		efs  Filesystem
+		name    string
+		efs     Filesystem
+		folders int
 	}{
-		{"open error", oefs},
-		{"readdir error", refs},
+		{"open error", oefs, 0},
+		{"readdir error", refs, 1},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -160,7 +161,7 @@ func Test_Scan_OpenErrorsHandling(t *testing.T) {
 
 			// Assert
 			ass.Equal(0, th.files, "Invalid files count")
-			ass.Equal(0, th.folders, "Invalid folders count")
+			ass.Equal(test.folders, th.folders, "Invalid folders count")
 		})
 	}
 }

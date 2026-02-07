@@ -54,41 +54,61 @@ func (bf *walker) len() int {
 func (bf *walker) walk(d string, results chan<- *filesystemItem) {
 	defer bf.wg.Done()
 
-	entries, err := bf.open(d)
-	if err != nil {
-		return
-	}
-
-	// Folder stat
+	// Process directory entries in chunks to reduce memory usage
+	const chunkSize = 128
 	var count int64
 	var size int64
 
-	for _, entry := range entries {
-		m := entry.Mode()
-		// Skip symlinks
-		if m&os.ModeSymlink != 0 {
-			continue
+	// Open directory
+	defer bf.releaseRestrict()
+	f, err := bf.fs.Open(d)
+	if err != nil {
+		return
+	}
+	defer Close(f)
+
+	// Process directory entries in chunks
+	for {
+		entries, err := f.Readdir(chunkSize)
+		if err != nil {
+			// Even if we have an error, we still need to send the directory event
+			// to maintain consistency in the event stream
+			break
 		}
 
-		path := filepath.Join(d, entry.Name())
-		if bf.skip(path) {
-			continue
-		}
-		// Queue subdirs to walk in a queue
-		if m.IsDir() {
-			bf.enqueue(path)
-		} else if m.IsRegular() {
-			// Send to channel
-			fileEvent := filesystemItem{
-				path:  path,
-				event: fsEventFile,
-				size:  entry.Size(),
+		// Process chunk of entries
+		for _, entry := range entries {
+			m := entry.Mode()
+			// Skip symlinks
+			if m&os.ModeSymlink != 0 {
+				continue
 			}
-			results <- &fileEvent
 
-			// update folder stat
-			count++
-			size += fileEvent.size
+			path := filepath.Join(d, entry.Name())
+			if bf.skip(path) {
+				continue
+			}
+			// Queue subdirs to walk in a queue
+			if m.IsDir() {
+				bf.enqueue(path)
+			} else if m.IsRegular() {
+				// Send to channel
+				fileEvent := filesystemItem{
+					path:  path,
+					event: fsEventFile,
+					size:  entry.Size(),
+				}
+				results <- &fileEvent
+
+				// update folder stat
+				count++
+				size += fileEvent.size
+			}
+		}
+
+		// If we got less than chunkSize entries, we've reached the end of directory
+		if len(entries) < chunkSize {
+			break
 		}
 	}
 
@@ -132,15 +152,4 @@ func (bf *walker) start() {
 
 func (bf *walker) wait() {
 	bf.wg.Wait()
-}
-
-func (bf *walker) open(path string) ([]os.FileInfo, error) {
-	defer bf.releaseRestrict()
-	f, err := bf.fs.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer Close(f)
-
-	return f.Readdir(-1)
 }
