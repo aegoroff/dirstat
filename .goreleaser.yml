@@ -48,7 +48,6 @@ builds:
     goarch:
       - arm64
 
-
 archives:
   - id: default
     ids:
@@ -58,8 +57,7 @@ archives:
       - "386"
 
 brews:
--
-    goarm: "7"
+  - goarm: "7"
     repository:
       owner: aegoroff
       name: homebrew-tap
@@ -73,21 +71,19 @@ brews:
     license: "Apache-2.0"
 
 scoops:
-  -
-    repository:
+  - repository:
       owner: aegoroff
       name: scoop-bucket
-    homepage:  https://github.com/aegoroff/dirstat
+    homepage: https://github.com/aegoroff/dirstat
     description: Small tool that shows selected folder or drive (on Windows) usage statistic
     license: Apache-2.0
 
 nfpms:
-  -
-    package_name: dirstat
+  - package_name: dirstat
     homepage: https://github.com/aegoroff/dirstat
     maintainer: Alexander Egorov <egoroff@gmail.com>
     description: Small tool that shows selected folder or drive (on Windows) usage statistic
-    license: MIT
+    license: Apache-2.0
     bindir: /usr/bin
     formats:
       - deb
@@ -95,7 +91,16 @@ nfpms:
 
 signs:
   - artifacts: checksum
-    args: ["--batch", "-u", "{{ .Env.GPG_FINGERPRINT }}", "--output", "${signature}", "--detach-sign", "${artifact}"]
+    args:
+      [
+        "--batch",
+        "-u",
+        "{{ .Env.GPG_FINGERPRINT }}",
+        "--output",
+        "${signature}",
+        "--detach-sign",
+        "${artifact}",
+      ]
 
 checksum:
   name_template: "checksums.txt"
