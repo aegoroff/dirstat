@@ -71,17 +71,8 @@ func (bf *walker) walk(d string, results chan<- *filesystemItem) {
 		}
 
 		path := filepath.Join(d, entry.Name())
-		if runtime.GOOS == "linux" {
-			skip := false
-			for _, prefix := range linuxPrefixesToSkip {
-				skip = strings.HasPrefix(path, prefix)
-				if skip {
-					break
-				}
-			}
-			if skip {
-				continue
-			}
+		if bf.skip(path) {
+			continue
 		}
 		// Queue subdirs to walk in a queue
 		if m.IsDir() {
@@ -108,6 +99,18 @@ func (bf *walker) walk(d string, results chan<- *filesystemItem) {
 		size:  size,
 	}
 	results <- &dirEvent
+}
+
+func (bf *walker) skip(path string) bool {
+	if runtime.GOOS != "linux" {
+		return false
+	}
+	for _, prefix := range linuxPrefixesToSkip {
+		if strings.HasPrefix(path, prefix) {
+			return true
+		}
+	}
+	return false
 }
 
 func (bf *walker) acquireRestrict() {
