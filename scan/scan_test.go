@@ -78,7 +78,7 @@ func Test_Scan_ManyData(t *testing.T) {
 		fp:      make([]string, 0),
 	}
 
-	for i := 0; i < 1000; i++ {
+	for i := range 1000 {
 		b := fmt.Sprintf("/f%d", i)
 		c := filepath.Join(b, "s")
 		th.fopaths.Add(b)
