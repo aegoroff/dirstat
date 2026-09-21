@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/aegoroff/godatastruct v1.5.0
-	github.com/dustin/go-humanize v1.0.1
+	github.com/dustin/go-humanize v1.1.0
 	github.com/gookit/color v1.6.1
 	github.com/jedib0t/go-pretty/v6 v6.8.3
 	github.com/mattn/go-runewidth v0.0.16 // indirect
