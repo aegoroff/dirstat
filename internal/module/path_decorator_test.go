@@ -15,7 +15,7 @@ func Test_PathDecorator(t *testing.T) {
 		d      decorator
 		result string
 	}{
-		{"remove root", &removeRootDecorator{root: root}, "/local"},
+		{"remove root", &removeRootDecorator{root: root}, filepath.FromSlash("/local")},
 		{"dont change", &noChangeDecorator{}, "/usr/local"},
 	}
 
