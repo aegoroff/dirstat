@@ -40,8 +40,6 @@ func Test_PositiveTests(t *testing.T) {
 		{"fo /", []string{"fo", "/"}, "TOP \\d+ folders by size"},
 		{"ver", []string{"ver"}, Version},
 		{"nothing", []string{}, ""},
-		{"fi :", []string{"fi", ":"}, ""},
-		{"fi nothing", []string{"fi", ""}, ""},
 		{"a / -p /res", []string{"a", "/", "-p", "/res"}, ""},
 	}
 
@@ -94,16 +92,33 @@ func Test_NoCmdOptionSetTest(t *testing.T) {
 }
 
 func Test_NegativeCmdTest(t *testing.T) {
-	// Arrange
-	ass := assert.New(t)
-	appFS := afero.NewMemMapFs()
-	w := out.NewMemoryEnvironment()
+	var tests = []struct {
+		name    string
+		cmdline []string
+	}{
+		{"unknown command", []string{"x"}},
+		{"fi :", []string{"fi", ":"}},
+		{"fi nothing", []string{"fi", ""}},
+		{"not existing path", []string{"a", "/nonexistent"}},
+		{"not existing path with output", []string{"a", "/nonexistent", "-p", "/res"}},
+	}
 
-	// Act
-	err := Execute(appFS, w, "x")
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// Arrange
+			ass := assert.New(t)
+			appFS := afero.NewMemMapFs()
+			w := out.NewMemoryEnvironment()
 
-	// Assert
-	ass.Error(err)
+			// Act
+			err := Execute(appFS, w, test.cmdline...)
+
+			// Assert
+			ass.Error(err)
+			exists, _ := afero.Exists(appFS, "/res")
+			ass.False(exists, "output file must not be created")
+		})
+	}
 }
 
 func Test_ErrorToCreateOutputFile_Test(t *testing.T) {

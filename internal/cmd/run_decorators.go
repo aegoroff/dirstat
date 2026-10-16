@@ -5,8 +5,6 @@ import (
 	"github.com/aegoroff/dirstat/internal/out"
 	"github.com/dustin/go-humanize"
 	"github.com/spf13/afero"
-	"os"
-	"path/filepath"
 	"runtime"
 	"time"
 )
@@ -25,19 +23,8 @@ func newTimeMeasureR(wrapped runner) runner {
 	}
 }
 
-func newPathCorrectionR(wrapped runner) runner {
+func newPrintRootR(wrapped runner) runner {
 	return func(path string, fs afero.Fs, p out.Printer, modules ...module.Module) {
-		if len(path) == 0 {
-			return
-		}
-		if (path)[len(path)-1] == ':' {
-			path = filepath.Join(path, string(os.PathSeparator))
-		}
-
-		if _, err := fs.Stat(path); os.IsNotExist(err) {
-			return
-		}
-
 		p.Cprint("Root: <red>%s</>\n\n", path)
 
 		wrapped(path, fs, p, modules...)

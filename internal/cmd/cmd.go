@@ -1,6 +1,10 @@
 package cmd
 
 import (
+	"fmt"
+	"os"
+	"path/filepath"
+
 	"github.com/aegoroff/dirstat/internal/module"
 	"github.com/aegoroff/dirstat/scan"
 	"github.com/spf13/cobra"
@@ -24,19 +28,35 @@ func newBaseCmd(c conf, path string) *baseCommand {
 		c:          c,
 		top:        *c.globals().top,
 		removeRoot: *c.globals().removeRoot,
-		path:       path,
+		path:       correctPath(path),
 	}
 }
 
+// correctPath turns Windows drive designator like "C:" into drive root "C:\"
+func correctPath(path string) string {
+	if len(path) > 0 && path[len(path)-1] == ':' {
+		return filepath.Join(path, string(os.PathSeparator))
+	}
+	return path
+}
+
 func (b *baseCommand) run(modules ...module.Module) error {
+	if b.path == "" {
+		return fmt.Errorf("path must not be empty")
+	}
+
+	c := b.c
+	if _, err := c.fs().Stat(b.path); err != nil {
+		return err
+	}
+
 	var r runner
 	{
 		r = module.Execute
 		r = newTimeMeasureR(r)
-		r = newPathCorrectionR(r)
+		r = newPrintRootR(r)
 	}
 
-	c := b.c
 	p, err := c.env().NewPrinter()
 	if err != nil {
 		return err
@@ -63,6 +83,8 @@ type cobraCreator struct {
 func (c *cobraCreator) runE() cobraRunSignature {
 	return func(cmd *cobra.Command, args []string) error {
 		if len(args) > 0 {
+			// Errors from here on are runtime ones, not usage mistakes
+			cmd.SilenceUsage = true
 			return c.createCmd(args[0]).execute()
 		}
 		return cmd.Help()
