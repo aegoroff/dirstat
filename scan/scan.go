@@ -91,10 +91,8 @@ func newFileEntry(item *filesystemItem) *FileEntry {
 
 func newFolderEntry(item *filesystemItem) *FolderEntry {
 	return &FolderEntry{
-		FileEntry: FileEntry{
-			Size: item.size,
-			Path: item.path,
-		},
+		Size:  item.size,
+		Path:  item.path,
 		Count: item.count,
 	}
 }

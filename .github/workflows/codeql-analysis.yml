@@ -35,7 +35,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v7
       with:
-        go-version: "1.24"
+        go-version: "1.27"
       id: go
 
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
