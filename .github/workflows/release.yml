@@ -16,16 +16,16 @@ jobs:
           echo "using version tag ${GITHUB_REF:11}"
           echo "version=${GITHUB_REF:11}" >> $GITHUB_OUTPUT
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
           go-version: "1.24"
       - name: Import GPG key
         id: import_gpg
-        uses: crazy-max/ghaction-import-gpg@v6
+        uses: crazy-max/ghaction-import-gpg@v7
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
@@ -38,7 +38,7 @@ jobs:
         env:
           OUTPUT: CHANGELOG.md
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v6
+        uses: goreleaser/goreleaser-action@v7
         with:
           distribution: goreleaser
           version: latest
