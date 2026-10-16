@@ -1,8 +1,10 @@
 package module
 
 import (
-	"github.com/stretchr/testify/assert"
+	"path/filepath"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_PathDecorator(t *testing.T) {
@@ -27,6 +29,36 @@ func Test_PathDecorator(t *testing.T) {
 
 			// Assert
 			ass.Equal(test.result, decorated)
+		})
+	}
+}
+
+func Test_RemoveRootDecorator_NotCleanRoot(t *testing.T) {
+	var tests = []struct {
+		root   string
+		path   string
+		result string
+	}{
+		{"./", filepath.Join("./", "a"), "/a"},
+		{"./", filepath.Join("./", "sub"), "/sub"},
+		{"./", "./", ""},
+		{".", filepath.Join(".", ".hidden"), "/.hidden"},
+		{"/usr/", filepath.Join("/usr/", "local"), "/local"},
+		{"/usr/", "/usr/", ""},
+		{"../x", filepath.Join("../x", "y"), "/y"},
+	}
+
+	for _, test := range tests {
+		t.Run(test.root+" "+test.path, func(t *testing.T) {
+			// Arrange
+			ass := assert.New(t)
+			ctx := NewContext(10, true, test.root)
+
+			// Act
+			decorated := ctx.pd.decorate(test.path)
+
+			// Assert
+			ass.Equal(filepath.FromSlash(test.result), decorated)
 		})
 	}
 }

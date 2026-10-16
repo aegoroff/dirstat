@@ -1,6 +1,10 @@
 package module
 
-import "github.com/aegoroff/godatastruct/rbtree"
+import (
+	"path/filepath"
+
+	"github.com/aegoroff/godatastruct/rbtree"
+)
 
 // Context defines modules context
 type Context struct {
@@ -18,7 +22,7 @@ func NewContext(top int, rr bool, root string) *Context {
 	var pd decorator
 
 	if rr {
-		pd = &removeRootDecorator{root: root}
+		pd = &removeRootDecorator{root: filepath.Clean(root)}
 	} else {
 		pd = &noChangeDecorator{}
 	}
