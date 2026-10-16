@@ -1,7 +1,6 @@
 # dirstat
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/893418f314cf44cc8123c2c28e4e2f9d)](https://app.codacy.com/gh/aegoroff/dirstat/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade) [![codecov](https://codecov.io/gh/aegoroff/dirstat/branch/master/graph/badge.svg)](https://codecov.io/gh/aegoroff/dirstat)
-[![Go Report Card](https://goreportcard.com/badge/github.com/aegoroff/dirstat)](https://goreportcard.com/report/github.com/aegoroff/dirstat)
 [![CI](https://github.com/aegoroff/dirstat/actions/workflows/ci.yml/badge.svg)](https://github.com/aegoroff/dirstat/actions/workflows/ci.yml)
 [![](https://tokei.rs/b1/github/aegoroff/dirstat?category=code)](https://github.com/XAMPPRocky/tokei)
 
