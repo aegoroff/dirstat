@@ -3,6 +3,7 @@ package scan
 import (
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"testing"
@@ -185,4 +186,48 @@ func (t *testFile) Readdir(_ int) ([]os.FileInfo, error) {
 
 func (e *testFs) Open(_ string) (File, error) {
 	return e.f, e.err
+}
+
+// chunkedFile returns directory entries one by one i.e. fewer than requested
+// before the end of directory as os.File does when a file vanishes during reading
+type chunkedFile struct {
+	entries []os.FileInfo
+}
+
+func (*chunkedFile) Close() error { return nil }
+
+func (c *chunkedFile) Readdir(_ int) ([]os.FileInfo, error) {
+	if len(c.entries) == 0 {
+		return nil, io.EOF
+	}
+	top := c.entries[:1]
+	c.entries = c.entries[1:]
+	return top, nil
+}
+
+func Test_Scan_ShortReaddirChunks(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	memfs := afero.NewMemMapFs()
+	var entries []os.FileInfo
+	for i := range 3 {
+		p := fmt.Sprintf("/f%d.txt", i)
+		_ = afero.WriteFile(memfs, p, []byte("123"), 0644)
+		fi, _ := memfs.Stat(p)
+		entries = append(entries, fi)
+	}
+	efs := &testFs{f: &chunkedFile{entries: entries}}
+
+	th := testHandler{
+		fipaths: make(c9s.HashSet[string]),
+		fopaths: make(c9s.HashSet[string]),
+		fp:      make([]string, 0),
+	}
+
+	// Act
+	Scan("/", efs, &th)
+
+	// Assert
+	ass.Equal(3, th.files)
+	ass.Equal(1, th.folders)
 }

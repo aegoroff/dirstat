@@ -69,12 +69,11 @@ func (bf *walker) walk(d string, results chan<- *filesystemItem) {
 
 	// Process directory entries in chunks
 	for {
+		// Readdir may return fewer entries than requested before the end of
+		// the directory (e.g. a file vanished between readdir and lstat),
+		// so read until an error (io.EOF at the end of directory) occurs.
+		// Entries returned together with an error are processed as well.
 		entries, err := f.Readdir(chunkSize)
-		if err != nil {
-			// Even if we have an error, we still need to send the directory event
-			// to maintain consistency in the event stream
-			break
-		}
 
 		// Process chunk of entries
 		for _, entry := range entries {
@@ -106,8 +105,9 @@ func (bf *walker) walk(d string, results chan<- *filesystemItem) {
 			}
 		}
 
-		// If we got less than chunkSize entries, we've reached the end of directory
-		if len(entries) < chunkSize {
+		if err != nil {
+			// Even if we have an error, we still need to send the directory event
+			// to maintain consistency in the event stream
 			break
 		}
 	}
