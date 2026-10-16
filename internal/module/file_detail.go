@@ -1,6 +1,8 @@
 package module
 
 import (
+	"slices"
+
 	"github.com/aegoroff/dirstat/internal/out"
 	"github.com/aegoroff/dirstat/scan"
 	"github.com/aegoroff/godatastruct/countingsort"
@@ -76,8 +78,7 @@ func (m *detailFileRenderer) render(p out.Printer) {
 
 	keys := m.enabledKeys()
 
-	for i := len(keys) - 1; i >= 0; i-- {
-		k := keys[i]
+	for _, k := range slices.Backward(keys) {
 		r := m.enabled[k]
 		if len(r.files) == 0 {
 			continue
