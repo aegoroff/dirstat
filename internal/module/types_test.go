@@ -128,7 +128,8 @@ func TestRange_Contains(t *testing.T) {
 	}{
 		{"-1", -1, false},
 		{"1", 1, true},
-		{"100", 100, true},
+		{"99", 99, true},
+		{"100", 100, false},
 		{"50", 50, true},
 		{"0", 0, false},
 		{"101", 101, false},

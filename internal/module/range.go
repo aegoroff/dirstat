@@ -56,9 +56,11 @@ func (r *Range) Count() int64 {
 	return r.count
 }
 
-// Contains defines whether the number specified within range
+// Contains defines whether the number specified within range.
+// Range is half-open i.e. Max isn't included into it, so the
+// adjacent ranges don't overlap
 func (r *Range) Contains(num int64) bool {
-	return num >= r.Min && num <= r.Max
+	return num >= r.Min && num < r.Max
 }
 
 func newRanges() rbtree.RbTree {
