@@ -30,3 +30,28 @@ func Test_SkipTest(t *testing.T) {
 	ass.Equal(0, th.files)
 	ass.Equal(1, th.folders)
 }
+
+func Test_SkipOnlyExactSystemFolders(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	fs := afero.NewMemMapFs()
+	_ = fs.MkdirAll("/devel", 0755)
+	_ = fs.MkdirAll("/system", 0755)
+	_ = fs.MkdirAll("/dev/shm", 0755)
+	_ = afero.WriteFile(fs, "/devel/f.txt", []byte("123"), 0644)
+	_ = afero.WriteFile(fs, "/system/f.txt", []byte("123"), 0644)
+	_ = afero.WriteFile(fs, "/dev/shm/f.txt", []byte("123"), 0644)
+
+	th := testHandler{
+		fipaths: make(c9s.HashSet[string]),
+		fopaths: make(c9s.HashSet[string]),
+		fp:      make([]string, 0),
+	}
+
+	// Act
+	Scan("/", newFs(fs), &th)
+
+	// Assert
+	ass.Equal(2, th.files)
+	ass.ElementsMatch([]string{"/", "/devel", "/system"}, th.fp)
+}

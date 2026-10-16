@@ -126,7 +126,7 @@ func (bf *walker) skip(path string) bool {
 		return false
 	}
 	for _, prefix := range linuxPrefixesToSkip {
-		if strings.HasPrefix(path, prefix) {
+		if path == prefix || strings.HasPrefix(path, prefix+"/") {
 			return true
 		}
 	}
