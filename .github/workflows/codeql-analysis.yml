@@ -9,6 +9,11 @@ on:
 jobs:
   CodeQL-Build:
 
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
     # CodeQL runs on ubuntu-latest and windows-latest
     runs-on: ubuntu-latest
 
