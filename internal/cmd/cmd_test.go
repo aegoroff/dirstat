@@ -101,6 +101,8 @@ func Test_NegativeCmdTest(t *testing.T) {
 		{"fi nothing", []string{"fi", ""}},
 		{"not existing path", []string{"a", "/nonexistent"}},
 		{"not existing path with output", []string{"a", "/nonexistent", "-p", "/res"}},
+		{"zero top", []string{"fi", "/", "-t", "0"}},
+		{"negative top", []string{"a", "/", "-t", "-1"}},
 	}
 
 	for _, test := range tests {

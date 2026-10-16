@@ -41,6 +41,10 @@ func correctPath(path string) string {
 }
 
 func (b *baseCommand) run(modules ...module.Module) error {
+	if b.top < 1 {
+		return fmt.Errorf("invalid top value %d: must be greater than zero", b.top)
+	}
+
 	if b.path == "" {
 		return fmt.Errorf("path must not be empty")
 	}
