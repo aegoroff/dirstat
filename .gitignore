@@ -2,3 +2,4 @@
 dist/
 /.idea/
 CHANGELOG.md
+.codegraph/
