@@ -15,7 +15,6 @@ func TestRange_Floor(t *testing.T) {
 		val    int64
 		result int64
 	}{
-		{"-1", -1, 1},
 		{"0", 0, 1},
 		{"1", 1, 1},
 		{"100*kbyte + 10", 100*kbyte + 10, 2},
@@ -45,6 +44,18 @@ func TestRange_Floor(t *testing.T) {
 			ass.True(expect.Key().Equal(r))
 		})
 	}
+}
+
+func TestRange_FloorLessThanMin(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	tree := newRanges()
+
+	// Act
+	_, ok := tree.Floor(&Range{Min: -1, Max: -1})
+
+	// Assert
+	ass.False(ok)
 }
 
 func TestRange_Equal(t *testing.T) {

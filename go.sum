@@ -1,5 +1,5 @@
-github.com/aegoroff/godatastruct v1.5.0 h1:4xG7RwVw6NDil+8Dqkv4+itrl5pHUEsn/QX39nj2GIY=
-github.com/aegoroff/godatastruct v1.5.0/go.mod h1:1623936jaDQtxmJ2P2L/JfX7GjC3+tGz6jp2YYPvjW4=
+github.com/aegoroff/godatastruct v1.6.0 h1:jqK6Ik3ZBl2BYJlNldZXgsSav5eXtOlc76qGqr44nw4=
+github.com/aegoroff/godatastruct v1.6.0/go.mod h1:1623936jaDQtxmJ2P2L/JfX7GjC3+tGz6jp2YYPvjW4=
 github.com/blang/semver v3.5.1+incompatible h1:cQNTCjp13qL8KC3Nbxr/y2Bqb63oX6wdnnjpJbkM4JQ=
 github.com/blang/semver v3.5.1+incompatible/go.mod h1:kRBLl5iJ+tD4TcOOxsy/0fnwebNt5EWlYSAyrTnjyyk=
 github.com/clipperhouse/uax29/v2 v2.7.0 h1:+gs4oBZ2gPfVrKPthwbMzWZDaAFPGYK72F0NJv2v7Vk=

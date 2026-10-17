@@ -3,7 +3,7 @@ module github.com/aegoroff/dirstat
 go 1.27
 
 require (
-	github.com/aegoroff/godatastruct v1.5.0
+	github.com/aegoroff/godatastruct v1.6.0
 	github.com/dustin/go-humanize v1.1.0
 	github.com/gookit/color v1.6.3
 	github.com/jedib0t/go-pretty/v6 v6.8.3
