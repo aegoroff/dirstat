@@ -6,7 +6,7 @@ require (
 	github.com/aegoroff/godatastruct v1.6.0
 	github.com/dustin/go-humanize v1.1.0
 	github.com/gookit/color v1.6.3
-	github.com/jedib0t/go-pretty/v6 v6.9.2
+	github.com/jedib0t/go-pretty/v6 v6.9.3
 	github.com/spf13/afero v1.15.0
 	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.12.1
